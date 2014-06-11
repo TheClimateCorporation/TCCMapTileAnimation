@@ -1,0 +1,486 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		3269A4AD1948EA57003F1AE3 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3269A4AC1948EA57003F1AE3 /* Foundation.framework */; };
+		3269A4AF1948EA57003F1AE3 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3269A4AE1948EA57003F1AE3 /* CoreGraphics.framework */; };
+		3269A4B11948EA57003F1AE3 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3269A4B01948EA57003F1AE3 /* UIKit.framework */; };
+		3269A4B71948EA57003F1AE3 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 3269A4B51948EA57003F1AE3 /* InfoPlist.strings */; };
+		3269A4B91948EA57003F1AE3 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 3269A4B81948EA57003F1AE3 /* main.m */; };
+		3269A4BD1948EA57003F1AE3 /* TCCAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3269A4BC1948EA57003F1AE3 /* TCCAppDelegate.m */; };
+		3269A4C01948EA57003F1AE3 /* Main_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3269A4BE1948EA57003F1AE3 /* Main_iPhone.storyboard */; };
+		3269A4C31948EA57003F1AE3 /* Main_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3269A4C11948EA57003F1AE3 /* Main_iPad.storyboard */; };
+		3269A4C61948EA57003F1AE3 /* TCCViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3269A4C51948EA57003F1AE3 /* TCCViewController.m */; };
+		3269A4C81948EA57003F1AE3 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3269A4C71948EA57003F1AE3 /* Images.xcassets */; };
+		3269A4CF1948EA57003F1AE3 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3269A4CE1948EA57003F1AE3 /* XCTest.framework */; };
+		3269A4D01948EA57003F1AE3 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3269A4AC1948EA57003F1AE3 /* Foundation.framework */; };
+		3269A4D11948EA57003F1AE3 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3269A4B01948EA57003F1AE3 /* UIKit.framework */; };
+		3269A4D91948EA57003F1AE3 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 3269A4D71948EA57003F1AE3 /* InfoPlist.strings */; };
+		3269A4DB1948EA57003F1AE3 /* MapTileAnimationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3269A4DA1948EA57003F1AE3 /* MapTileAnimationTests.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		3269A4D21948EA57003F1AE3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3269A4A11948EA57003F1AE3 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3269A4A81948EA57003F1AE3;
+			remoteInfo = MapTileAnimation;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		3269A4A91948EA57003F1AE3 /* MapTileAnimation.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MapTileAnimation.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3269A4AC1948EA57003F1AE3 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		3269A4AE1948EA57003F1AE3 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		3269A4B01948EA57003F1AE3 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		3269A4B41948EA57003F1AE3 /* MapTileAnimation-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "MapTileAnimation-Info.plist"; sourceTree = "<group>"; };
+		3269A4B61948EA57003F1AE3 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		3269A4B81948EA57003F1AE3 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		3269A4BA1948EA57003F1AE3 /* MapTileAnimation-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "MapTileAnimation-Prefix.pch"; sourceTree = "<group>"; };
+		3269A4BB1948EA57003F1AE3 /* TCCAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TCCAppDelegate.h; sourceTree = "<group>"; };
+		3269A4BC1948EA57003F1AE3 /* TCCAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TCCAppDelegate.m; sourceTree = "<group>"; };
+		3269A4BF1948EA57003F1AE3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPhone.storyboard; sourceTree = "<group>"; };
+		3269A4C21948EA57003F1AE3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPad.storyboard; sourceTree = "<group>"; };
+		3269A4C41948EA57003F1AE3 /* TCCViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TCCViewController.h; sourceTree = "<group>"; };
+		3269A4C51948EA57003F1AE3 /* TCCViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TCCViewController.m; sourceTree = "<group>"; };
+		3269A4C71948EA57003F1AE3 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		3269A4CD1948EA57003F1AE3 /* MapTileAnimationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MapTileAnimationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		3269A4CE1948EA57003F1AE3 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		3269A4D61948EA57003F1AE3 /* MapTileAnimationTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "MapTileAnimationTests-Info.plist"; sourceTree = "<group>"; };
+		3269A4D81948EA57003F1AE3 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		3269A4DA1948EA57003F1AE3 /* MapTileAnimationTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MapTileAnimationTests.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		3269A4A61948EA57003F1AE3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3269A4AF1948EA57003F1AE3 /* CoreGraphics.framework in Frameworks */,
+				3269A4B11948EA57003F1AE3 /* UIKit.framework in Frameworks */,
+				3269A4AD1948EA57003F1AE3 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3269A4CA1948EA57003F1AE3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3269A4CF1948EA57003F1AE3 /* XCTest.framework in Frameworks */,
+				3269A4D11948EA57003F1AE3 /* UIKit.framework in Frameworks */,
+				3269A4D01948EA57003F1AE3 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		3269A4A01948EA57003F1AE3 = {
+			isa = PBXGroup;
+			children = (
+				3269A4B21948EA57003F1AE3 /* MapTileAnimation */,
+				3269A4D41948EA57003F1AE3 /* MapTileAnimationTests */,
+				3269A4AB1948EA57003F1AE3 /* Frameworks */,
+				3269A4AA1948EA57003F1AE3 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		3269A4AA1948EA57003F1AE3 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				3269A4A91948EA57003F1AE3 /* MapTileAnimation.app */,
+				3269A4CD1948EA57003F1AE3 /* MapTileAnimationTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		3269A4AB1948EA57003F1AE3 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				3269A4AC1948EA57003F1AE3 /* Foundation.framework */,
+				3269A4AE1948EA57003F1AE3 /* CoreGraphics.framework */,
+				3269A4B01948EA57003F1AE3 /* UIKit.framework */,
+				3269A4CE1948EA57003F1AE3 /* XCTest.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		3269A4B21948EA57003F1AE3 /* MapTileAnimation */ = {
+			isa = PBXGroup;
+			children = (
+				3269A4BB1948EA57003F1AE3 /* TCCAppDelegate.h */,
+				3269A4BC1948EA57003F1AE3 /* TCCAppDelegate.m */,
+				3269A4BE1948EA57003F1AE3 /* Main_iPhone.storyboard */,
+				3269A4C11948EA57003F1AE3 /* Main_iPad.storyboard */,
+				3269A4C41948EA57003F1AE3 /* TCCViewController.h */,
+				3269A4C51948EA57003F1AE3 /* TCCViewController.m */,
+				3269A4C71948EA57003F1AE3 /* Images.xcassets */,
+				3269A4B31948EA57003F1AE3 /* Supporting Files */,
+			);
+			path = MapTileAnimation;
+			sourceTree = "<group>";
+		};
+		3269A4B31948EA57003F1AE3 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				3269A4B41948EA57003F1AE3 /* MapTileAnimation-Info.plist */,
+				3269A4B51948EA57003F1AE3 /* InfoPlist.strings */,
+				3269A4B81948EA57003F1AE3 /* main.m */,
+				3269A4BA1948EA57003F1AE3 /* MapTileAnimation-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		3269A4D41948EA57003F1AE3 /* MapTileAnimationTests */ = {
+			isa = PBXGroup;
+			children = (
+				3269A4DA1948EA57003F1AE3 /* MapTileAnimationTests.m */,
+				3269A4D51948EA57003F1AE3 /* Supporting Files */,
+			);
+			path = MapTileAnimationTests;
+			sourceTree = "<group>";
+		};
+		3269A4D51948EA57003F1AE3 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				3269A4D61948EA57003F1AE3 /* MapTileAnimationTests-Info.plist */,
+				3269A4D71948EA57003F1AE3 /* InfoPlist.strings */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		3269A4A81948EA57003F1AE3 /* MapTileAnimation */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3269A4DE1948EA57003F1AE3 /* Build configuration list for PBXNativeTarget "MapTileAnimation" */;
+			buildPhases = (
+				3269A4A51948EA57003F1AE3 /* Sources */,
+				3269A4A61948EA57003F1AE3 /* Frameworks */,
+				3269A4A71948EA57003F1AE3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MapTileAnimation;
+			productName = MapTileAnimation;
+			productReference = 3269A4A91948EA57003F1AE3 /* MapTileAnimation.app */;
+			productType = "com.apple.product-type.application";
+		};
+		3269A4CC1948EA57003F1AE3 /* MapTileAnimationTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3269A4E11948EA57003F1AE3 /* Build configuration list for PBXNativeTarget "MapTileAnimationTests" */;
+			buildPhases = (
+				3269A4C91948EA57003F1AE3 /* Sources */,
+				3269A4CA1948EA57003F1AE3 /* Frameworks */,
+				3269A4CB1948EA57003F1AE3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				3269A4D31948EA57003F1AE3 /* PBXTargetDependency */,
+			);
+			name = MapTileAnimationTests;
+			productName = MapTileAnimationTests;
+			productReference = 3269A4CD1948EA57003F1AE3 /* MapTileAnimationTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		3269A4A11948EA57003F1AE3 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				CLASSPREFIX = TCC;
+				LastUpgradeCheck = 0510;
+				ORGANIZATIONNAME = "The Climate Corporation";
+				TargetAttributes = {
+					3269A4CC1948EA57003F1AE3 = {
+						TestTargetID = 3269A4A81948EA57003F1AE3;
+					};
+				};
+			};
+			buildConfigurationList = 3269A4A41948EA57003F1AE3 /* Build configuration list for PBXProject "MapTileAnimation" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 3269A4A01948EA57003F1AE3;
+			productRefGroup = 3269A4AA1948EA57003F1AE3 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				3269A4A81948EA57003F1AE3 /* MapTileAnimation */,
+				3269A4CC1948EA57003F1AE3 /* MapTileAnimationTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		3269A4A71948EA57003F1AE3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3269A4C31948EA57003F1AE3 /* Main_iPad.storyboard in Resources */,
+				3269A4C81948EA57003F1AE3 /* Images.xcassets in Resources */,
+				3269A4C01948EA57003F1AE3 /* Main_iPhone.storyboard in Resources */,
+				3269A4B71948EA57003F1AE3 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3269A4CB1948EA57003F1AE3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3269A4D91948EA57003F1AE3 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		3269A4A51948EA57003F1AE3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3269A4B91948EA57003F1AE3 /* main.m in Sources */,
+				3269A4BD1948EA57003F1AE3 /* TCCAppDelegate.m in Sources */,
+				3269A4C61948EA57003F1AE3 /* TCCViewController.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3269A4C91948EA57003F1AE3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3269A4DB1948EA57003F1AE3 /* MapTileAnimationTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		3269A4D31948EA57003F1AE3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3269A4A81948EA57003F1AE3 /* MapTileAnimation */;
+			targetProxy = 3269A4D21948EA57003F1AE3 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		3269A4B51948EA57003F1AE3 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				3269A4B61948EA57003F1AE3 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		3269A4BE1948EA57003F1AE3 /* Main_iPhone.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				3269A4BF1948EA57003F1AE3 /* Base */,
+			);
+			name = Main_iPhone.storyboard;
+			sourceTree = "<group>";
+		};
+		3269A4C11948EA57003F1AE3 /* Main_iPad.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				3269A4C21948EA57003F1AE3 /* Base */,
+			);
+			name = Main_iPad.storyboard;
+			sourceTree = "<group>";
+		};
+		3269A4D71948EA57003F1AE3 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				3269A4D81948EA57003F1AE3 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		3269A4DC1948EA57003F1AE3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		3269A4DD1948EA57003F1AE3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		3269A4DF1948EA57003F1AE3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "MapTileAnimation/MapTileAnimation-Prefix.pch";
+				INFOPLIST_FILE = "MapTileAnimation/MapTileAnimation-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		3269A4E01948EA57003F1AE3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "MapTileAnimation/MapTileAnimation-Prefix.pch";
+				INFOPLIST_FILE = "MapTileAnimation/MapTileAnimation-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+		3269A4E21948EA57003F1AE3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/MapTileAnimation.app/MapTileAnimation";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "MapTileAnimation/MapTileAnimation-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = "MapTileAnimationTests/MapTileAnimationTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Debug;
+		};
+		3269A4E31948EA57003F1AE3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/MapTileAnimation.app/MapTileAnimation";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "MapTileAnimation/MapTileAnimation-Prefix.pch";
+				INFOPLIST_FILE = "MapTileAnimationTests/MapTileAnimationTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		3269A4A41948EA57003F1AE3 /* Build configuration list for PBXProject "MapTileAnimation" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3269A4DC1948EA57003F1AE3 /* Debug */,
+				3269A4DD1948EA57003F1AE3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3269A4DE1948EA57003F1AE3 /* Build configuration list for PBXNativeTarget "MapTileAnimation" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3269A4DF1948EA57003F1AE3 /* Debug */,
+				3269A4E01948EA57003F1AE3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		3269A4E11948EA57003F1AE3 /* Build configuration list for PBXNativeTarget "MapTileAnimationTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3269A4E21948EA57003F1AE3 /* Debug */,
+				3269A4E31948EA57003F1AE3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 3269A4A11948EA57003F1AE3 /* Project object */;
+}
