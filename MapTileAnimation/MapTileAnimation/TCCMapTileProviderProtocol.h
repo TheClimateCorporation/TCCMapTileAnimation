@@ -14,4 +14,7 @@
 
 - (void) tileProvider: (TCCMapTileProvider *)aProvider didFetchTimeFrameData: (NSData *)theTimeFrameData;
 
+// called by the tile provider to get a base URI (without tile coordinates) for a given time index
+- (NSString *)baseURIForTimeIndex: (NSUInteger)aTimeIndex;
+
 @end

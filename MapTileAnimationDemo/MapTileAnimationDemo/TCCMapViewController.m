@@ -11,6 +11,7 @@
 
 #import "TCCMapTileProviderProtocol.h"
 #import "TCCMapTileProvider.h"
+#import "MKMapView+Extras.h"
 
 #define FUTURE_RADAR_FRAMES_URI "https://qa1-twi.climate.com/assets/wdt-future-radar/LKG.txt?grower_apps=true"
 //#define FUTURE_RADAR_FRAMES_URI "http://climate.com/assets/wdt-future-radar/LKG.txt?grower_apps=true"
@@ -30,8 +31,8 @@
     [super viewDidLoad];
     // Set the starting  location.
     CLLocationCoordinate2D startingLocation;
-    startingLocation.latitude = 38.6272;  //St. Louis, MO
-    startingLocation.longitude = -90.1978;
+    startingLocation.latitude = 35.2269;  //St. Louis, MO
+    startingLocation.longitude = -80.8433;
 	
 	self.mapView.region = MKCoordinateRegionMakeWithDistance(startingLocation, 180000, 180000);
     [self.mapView setCenterCoordinate: startingLocation];
@@ -61,12 +62,25 @@
 		[mapController.mapView addOverlay: tileOverlay];
 	});
 }
+// called by the tile provider to get a base URI (without tile coordinates) for a given time index
+- (NSString *)baseURIForTimeIndex: (NSUInteger)aTimeIndex;
+{
+	return [self.timeFrameParser.timeFrameURLs objectAtIndex: aTimeIndex];
+}
+
 //============================================================
 #pragma mark - MKMapViewDelegate Protocol
 //============================================================
 - (void)mapViewDidFinishRenderingMap:(MKMapView *)mapView fullyRendered:(BOOL)fullyRendered
 {
-	
+	if (fullyRendered == YES) {
+		
+		//start downloading the image tiles for the time frame indexes
+		[self.tileProvider fetchTilesForMapRect: mapView.visibleMapRect zoomScale: [mapView currentZoomScale] timeIndex: 1 completionBlock:^(NSArray *tileArray) {
+			NSArray *array = tileArray;
+		}];
+
+	}
 }
 //============================================================
 - (void)mapView:(MKMapView *)mapView regionDidChangeAnimated:(BOOL)animated
