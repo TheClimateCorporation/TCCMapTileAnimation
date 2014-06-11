@@ -15,13 +15,17 @@
 		3269A4BD1948EA57003F1AE3 /* TCCAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3269A4BC1948EA57003F1AE3 /* TCCAppDelegate.m */; };
 		3269A4C01948EA57003F1AE3 /* Main_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3269A4BE1948EA57003F1AE3 /* Main_iPhone.storyboard */; };
 		3269A4C31948EA57003F1AE3 /* Main_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3269A4C11948EA57003F1AE3 /* Main_iPad.storyboard */; };
-		3269A4C61948EA57003F1AE3 /* TCCViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3269A4C51948EA57003F1AE3 /* TCCViewController.m */; };
+		3269A4C61948EA57003F1AE3 /* TCCMapViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3269A4C51948EA57003F1AE3 /* TCCMapViewController.m */; };
 		3269A4C81948EA57003F1AE3 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3269A4C71948EA57003F1AE3 /* Images.xcassets */; };
 		3269A4CF1948EA57003F1AE3 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3269A4CE1948EA57003F1AE3 /* XCTest.framework */; };
 		3269A4D01948EA57003F1AE3 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3269A4AC1948EA57003F1AE3 /* Foundation.framework */; };
 		3269A4D11948EA57003F1AE3 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3269A4B01948EA57003F1AE3 /* UIKit.framework */; };
 		3269A4D91948EA57003F1AE3 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 3269A4D71948EA57003F1AE3 /* InfoPlist.strings */; };
 		3269A4DB1948EA57003F1AE3 /* MapTileAnimationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3269A4DA1948EA57003F1AE3 /* MapTileAnimationTests.m */; };
+		3269A4E51948EB81003F1AE3 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3269A4E41948EB81003F1AE3 /* MapKit.framework */; };
+		3269A4E91948EFBA003F1AE3 /* TCCMapTileProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 3269A4E81948EFBA003F1AE3 /* TCCMapTileProvider.m */; };
+		3269A4ED1948FBDC003F1AE3 /* TCCMapTile.m in Sources */ = {isa = PBXBuildFile; fileRef = 3269A4EC1948FBDC003F1AE3 /* TCCMapTile.m */; };
+		3269A4F01948FFDC003F1AE3 /* TCCTimeFrameParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 3269A4EF1948FFDC003F1AE3 /* TCCTimeFrameParser.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,14 +51,22 @@
 		3269A4BC1948EA57003F1AE3 /* TCCAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TCCAppDelegate.m; sourceTree = "<group>"; };
 		3269A4BF1948EA57003F1AE3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPhone.storyboard; sourceTree = "<group>"; };
 		3269A4C21948EA57003F1AE3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPad.storyboard; sourceTree = "<group>"; };
-		3269A4C41948EA57003F1AE3 /* TCCViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TCCViewController.h; sourceTree = "<group>"; };
-		3269A4C51948EA57003F1AE3 /* TCCViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TCCViewController.m; sourceTree = "<group>"; };
+		3269A4C41948EA57003F1AE3 /* TCCMapViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TCCMapViewController.h; sourceTree = "<group>"; };
+		3269A4C51948EA57003F1AE3 /* TCCMapViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TCCMapViewController.m; sourceTree = "<group>"; };
 		3269A4C71948EA57003F1AE3 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		3269A4CD1948EA57003F1AE3 /* MapTileAnimationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MapTileAnimationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3269A4CE1948EA57003F1AE3 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		3269A4D61948EA57003F1AE3 /* MapTileAnimationTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "MapTileAnimationTests-Info.plist"; sourceTree = "<group>"; };
 		3269A4D81948EA57003F1AE3 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		3269A4DA1948EA57003F1AE3 /* MapTileAnimationTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MapTileAnimationTests.m; sourceTree = "<group>"; };
+		3269A4E41948EB81003F1AE3 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
+		3269A4E71948EFBA003F1AE3 /* TCCMapTileProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCCMapTileProvider.h; sourceTree = "<group>"; };
+		3269A4E81948EFBA003F1AE3 /* TCCMapTileProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCCMapTileProvider.m; sourceTree = "<group>"; };
+		3269A4EA1948F1ED003F1AE3 /* TCCMapTileProviderProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCCMapTileProviderProtocol.h; sourceTree = "<group>"; };
+		3269A4EB1948FBDC003F1AE3 /* TCCMapTile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCCMapTile.h; sourceTree = "<group>"; };
+		3269A4EC1948FBDC003F1AE3 /* TCCMapTile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCCMapTile.m; sourceTree = "<group>"; };
+		3269A4EE1948FFDC003F1AE3 /* TCCTimeFrameParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCCTimeFrameParser.h; sourceTree = "<group>"; };
+		3269A4EF1948FFDC003F1AE3 /* TCCTimeFrameParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCCTimeFrameParser.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,6 +74,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3269A4E51948EB81003F1AE3 /* MapKit.framework in Frameworks */,
 				3269A4AF1948EA57003F1AE3 /* CoreGraphics.framework in Frameworks */,
 				3269A4B11948EA57003F1AE3 /* UIKit.framework in Frameworks */,
 				3269A4AD1948EA57003F1AE3 /* Foundation.framework in Frameworks */,
@@ -103,6 +116,7 @@
 		3269A4AB1948EA57003F1AE3 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				3269A4E41948EB81003F1AE3 /* MapKit.framework */,
 				3269A4AC1948EA57003F1AE3 /* Foundation.framework */,
 				3269A4AE1948EA57003F1AE3 /* CoreGraphics.framework */,
 				3269A4B01948EA57003F1AE3 /* UIKit.framework */,
@@ -118,8 +132,11 @@
 				3269A4BC1948EA57003F1AE3 /* TCCAppDelegate.m */,
 				3269A4BE1948EA57003F1AE3 /* Main_iPhone.storyboard */,
 				3269A4C11948EA57003F1AE3 /* Main_iPad.storyboard */,
-				3269A4C41948EA57003F1AE3 /* TCCViewController.h */,
-				3269A4C51948EA57003F1AE3 /* TCCViewController.m */,
+				3269A4C41948EA57003F1AE3 /* TCCMapViewController.h */,
+				3269A4C51948EA57003F1AE3 /* TCCMapViewController.m */,
+				3269A4EE1948FFDC003F1AE3 /* TCCTimeFrameParser.h */,
+				3269A4EF1948FFDC003F1AE3 /* TCCTimeFrameParser.m */,
+				3269A4E61948EF77003F1AE3 /* Map Tiles */,
 				3269A4C71948EA57003F1AE3 /* Images.xcassets */,
 				3269A4B31948EA57003F1AE3 /* Supporting Files */,
 			);
@@ -153,6 +170,18 @@
 				3269A4D71948EA57003F1AE3 /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		3269A4E61948EF77003F1AE3 /* Map Tiles */ = {
+			isa = PBXGroup;
+			children = (
+				3269A4EA1948F1ED003F1AE3 /* TCCMapTileProviderProtocol.h */,
+				3269A4E71948EFBA003F1AE3 /* TCCMapTileProvider.h */,
+				3269A4E81948EFBA003F1AE3 /* TCCMapTileProvider.m */,
+				3269A4EB1948FBDC003F1AE3 /* TCCMapTile.h */,
+				3269A4EC1948FBDC003F1AE3 /* TCCMapTile.m */,
+			);
+			path = "Map Tiles";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -254,9 +283,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3269A4F01948FFDC003F1AE3 /* TCCTimeFrameParser.m in Sources */,
+				3269A4E91948EFBA003F1AE3 /* TCCMapTileProvider.m in Sources */,
 				3269A4B91948EA57003F1AE3 /* main.m in Sources */,
 				3269A4BD1948EA57003F1AE3 /* TCCAppDelegate.m in Sources */,
-				3269A4C61948EA57003F1AE3 /* TCCViewController.m in Sources */,
+				3269A4ED1948FBDC003F1AE3 /* TCCMapTile.m in Sources */,
+				3269A4C61948EA57003F1AE3 /* TCCMapViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
