@@ -1,0 +1,515 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		9B49BBC519490A5700094005 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9B49BBC419490A5700094005 /* Foundation.framework */; };
+		9B49BBC719490A5700094005 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9B49BBC619490A5700094005 /* CoreGraphics.framework */; };
+		9B49BBC919490A5700094005 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9B49BBC819490A5700094005 /* UIKit.framework */; };
+		9B49BBCF19490A5700094005 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 9B49BBCD19490A5700094005 /* InfoPlist.strings */; };
+		9B49BBD119490A5700094005 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B49BBD019490A5700094005 /* main.m */; };
+		9B49BBD519490A5700094005 /* TCCAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B49BBD419490A5700094005 /* TCCAppDelegate.m */; };
+		9B49BBD819490A5700094005 /* Main_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9B49BBD619490A5700094005 /* Main_iPhone.storyboard */; };
+		9B49BBDB19490A5700094005 /* Main_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9B49BBD919490A5700094005 /* Main_iPad.storyboard */; };
+		9B49BBE019490A5700094005 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9B49BBDF19490A5700094005 /* Images.xcassets */; };
+		9B49BBE719490A5700094005 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9B49BBE619490A5700094005 /* XCTest.framework */; };
+		9B49BBE819490A5700094005 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9B49BBC419490A5700094005 /* Foundation.framework */; };
+		9B49BBE919490A5700094005 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9B49BBC819490A5700094005 /* UIKit.framework */; };
+		9B49BBF119490A5700094005 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 9B49BBEF19490A5700094005 /* InfoPlist.strings */; };
+		9B49BBF319490A5700094005 /* MapTileAnimationDemoTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B49BBF219490A5700094005 /* MapTileAnimationDemoTests.m */; };
+		9B49BC0019490AAE00094005 /* TCCMapViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B49BBFD19490AAE00094005 /* TCCMapViewController.m */; };
+		9B49BC0119490AAE00094005 /* TCCTimeFrameParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B49BBFF19490AAE00094005 /* TCCTimeFrameParser.m */; };
+		9B49BC5D19490CA500094005 /* TCCMapTile.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B49BC5919490CA500094005 /* TCCMapTile.m */; };
+		9B49BC5E19490CA500094005 /* TCCMapTileProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B49BC5B19490CA500094005 /* TCCMapTileProvider.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		9B49BBEA19490A5700094005 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9B49BBB919490A5700094005 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9B49BBC019490A5700094005;
+			remoteInfo = MapTileAnimationDemo;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		9B49BBC119490A5700094005 /* MapTileAnimationDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MapTileAnimationDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9B49BBC419490A5700094005 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		9B49BBC619490A5700094005 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		9B49BBC819490A5700094005 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		9B49BBCC19490A5700094005 /* MapTileAnimationDemo-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "MapTileAnimationDemo-Info.plist"; sourceTree = "<group>"; };
+		9B49BBCE19490A5700094005 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		9B49BBD019490A5700094005 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		9B49BBD219490A5700094005 /* MapTileAnimationDemo-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "MapTileAnimationDemo-Prefix.pch"; sourceTree = "<group>"; };
+		9B49BBD319490A5700094005 /* TCCAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TCCAppDelegate.h; sourceTree = "<group>"; };
+		9B49BBD419490A5700094005 /* TCCAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TCCAppDelegate.m; sourceTree = "<group>"; };
+		9B49BBD719490A5700094005 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPhone.storyboard; sourceTree = "<group>"; };
+		9B49BBDA19490A5700094005 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPad.storyboard; sourceTree = "<group>"; };
+		9B49BBDF19490A5700094005 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		9B49BBE519490A5700094005 /* MapTileAnimationDemoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MapTileAnimationDemoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		9B49BBE619490A5700094005 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		9B49BBEE19490A5700094005 /* MapTileAnimationDemoTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "MapTileAnimationDemoTests-Info.plist"; sourceTree = "<group>"; };
+		9B49BBF019490A5700094005 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		9B49BBF219490A5700094005 /* MapTileAnimationDemoTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MapTileAnimationDemoTests.m; sourceTree = "<group>"; };
+		9B49BBFC19490AAE00094005 /* TCCMapViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCCMapViewController.h; sourceTree = "<group>"; };
+		9B49BBFD19490AAE00094005 /* TCCMapViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCCMapViewController.m; sourceTree = "<group>"; };
+		9B49BBFE19490AAE00094005 /* TCCTimeFrameParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCCTimeFrameParser.h; sourceTree = "<group>"; };
+		9B49BBFF19490AAE00094005 /* TCCTimeFrameParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCCTimeFrameParser.m; sourceTree = "<group>"; };
+		9B49BC5819490CA500094005 /* TCCMapTile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCCMapTile.h; sourceTree = "<group>"; };
+		9B49BC5919490CA500094005 /* TCCMapTile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCCMapTile.m; sourceTree = "<group>"; };
+		9B49BC5A19490CA500094005 /* TCCMapTileProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCCMapTileProvider.h; sourceTree = "<group>"; };
+		9B49BC5B19490CA500094005 /* TCCMapTileProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCCMapTileProvider.m; sourceTree = "<group>"; };
+		9B49BC5C19490CA500094005 /* TCCMapTileProviderProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCCMapTileProviderProtocol.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		9B49BBBE19490A5700094005 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9B49BBC719490A5700094005 /* CoreGraphics.framework in Frameworks */,
+				9B49BBC919490A5700094005 /* UIKit.framework in Frameworks */,
+				9B49BBC519490A5700094005 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9B49BBE219490A5700094005 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9B49BBE719490A5700094005 /* XCTest.framework in Frameworks */,
+				9B49BBE919490A5700094005 /* UIKit.framework in Frameworks */,
+				9B49BBE819490A5700094005 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		9B49BBB819490A5700094005 = {
+			isa = PBXGroup;
+			children = (
+				9B49BBCA19490A5700094005 /* MapTileAnimationDemo */,
+				9B49BC5619490CA500094005 /* MapTileAnimation */,
+				9B49BBEC19490A5700094005 /* MapTileAnimationDemoTests */,
+				9B49BBC319490A5700094005 /* Frameworks */,
+				9B49BBC219490A5700094005 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		9B49BBC219490A5700094005 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				9B49BBC119490A5700094005 /* MapTileAnimationDemo.app */,
+				9B49BBE519490A5700094005 /* MapTileAnimationDemoTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		9B49BBC319490A5700094005 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				9B49BBC419490A5700094005 /* Foundation.framework */,
+				9B49BBC619490A5700094005 /* CoreGraphics.framework */,
+				9B49BBC819490A5700094005 /* UIKit.framework */,
+				9B49BBE619490A5700094005 /* XCTest.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		9B49BBCA19490A5700094005 /* MapTileAnimationDemo */ = {
+			isa = PBXGroup;
+			children = (
+				9B49BBFC19490AAE00094005 /* TCCMapViewController.h */,
+				9B49BBFD19490AAE00094005 /* TCCMapViewController.m */,
+				9B49BBFE19490AAE00094005 /* TCCTimeFrameParser.h */,
+				9B49BBFF19490AAE00094005 /* TCCTimeFrameParser.m */,
+				9B49BBD619490A5700094005 /* Main_iPhone.storyboard */,
+				9B49BBD919490A5700094005 /* Main_iPad.storyboard */,
+				9B49BBCB19490A5700094005 /* Supporting Files */,
+			);
+			path = MapTileAnimationDemo;
+			sourceTree = "<group>";
+		};
+		9B49BBCB19490A5700094005 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				9B49BBDF19490A5700094005 /* Images.xcassets */,
+				9B49BBD319490A5700094005 /* TCCAppDelegate.h */,
+				9B49BBD419490A5700094005 /* TCCAppDelegate.m */,
+				9B49BBCC19490A5700094005 /* MapTileAnimationDemo-Info.plist */,
+				9B49BBCD19490A5700094005 /* InfoPlist.strings */,
+				9B49BBD019490A5700094005 /* main.m */,
+				9B49BBD219490A5700094005 /* MapTileAnimationDemo-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		9B49BBEC19490A5700094005 /* MapTileAnimationDemoTests */ = {
+			isa = PBXGroup;
+			children = (
+				9B49BBF219490A5700094005 /* MapTileAnimationDemoTests.m */,
+				9B49BBED19490A5700094005 /* Supporting Files */,
+			);
+			path = MapTileAnimationDemoTests;
+			sourceTree = "<group>";
+		};
+		9B49BBED19490A5700094005 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				9B49BBEE19490A5700094005 /* MapTileAnimationDemoTests-Info.plist */,
+				9B49BBEF19490A5700094005 /* InfoPlist.strings */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		9B49BC5619490CA500094005 /* MapTileAnimation */ = {
+			isa = PBXGroup;
+			children = (
+				9B49BC5819490CA500094005 /* TCCMapTile.h */,
+				9B49BC5919490CA500094005 /* TCCMapTile.m */,
+				9B49BC5A19490CA500094005 /* TCCMapTileProvider.h */,
+				9B49BC5B19490CA500094005 /* TCCMapTileProvider.m */,
+				9B49BC5C19490CA500094005 /* TCCMapTileProviderProtocol.h */,
+			);
+			name = MapTileAnimation;
+			path = ../MapTileAnimation/MapTileAnimation;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		9B49BBC019490A5700094005 /* MapTileAnimationDemo */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9B49BBF619490A5700094005 /* Build configuration list for PBXNativeTarget "MapTileAnimationDemo" */;
+			buildPhases = (
+				9B49BBBD19490A5700094005 /* Sources */,
+				9B49BBBE19490A5700094005 /* Frameworks */,
+				9B49BBBF19490A5700094005 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MapTileAnimationDemo;
+			productName = MapTileAnimationDemo;
+			productReference = 9B49BBC119490A5700094005 /* MapTileAnimationDemo.app */;
+			productType = "com.apple.product-type.application";
+		};
+		9B49BBE419490A5700094005 /* MapTileAnimationDemoTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9B49BBF919490A5700094005 /* Build configuration list for PBXNativeTarget "MapTileAnimationDemoTests" */;
+			buildPhases = (
+				9B49BBE119490A5700094005 /* Sources */,
+				9B49BBE219490A5700094005 /* Frameworks */,
+				9B49BBE319490A5700094005 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				9B49BBEB19490A5700094005 /* PBXTargetDependency */,
+			);
+			name = MapTileAnimationDemoTests;
+			productName = MapTileAnimationDemoTests;
+			productReference = 9B49BBE519490A5700094005 /* MapTileAnimationDemoTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		9B49BBB919490A5700094005 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				CLASSPREFIX = TCC;
+				LastUpgradeCheck = 0510;
+				ORGANIZATIONNAME = "The Climate Corporation";
+				TargetAttributes = {
+					9B49BBE419490A5700094005 = {
+						TestTargetID = 9B49BBC019490A5700094005;
+					};
+				};
+			};
+			buildConfigurationList = 9B49BBBC19490A5700094005 /* Build configuration list for PBXProject "MapTileAnimationDemo" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 9B49BBB819490A5700094005;
+			productRefGroup = 9B49BBC219490A5700094005 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				9B49BBC019490A5700094005 /* MapTileAnimationDemo */,
+				9B49BBE419490A5700094005 /* MapTileAnimationDemoTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		9B49BBBF19490A5700094005 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9B49BBDB19490A5700094005 /* Main_iPad.storyboard in Resources */,
+				9B49BBE019490A5700094005 /* Images.xcassets in Resources */,
+				9B49BBD819490A5700094005 /* Main_iPhone.storyboard in Resources */,
+				9B49BBCF19490A5700094005 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9B49BBE319490A5700094005 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9B49BBF119490A5700094005 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		9B49BBBD19490A5700094005 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9B49BC0119490AAE00094005 /* TCCTimeFrameParser.m in Sources */,
+				9B49BBD119490A5700094005 /* main.m in Sources */,
+				9B49BC0019490AAE00094005 /* TCCMapViewController.m in Sources */,
+				9B49BC5D19490CA500094005 /* TCCMapTile.m in Sources */,
+				9B49BC5E19490CA500094005 /* TCCMapTileProvider.m in Sources */,
+				9B49BBD519490A5700094005 /* TCCAppDelegate.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9B49BBE119490A5700094005 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9B49BBF319490A5700094005 /* MapTileAnimationDemoTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		9B49BBEB19490A5700094005 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9B49BBC019490A5700094005 /* MapTileAnimationDemo */;
+			targetProxy = 9B49BBEA19490A5700094005 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		9B49BBCD19490A5700094005 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				9B49BBCE19490A5700094005 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		9B49BBD619490A5700094005 /* Main_iPhone.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				9B49BBD719490A5700094005 /* Base */,
+			);
+			name = Main_iPhone.storyboard;
+			sourceTree = "<group>";
+		};
+		9B49BBD919490A5700094005 /* Main_iPad.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				9B49BBDA19490A5700094005 /* Base */,
+			);
+			name = Main_iPad.storyboard;
+			sourceTree = "<group>";
+		};
+		9B49BBEF19490A5700094005 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				9B49BBF019490A5700094005 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		9B49BBF419490A5700094005 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		9B49BBF519490A5700094005 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		9B49BBF719490A5700094005 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "MapTileAnimationDemo/MapTileAnimationDemo-Prefix.pch";
+				INFOPLIST_FILE = "MapTileAnimationDemo/MapTileAnimationDemo-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		9B49BBF819490A5700094005 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "MapTileAnimationDemo/MapTileAnimationDemo-Prefix.pch";
+				INFOPLIST_FILE = "MapTileAnimationDemo/MapTileAnimationDemo-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+		9B49BBFA19490A5700094005 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/MapTileAnimationDemo.app/MapTileAnimationDemo";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "MapTileAnimationDemo/MapTileAnimationDemo-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = "MapTileAnimationDemoTests/MapTileAnimationDemoTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Debug;
+		};
+		9B49BBFB19490A5700094005 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/MapTileAnimationDemo.app/MapTileAnimationDemo";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "MapTileAnimationDemo/MapTileAnimationDemo-Prefix.pch";
+				INFOPLIST_FILE = "MapTileAnimationDemoTests/MapTileAnimationDemoTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		9B49BBBC19490A5700094005 /* Build configuration list for PBXProject "MapTileAnimationDemo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9B49BBF419490A5700094005 /* Debug */,
+				9B49BBF519490A5700094005 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9B49BBF619490A5700094005 /* Build configuration list for PBXNativeTarget "MapTileAnimationDemo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9B49BBF719490A5700094005 /* Debug */,
+				9B49BBF819490A5700094005 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		9B49BBF919490A5700094005 /* Build configuration list for PBXNativeTarget "MapTileAnimationDemoTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9B49BBFA19490A5700094005 /* Debug */,
+				9B49BBFB19490A5700094005 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 9B49BBB919490A5700094005 /* Project object */;
+}

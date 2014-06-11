@@ -1,6 +1,6 @@
 //
-//  MapTileAnimationTests.m
-//  MapTileAnimationTests
+//  MapTileAnimationDemoTests.m
+//  MapTileAnimationDemoTests
 //
 //  Created by Richard Shin on 6/11/14.
 //  Copyright (c) 2014 The Climate Corporation. All rights reserved.
@@ -8,11 +8,11 @@
 
 #import <XCTest/XCTest.h>
 
-@interface MapTileAnimationTests : XCTestCase
+@interface MapTileAnimationDemoTests : XCTestCase
 
 @end
 
-@implementation MapTileAnimationTests
+@implementation MapTileAnimationDemoTests
 
 - (void)setUp
 {

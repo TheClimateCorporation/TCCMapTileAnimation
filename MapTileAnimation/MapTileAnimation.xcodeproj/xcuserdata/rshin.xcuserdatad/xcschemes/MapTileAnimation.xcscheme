@@ -14,8 +14,8 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "3269A4A81948EA57003F1AE3"
-               BuildableName = "MapTileAnimation.app"
+               BlueprintIdentifier = "9B49BC0A19490BD000094005"
+               BuildableName = "libMapTileAnimation.a"
                BlueprintName = "MapTileAnimation"
                ReferencedContainer = "container:MapTileAnimation.xcodeproj">
             </BuildableReference>
@@ -32,22 +32,13 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "3269A4CC1948EA57003F1AE3"
+               BlueprintIdentifier = "9B49BC1A19490BD000094005"
                BuildableName = "MapTileAnimationTests.xctest"
                BlueprintName = "MapTileAnimationTests"
                ReferencedContainer = "container:MapTileAnimation.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "3269A4A81948EA57003F1AE3"
-            BuildableName = "MapTileAnimation.app"
-            BlueprintName = "MapTileAnimation"
-            ReferencedContainer = "container:MapTileAnimation.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
    </TestAction>
    <LaunchAction
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
@@ -58,15 +49,6 @@
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       allowLocationSimulation = "YES">
-      <BuildableProductRunnable>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "3269A4A81948EA57003F1AE3"
-            BuildableName = "MapTileAnimation.app"
-            BlueprintName = "MapTileAnimation"
-            ReferencedContainer = "container:MapTileAnimation.xcodeproj">
-         </BuildableReference>
-      </BuildableProductRunnable>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
@@ -76,15 +58,6 @@
       useCustomWorkingDirectory = "NO"
       buildConfiguration = "Release"
       debugDocumentVersioning = "YES">
-      <BuildableProductRunnable>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "3269A4A81948EA57003F1AE3"
-            BuildableName = "MapTileAnimation.app"
-            BlueprintName = "MapTileAnimation"
-            ReferencedContainer = "container:MapTileAnimation.xcodeproj">
-         </BuildableReference>
-      </BuildableProductRunnable>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

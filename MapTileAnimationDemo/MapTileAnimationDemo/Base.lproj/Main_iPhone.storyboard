@@ -16,18 +16,18 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" mapType="hybrid" pitchEnabled="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rOT-fq-9zq">
+                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" mapType="hybrid" translatesAutoresizingMaskIntoConstraints="NO" id="l32-pv-Rsy">
                                 <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <connections>
-                                    <outlet property="delegate" destination="vXZ-lx-hvc" id="xTJ-SJ-eS3"/>
+                                    <outlet property="delegate" destination="vXZ-lx-hvc" id="y7P-AW-IX4"/>
                                 </connections>
                             </mapView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
                     <connections>
-                        <outlet property="mapView" destination="rOT-fq-9zq" id="c2z-lg-9Gm"/>
+                        <outlet property="mapView" destination="l32-pv-Rsy" id="haA-QL-1lD"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>
