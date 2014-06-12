@@ -69,8 +69,11 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale)
 			
 			if (data) {
 				if (urlResponse.statusCode == 200) {
-					if ([self.delegate respondsToSelector: @selector(tileProvider:didFetchTimeFrameData:)])
-						[self.delegate tileProvider: self didFetchTimeFrameData: data];
+					__weak TCCMapTileProvider *provider = self;
+					dispatch_async(dispatch_get_main_queue(), ^{
+						if ([provider.delegate respondsToSelector: @selector(tileProvider:didFetchTimeFrameData:)])
+							[provider.delegate tileProvider: provider didFetchTimeFrameData: data];
+					});
 				}
 			} else {
 				NSLog(@"error = %@", error);
@@ -91,6 +94,7 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale)
 	}
 	
 	[self.operationQueue waitUntilAllOperationsAreFinished];
+	
 	block([NSArray arrayWithArray: mapTiles]);
 }
 //============================================================
@@ -100,7 +104,7 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale)
     NSMutableArray *tiles = nil;
 	
     // The number of tiles either wide or high.
-	//    NSInteger zTiles = pow(2, z);
+//	NSInteger zTiles = pow(2, z);
     
     NSInteger minX = floor((MKMapRectGetMinX(aRect) * aScale) / OVERLAY_SIZE);
     NSInteger maxX = floor((MKMapRectGetMaxX(aRect) * aScale) / OVERLAY_SIZE);
@@ -110,7 +114,7 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale)
 	for(NSInteger x = minX; x <= maxX; x++) {
         for(NSInteger y = minY; y <=maxY; y++) {
             // Flip the y index to properly reference overlay files.
-			//            NSInteger flippedY = abs(y + 1 - zTiles);
+//			NSInteger flippedY = abs(y + 1 - zTiles);
             NSString *tileCoord = [[NSString alloc] initWithFormat:@"%ld/%ld/%ld", (long)z, (long)x, (long)y];
 			
 			if (!tiles) {
@@ -158,10 +162,10 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale)
 			NSURLSessionTask *task = [session dataTaskWithURL: [NSURL URLWithString: urlString] completionHandler: ^(NSData *data, NSURLResponse *response, NSError *error) {
 				
 				NSHTTPURLResponse *urlResponse = (NSHTTPURLResponse *)response;
-				
+//				NSLog(@"response %d %@", urlResponse.statusCode, error.localizedDescription);
+
 				if (data) {
 					if (urlResponse.statusCode == 200) {
-						
 						[provider.imageTileCache setObject: data forKey: cacheKey];
 						
 						UIImage *img = [[UIImage alloc] initWithData: data];

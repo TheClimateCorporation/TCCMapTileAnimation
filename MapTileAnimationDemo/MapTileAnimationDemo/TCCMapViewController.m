@@ -9,9 +9,13 @@
 #import "TCCMapViewController.h"
 #import "TCCTimeFrameParser.h"
 
+#import "TCCMapTileRenderer.h"
+#import "TCCMapTileOverlay.h"
+
 #import "TCCMapTileProviderProtocol.h"
 #import "TCCMapTileProvider.h"
 #import "MKMapView+Extras.h"
+
 
 #define FUTURE_RADAR_FRAMES_URI "https://qa1-twi.climate.com/assets/wdt-future-radar/LKG.txt?grower_apps=true"
 //#define FUTURE_RADAR_FRAMES_URI "http://climate.com/assets/wdt-future-radar/LKG.txt?grower_apps=true"
@@ -31,15 +35,14 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	self.currentTimeIndex = 1;
+	self.currentTimeIndex = 0;
 	
     // Set the starting  location.
     CLLocationCoordinate2D startingLocation;
-    startingLocation.latitude = 35.2269;  //St. Louis, MO
-    startingLocation.longitude = -80.8433;
-	
-	self.mapView.region = MKCoordinateRegionMakeWithDistance(startingLocation, 180000, 180000);
-    [self.mapView setCenterCoordinate: startingLocation];
+    startingLocation.latitude = 38.6272;
+    startingLocation.longitude = -90.1978;
+
+	[self.mapView setCenterCoordinate: startingLocation zoomLevel: 6 animated: NO];
 
 	self.tileProvider = [[TCCMapTileProvider alloc] initWithTimeFrameURI: @FUTURE_RADAR_FRAMES_URI delegate: self];
 }
@@ -54,26 +57,19 @@
 //============================================================
 - (void) tileProvider: (TCCMapTileProvider *)aProvider didFetchTimeFrameData: (NSData *)theTimeFrameData
 {
-	__block TCCMapViewController *mapController = self;
-	
 	self.timeFrameParser = [[TCCTimeFrameParser alloc] initWithData: theTimeFrameData];
 
-	NSArray *templateURLs = self.timeFrameParser.templateFrameTimeURLs;
-	NSString *templateURL = [templateURLs firstObject];
-	
-	dispatch_async(dispatch_get_main_queue(), ^{
-		MKTileOverlay *tileOverlay = [[MKTileOverlay alloc] initWithURLTemplate: templateURL];
-		[mapController.mapView addOverlay: tileOverlay];
-	});
 }
+//============================================================
 // called by the tile provider to get a base URI (without tile coordinates) for a given time index
 - (NSString *)baseURIForTimeIndex: (NSUInteger)aTimeIndex;
 {
 	return [self.timeFrameParser.timeFrameURLs objectAtIndex: aTimeIndex];
 }
+//============================================================
 - (NSString *)uniqueCacheKey
 {
-	//this will grab the the time stamp string for the currentTimeIndex, we use this as a unique key
+	//this will grab the the time stamp string for the currentTimeIndex, we use this as a unique key for caching
 	NSString *indexURL = [[self.timeFrameParser timeFrameURLs] objectAtIndex: self.currentTimeIndex];
 	NSString *key = [indexURL lastPathComponent];
 	return key;
@@ -85,9 +81,20 @@
 {
 	if (fullyRendered == YES) {
 		
+//		NSArray *templateURLs = self.timeFrameParser.templateFrameTimeURLs;
+//		NSString *templateURL = [templateURLs firstObject];
+//		
+//		MKTileOverlay *tileOverlay = [[MKTileOverlay alloc] initWithURLTemplate: templateURL];
+//		[self.mapView addOverlay: tileOverlay];
+
+		__block TCCMapViewController *controller = self;
+		
 		//start downloading the image tiles for the time frame indexes
-		[self.tileProvider fetchTilesForMapRect: mapView.visibleMapRect zoomScale: [mapView currentZoomScale] timeIndex: self.currentTimeIndex completionBlock:^(NSArray *tileArray) {
-			NSArray *array = tileArray;
+		[self.tileProvider fetchTilesForMapRect: self.mapView.visibleMapRect zoomScale: [self.mapView currentZoomScale] timeIndex: self.currentTimeIndex completionBlock:^(NSArray *tileArray) {
+			
+			TCCMapTileOverlay *overlay = [[TCCMapTileOverlay alloc] initWithTileArray: tileArray];
+			[controller.mapView addOverlay: overlay];
+			
 		}];
 
 	}
@@ -103,6 +110,11 @@
 	if ([overlay isKindOfClass: [MKTileOverlay class]])
 	{
 		MKTileOverlayRenderer *renderer = [[MKTileOverlayRenderer alloc] initWithTileOverlay: (MKTileOverlay *)overlay];
+		return renderer;
+	}
+	else if ([overlay isKindOfClass: [TCCMapTileOverlay class]])
+	{
+		TCCMapTileRenderer *renderer = [[TCCMapTileRenderer alloc] initWithOverlay: overlay];
 		return renderer;
 	}
 	return nil;
