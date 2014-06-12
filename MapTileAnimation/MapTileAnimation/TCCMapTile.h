@@ -17,6 +17,5 @@
 
 - (id) initWithFrame:(MKMapRect)aTileFrame tileCoordinate:(NSString *)aTileCoordinate;
 
-- (void) fetchImageOnQueue: (NSOperationQueue *)aQueue baseURLString: (NSString *)aURLString;
 
 @end

@@ -21,6 +21,8 @@
 @property (nonatomic, readwrite, weak) IBOutlet MKMapView *mapView;
 @property (nonatomic, readwrite, strong) TCCMapTileProvider *tileProvider;
 @property (nonatomic, readwrite, strong) TCCTimeFrameParser *timeFrameParser;
+@property (readwrite, assign) NSUInteger currentTimeIndex;
+
 
 @end
 
@@ -29,6 +31,8 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+	self.currentTimeIndex = 1;
+	
     // Set the starting  location.
     CLLocationCoordinate2D startingLocation;
     startingLocation.latitude = 35.2269;  //St. Louis, MO
@@ -67,7 +71,13 @@
 {
 	return [self.timeFrameParser.timeFrameURLs objectAtIndex: aTimeIndex];
 }
-
+- (NSString *)uniqueCacheKey
+{
+	//this will grab the the time stamp string for the currentTimeIndex, we use this as a unique key
+	NSString *indexURL = [[self.timeFrameParser timeFrameURLs] objectAtIndex: self.currentTimeIndex];
+	NSString *key = [indexURL lastPathComponent];
+	return key;
+}
 //============================================================
 #pragma mark - MKMapViewDelegate Protocol
 //============================================================
@@ -76,7 +86,7 @@
 	if (fullyRendered == YES) {
 		
 		//start downloading the image tiles for the time frame indexes
-		[self.tileProvider fetchTilesForMapRect: mapView.visibleMapRect zoomScale: [mapView currentZoomScale] timeIndex: 1 completionBlock:^(NSArray *tileArray) {
+		[self.tileProvider fetchTilesForMapRect: mapView.visibleMapRect zoomScale: [mapView currentZoomScale] timeIndex: self.currentTimeIndex completionBlock:^(NSArray *tileArray) {
 			NSArray *array = tileArray;
 		}];
 

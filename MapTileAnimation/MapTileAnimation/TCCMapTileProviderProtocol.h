@@ -17,4 +17,8 @@
 // called by the tile provider to get a base URI (without tile coordinates) for a given time index
 - (NSString *)baseURIForTimeIndex: (NSUInteger)aTimeIndex;
 
+@optional
+// called to get a unique cache name key
+- (NSString *)uniqueCacheKey;
+
 @end

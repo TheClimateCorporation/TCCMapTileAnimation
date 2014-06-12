@@ -12,9 +12,12 @@
 @interface TCCMapTileProvider ()
 
 @property (nonatomic, readwrite, strong) NSOperationQueue *operationQueue;
+@property (nonatomic, readwrite, strong) NSCache *imageTileCache;
+
 
 - (void) fetchTimeStampsAtURL: (NSURL *)aURL;
 - (NSArray *) mapTilesInMapRect: (MKMapRect)aRect zoomScale: (MKZoomScale)aScale;
+- (void) fetchTileImage: (TCCMapTile *)aMapTile baseURLString: (NSString *)aURLString;
 
 @end
 
@@ -42,9 +45,18 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale)
 		
 		self.operationQueue = [[NSOperationQueue alloc] init];
 		self.delegate = aDelegate;
+		self.imageTileCache = [[NSCache alloc] init];
+		self.imageTileCache.name = NSStringFromClass([TCCMapTileProvider class]);
+		self.imageTileCache.countLimit = 450;
+		
 		[self fetchTimeStampsAtURL: [NSURL URLWithString: aTimeFrameURI]];
 	}
 	return self;
+}
+//============================================================
+- (void) dealloc
+{
+	[self.imageTileCache removeAllObjects];
 }
 //============================================================
 - (void) fetchTimeStampsAtURL: (NSURL *)aURL
@@ -75,7 +87,7 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale)
 	NSArray *mapTiles = [self mapTilesInMapRect: aMapRect zoomScale: aScale];
 	
 	for (TCCMapTile *tile in mapTiles) {
-		[tile fetchImageOnQueue: self.operationQueue baseURLString: baseURI];
+		[self fetchTileImage: tile baseURLString: baseURI];
 	}
 	
 	[self.operationQueue waitUntilAllOperationsAreFinished];
@@ -112,6 +124,62 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale)
     return [NSArray arrayWithArray: tiles];
 }
 //============================================================
+- (void) fetchTileImage: (TCCMapTile *)aMapTile baseURLString: (NSString *)aURLString;
+{
+	__block TCCMapTile *mapTile = aMapTile;
+	__block TCCMapTileProvider *provider = self;
+	
+	[self.operationQueue addOperationWithBlock: ^{
+		dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+		
+		NSString *cacheKey = nil;
+		
+		if ([provider.delegate respondsToSelector: @selector(uniqueCacheKey)]) {
+			NSString *key = [provider.delegate uniqueCacheKey];
+			cacheKey = [NSString stringWithFormat: @"%@/%@", key, mapTile.tileCoordinate];
+		} else {
+			cacheKey = [NSString stringWithFormat: @"%@/%@", aURLString, mapTile.tileCoordinate];
+		}
+		
+		NSData *cachedData = [provider.imageTileCache objectForKey: cacheKey];
+		if (cachedData != nil)
+		{
+			NSLog(@"using cached data");
+			UIImage *img = [[UIImage alloc] initWithData: cachedData];
+			mapTile.imageTile = img;
+			dispatch_semaphore_signal(semaphore);
+		}
+		else
+		{
+			NSString *urlString = [NSString stringWithFormat: @"%@/%@.png", aURLString, mapTile.tileCoordinate];
+//			NSLog(@"derived->urlString = %@", urlString);
+			
+			NSURLSession *session = [NSURLSession sharedSession];
+			NSURLSessionTask *task = [session dataTaskWithURL: [NSURL URLWithString: urlString] completionHandler: ^(NSData *data, NSURLResponse *response, NSError *error) {
+				
+				NSHTTPURLResponse *urlResponse = (NSHTTPURLResponse *)response;
+				
+				if (data) {
+					if (urlResponse.statusCode == 200) {
+						
+						[provider.imageTileCache setObject: data forKey: cacheKey];
+						
+						UIImage *img = [[UIImage alloc] initWithData: data];
+						mapTile.imageTile = img;
+					}
+				} else {
+					NSLog(@"error = %@", error);
+				}
+				
+				dispatch_semaphore_signal(semaphore);
+			}];
+			[task resume];
+		}
+
+		// have the thread wait until the download task is done
+		dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+	}];
+}
 
 //============================================================
 
