@@ -16,18 +16,61 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" mapType="hybrid" translatesAutoresizingMaskIntoConstraints="NO" id="l32-pv-Rsy">
-                                <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="hybrid" translatesAutoresizingMaskIntoConstraints="NO" id="l32-pv-Rsy">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="517"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="320" id="R7p-Xh-G7U"/>
+                                </constraints>
                                 <connections>
                                     <outlet property="delegate" destination="vXZ-lx-hvc" id="y7P-AW-IX4"/>
                                 </connections>
                             </mapView>
+                            <stepper opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" wraps="YES" maximumValue="100" translatesAutoresizingMaskIntoConstraints="NO" id="JMu-CT-4Da">
+                                <rect key="frame" x="113" y="528" width="94" height="29"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <color key="backgroundColor" red="0.2033266024" green="0.24029508990000001" blue="0.25415826609999997" alpha="1" colorSpace="deviceRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="29" id="IKE-KD-Fc0"/>
+                                    <constraint firstAttribute="width" constant="94" id="sFL-KH-AMP"/>
+                                </constraints>
+                                <color key="tintColor" red="0.0" green="1" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <connections>
+                                    <action selector="onHandleTimeIndexChange:" destination="vXZ-lx-hvc" eventType="valueChanged" id="1ph-J6-a1H"/>
+                                </connections>
+                            </stepper>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="orF-6A-5Ok">
+                                <rect key="frame" x="258" y="532" width="42" height="21"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="21" id="J9m-E0-l6E"/>
+                                    <constraint firstAttribute="width" constant="42" id="rMf-OD-cmX"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="l32-pv-Rsy" firstAttribute="top" secondItem="kh9-bI-dsS" secondAttribute="top" id="0se-Dk-RdH"/>
+                            <constraint firstItem="2fi-mo-0CV" firstAttribute="top" secondItem="JMu-CT-4Da" secondAttribute="bottom" constant="11" id="A8Y-7C-QSx"/>
+                            <constraint firstItem="JMu-CT-4Da" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" constant="113" id="FbN-GR-8A5"/>
+                            <constraint firstItem="orF-6A-5Ok" firstAttribute="leading" secondItem="JMu-CT-4Da" secondAttribute="trailing" constant="51" id="GiB-0y-USH"/>
+                            <constraint firstAttribute="trailing" secondItem="orF-6A-5Ok" secondAttribute="trailing" constant="20" id="KKU-1q-WdW"/>
+                            <constraint firstAttribute="trailing" secondItem="JMu-CT-4Da" secondAttribute="trailing" constant="113" id="N1g-jX-BYX"/>
+                            <constraint firstItem="orF-6A-5Ok" firstAttribute="top" secondItem="l32-pv-Rsy" secondAttribute="bottom" constant="15" id="OQU-s5-l6A"/>
+                            <constraint firstAttribute="trailing" secondItem="l32-pv-Rsy" secondAttribute="trailing" id="Vg3-00-7NE"/>
+                            <constraint firstItem="JMu-CT-4Da" firstAttribute="top" secondItem="l32-pv-Rsy" secondAttribute="bottom" constant="11" id="W2i-HC-QAW"/>
+                            <constraint firstItem="2fi-mo-0CV" firstAttribute="top" secondItem="orF-6A-5Ok" secondAttribute="bottom" constant="15" id="mNG-e9-WrX"/>
+                            <constraint firstItem="l32-pv-Rsy" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" id="myg-Qi-JyI"/>
+                            <constraint firstItem="JMu-CT-4Da" firstAttribute="top" secondItem="l32-pv-Rsy" secondAttribute="bottom" constant="11" id="urb-UK-u9I"/>
+                        </constraints>
                     </view>
                     <connections>
                         <outlet property="mapView" destination="l32-pv-Rsy" id="haA-QL-1lD"/>
+                        <outlet property="timeIndexLabel" destination="orF-6A-5Ok" id="YkP-Bf-EkO"/>
+                        <outlet property="timeIndexStepper" destination="JMu-CT-4Da" id="5eo-lf-ahg"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>

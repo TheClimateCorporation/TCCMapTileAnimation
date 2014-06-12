@@ -14,4 +14,6 @@
 
 - (id) initWithTileArray: (NSArray *)anArray;
 
+- (void) updateWithTileArray: (NSArray *)aTileArray;
+
 @end

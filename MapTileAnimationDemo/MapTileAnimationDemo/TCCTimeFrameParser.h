@@ -15,6 +15,8 @@
 @property (readonly) NSArray *templateFrameTimeURLs;
 @property (readonly) NSArray *timeFrameURLs;
 
+@property (readonly) NSUInteger countOfTimeIndexes;
+
 - (id) initWithData: (NSData *)timeStampData;
 
 @end

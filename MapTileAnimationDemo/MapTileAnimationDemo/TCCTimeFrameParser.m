@@ -59,6 +59,10 @@
 	
 	return _timeFrameURLs;
 }
+- (NSUInteger) countOfTimeIndexes
+{
+	return [self timeFrameURLs].count;
+}
 //=================================================================================
 - (NSArray *)templateFrameTimeURLs
 {

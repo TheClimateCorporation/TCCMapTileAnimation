@@ -19,6 +19,11 @@
 	return self;
 }
 
+- (void) updateWithTileArray: (NSArray *)aTileArray
+{
+	self.mapTiles = aTileArray;
+}
+
 - (CLLocationCoordinate2D)coordinate
 {
     return MKCoordinateForMapPoint(MKMapPointMake(MKMapRectGetMidX([self boundingMapRect]), MKMapRectGetMidY([self boundingMapRect])));

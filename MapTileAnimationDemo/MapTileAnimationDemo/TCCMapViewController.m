@@ -23,10 +23,14 @@
 @interface TCCMapViewController () <MKMapViewDelegate>
 
 @property (nonatomic, readwrite, weak) IBOutlet MKMapView *mapView;
+@property (weak, nonatomic) IBOutlet UIStepper *timeIndexStepper;
+@property (weak, nonatomic) IBOutlet UILabel *timeIndexLabel;
 @property (nonatomic, readwrite, strong) TCCMapTileProvider *tileProvider;
 @property (nonatomic, readwrite, strong) TCCTimeFrameParser *timeFrameParser;
 @property (readwrite, assign) NSUInteger currentTimeIndex;
 
+@property (readwrite, weak) TCCMapTileOverlay *tileOverlay;
+@property (readwrite, weak) TCCMapTileRenderer *tileRenderer;
 
 @end
 
@@ -53,12 +57,32 @@
     // Dispose of any resources that can be recreated.
 }
 //============================================================
+- (IBAction)onHandleTimeIndexChange:(id)sender
+{
+	self.currentTimeIndex = (NSUInteger)self.timeIndexStepper.value;
+	self.timeIndexLabel.text = [NSString stringWithFormat: @"%d", self.currentTimeIndex];
+	
+	__block TCCMapViewController *controller = self;
+	
+	[self.tileProvider fetchTilesForMapRect: self.mapView.visibleMapRect zoomScale: [self.mapView currentZoomScale] timeIndex: self.currentTimeIndex completionBlock:^(NSArray *tileArray) {
+		
+		[controller.tileOverlay updateWithTileArray: tileArray];
+		[controller.tileRenderer setNeedsDisplay];
+		
+		NSLog(@"done");
+	}];
+
+}
+//============================================================
 #pragma mark - TCCMapTileProvider Protocol
 //============================================================
 - (void) tileProvider: (TCCMapTileProvider *)aProvider didFetchTimeFrameData: (NSData *)theTimeFrameData
 {
 	self.timeFrameParser = [[TCCTimeFrameParser alloc] initWithData: theTimeFrameData];
-
+	
+	self.timeIndexStepper.maximumValue = (double)self.timeFrameParser.countOfTimeIndexes;
+	self.timeIndexStepper.value = (double)self.currentTimeIndex;
+	self.timeIndexLabel.text = [NSString stringWithFormat: @"%d", self.currentTimeIndex];
 }
 //============================================================
 // called by the tile provider to get a base URI (without tile coordinates) for a given time index
@@ -87,15 +111,18 @@
 //		MKTileOverlay *tileOverlay = [[MKTileOverlay alloc] initWithURLTemplate: templateURL];
 //		[self.mapView addOverlay: tileOverlay];
 
-		__block TCCMapViewController *controller = self;
-		
-		//start downloading the image tiles for the time frame indexes
-		[self.tileProvider fetchTilesForMapRect: self.mapView.visibleMapRect zoomScale: [self.mapView currentZoomScale] timeIndex: self.currentTimeIndex completionBlock:^(NSArray *tileArray) {
+		static dispatch_once_t onceToken;
+		dispatch_once(&onceToken, ^{
+			__block TCCMapViewController *controller = self;
 			
-			TCCMapTileOverlay *overlay = [[TCCMapTileOverlay alloc] initWithTileArray: tileArray];
-			[controller.mapView addOverlay: overlay];
-			
-		}];
+			//start downloading the image tiles for the time frame indexes
+			[self.tileProvider fetchTilesForMapRect: self.mapView.visibleMapRect zoomScale: [self.mapView currentZoomScale] timeIndex: self.currentTimeIndex completionBlock:^(NSArray *tileArray) {
+				
+				TCCMapTileOverlay *overlay = [[TCCMapTileOverlay alloc] initWithTileArray: tileArray];
+				[controller.mapView addOverlay: overlay];
+				
+			}];
+		});
 
 	}
 }
@@ -114,8 +141,10 @@
 	}
 	else if ([overlay isKindOfClass: [TCCMapTileOverlay class]])
 	{
-		TCCMapTileRenderer *renderer = [[TCCMapTileRenderer alloc] initWithOverlay: overlay];
-		return renderer;
+		self.tileOverlay = (TCCMapTileOverlay *)overlay;
+		TCCMapTileRenderer *renderer = [[TCCMapTileRenderer alloc] initWithOverlay: self.tileOverlay];
+		self.tileRenderer = renderer;
+		return self.tileRenderer;
 	}
 	return nil;
 }
