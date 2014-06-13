@@ -130,8 +130,8 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale)
 //============================================================
 - (void) fetchTileImage: (TCCMapTile *)aMapTile baseURLString: (NSString *)aURLString;
 {
-	__block TCCMapTile *mapTile = aMapTile;
-	__block TCCMapTileProvider *provider = self;
+	TCCMapTile *mapTile = aMapTile;
+	TCCMapTileProvider *provider = self;
 	
 	[self.operationQueue addOperationWithBlock: ^{
 		dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);

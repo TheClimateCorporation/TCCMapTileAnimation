@@ -60,9 +60,9 @@
 - (IBAction)onHandleTimeIndexChange:(id)sender
 {
 	self.currentTimeIndex = (NSUInteger)self.timeIndexStepper.value;
-	self.timeIndexLabel.text = [NSString stringWithFormat: @"%d", self.currentTimeIndex];
+	self.timeIndexLabel.text = [NSString stringWithFormat: @"%lu", (unsigned long)self.currentTimeIndex];
 	
-	__block TCCMapViewController *controller = self;
+	TCCMapViewController *controller = self;
 	
 	[self.tileProvider fetchTilesForMapRect: self.mapView.visibleMapRect zoomScale: [self.mapView currentZoomScale] timeIndex: self.currentTimeIndex completionBlock:^(NSArray *tileArray) {
 		
@@ -82,7 +82,7 @@
 	
 	self.timeIndexStepper.maximumValue = (double)self.timeFrameParser.countOfTimeIndexes;
 	self.timeIndexStepper.value = (double)self.currentTimeIndex;
-	self.timeIndexLabel.text = [NSString stringWithFormat: @"%d", self.currentTimeIndex];
+	self.timeIndexLabel.text = [NSString stringWithFormat: @"%lu", (unsigned long)self.currentTimeIndex];
 }
 //============================================================
 // called by the tile provider to get a base URI (without tile coordinates) for a given time index
