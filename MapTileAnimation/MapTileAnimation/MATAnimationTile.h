@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import <MapKit/MapKit.h>
 
-@interface TCCMapTile : NSObject
+@interface MATAnimationTile : NSObject
 
 @property (nonatomic, readwrite, strong) NSString *tileCoordinate;
 @property (nonatomic, readwrite, assign) MKMapRect mapRectFrame;

@@ -7,7 +7,7 @@
 //
 
 #import "TCCMapTileProvider.h"
-#import "TCCMapTile.h"
+#import "MATAnimationTile.h"
 
 @interface TCCMapTileProvider ()
 
@@ -17,7 +17,7 @@
 
 - (void) fetchTimeStampsAtURL: (NSURL *)aURL;
 - (NSArray *) mapTilesInMapRect: (MKMapRect)aRect zoomScale: (MKZoomScale)aScale;
-- (void) fetchTileImage: (TCCMapTile *)aMapTile baseURLString: (NSString *)aURLString;
+- (void) fetchTileImage: (MATAnimationTile *)aMapTile baseURLString: (NSString *)aURLString;
 
 @end
 
@@ -89,7 +89,7 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale)
 	NSString *baseURI = [self.delegate baseURIForTimeIndex: aTimeIndex];
 	NSArray *mapTiles = [self mapTilesInMapRect: aMapRect zoomScale: aScale];
 	
-	for (TCCMapTile *tile in mapTiles) {
+	for (MATAnimationTile *tile in mapTiles) {
 		[self fetchTileImage: tile baseURLString: baseURI];
 	}
 	
@@ -121,16 +121,16 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale)
 				tiles = [NSMutableArray array];
 			}
 			MKMapRect frame = MKMapRectMake((double)(x * OVERLAY_SIZE) / aScale, (double)(y * OVERLAY_SIZE) / aScale, OVERLAY_SIZE / aScale, OVERLAY_SIZE / aScale);
-			TCCMapTile *tile = [[TCCMapTile alloc] initWithFrame: frame tileCoordinate: tileCoord];
+			MATAnimationTile *tile = [[MATAnimationTile alloc] initWithFrame: frame tileCoordinate: tileCoord];
 			[tiles addObject:tile];
         }
     }
     return [NSArray arrayWithArray: tiles];
 }
 //============================================================
-- (void) fetchTileImage: (TCCMapTile *)aMapTile baseURLString: (NSString *)aURLString;
+- (void) fetchTileImage: (MATAnimationTile *)aMapTile baseURLString: (NSString *)aURLString;
 {
-	TCCMapTile *mapTile = aMapTile;
+	MATAnimationTile *mapTile = aMapTile;
 	TCCMapTileProvider *provider = self;
 	
 	[self.operationQueue addOperationWithBlock: ^{

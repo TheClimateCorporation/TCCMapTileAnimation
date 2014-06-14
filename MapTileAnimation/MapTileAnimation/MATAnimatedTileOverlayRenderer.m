@@ -6,11 +6,11 @@
 //  Copyright (c) 2014 The Climate Corporation. All rights reserved.
 //
 
-#import "TCCMapTileRenderer.h"
-#import "TCCMapTileOverlay.h"
-#import "TCCMapTile.h"
+#import "MATAnimatedTileOverlayRenderer.h"
+#import "MATAnimatedTileOverlay.h"
+#import "MATAnimationTile.h"
 
-@implementation TCCMapTileRenderer
+@implementation MATAnimatedTileOverlayRenderer
 
 - (id) initWithOverlay:(id<MKOverlay>)overlay
 {
@@ -29,7 +29,7 @@
 
 -(void)drawMapRect:(MKMapRect)mapRect zoomScale:(MKZoomScale)zoomScale inContext:(CGContextRef)context
 {
-    TCCMapTileOverlay *mapOverlay = (TCCMapTileOverlay *)self.overlay;
+    MATAnimatedTileOverlay *mapOverlay = (MATAnimatedTileOverlay *)self.overlay;
     
     // Get a list of one or more tile images for this map's rect.
 	
@@ -37,7 +37,7 @@
     
     CGContextSetAlpha(context, 1.0);
     
-    for (TCCMapTile *tile in rectTiles)
+    for (MATAnimationTile *tile in rectTiles)
     {
 		if (tile.imageTile == nil)
 			continue;

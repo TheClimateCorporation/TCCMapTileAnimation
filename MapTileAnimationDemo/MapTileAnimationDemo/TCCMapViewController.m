@@ -9,8 +9,8 @@
 #import "TCCMapViewController.h"
 #import "TCCTimeFrameParser.h"
 
-#import "TCCMapTileRenderer.h"
-#import "TCCMapTileOverlay.h"
+#import "MATAnimatedTileOverlayRenderer.h"
+#import "MATAnimatedTileOverlay.h"
 
 #import "TCCMapTileProviderProtocol.h"
 #import "TCCMapTileProvider.h"
@@ -29,8 +29,8 @@
 @property (nonatomic, readwrite, strong) TCCTimeFrameParser *timeFrameParser;
 @property (readwrite, assign) NSUInteger currentTimeIndex;
 
-@property (readwrite, weak) TCCMapTileOverlay *tileOverlay;
-@property (readwrite, weak) TCCMapTileRenderer *tileRenderer;
+@property (readwrite, weak) MATAnimatedTileOverlay *tileOverlay;
+@property (readwrite, weak) MATAnimatedTileOverlayRenderer *tileRenderer;
 
 @end
 
@@ -118,7 +118,7 @@
 			//start downloading the image tiles for the time frame indexes
 			[self.tileProvider fetchTilesForMapRect: self.mapView.visibleMapRect zoomScale: [self.mapView currentZoomScale] timeIndex: self.currentTimeIndex completionBlock:^(NSArray *tileArray) {
 				
-				TCCMapTileOverlay *overlay = [[TCCMapTileOverlay alloc] initWithTileArray: tileArray];
+				MATAnimatedTileOverlay *overlay = [[MATAnimatedTileOverlay alloc] initWithTileArray: tileArray];
 				[controller.mapView addOverlay: overlay];
 				
 			}];
@@ -139,10 +139,10 @@
 		MKTileOverlayRenderer *renderer = [[MKTileOverlayRenderer alloc] initWithTileOverlay: (MKTileOverlay *)overlay];
 		return renderer;
 	}
-	else if ([overlay isKindOfClass: [TCCMapTileOverlay class]])
+	else if ([overlay isKindOfClass: [MATAnimatedTileOverlay class]])
 	{
-		self.tileOverlay = (TCCMapTileOverlay *)overlay;
-		TCCMapTileRenderer *renderer = [[TCCMapTileRenderer alloc] initWithOverlay: self.tileOverlay];
+		self.tileOverlay = (MATAnimatedTileOverlay *)overlay;
+		MATAnimatedTileOverlayRenderer *renderer = [[MATAnimatedTileOverlayRenderer alloc] initWithOverlay: self.tileOverlay];
 		self.tileRenderer = renderer;
 		return self.tileRenderer;
 	}

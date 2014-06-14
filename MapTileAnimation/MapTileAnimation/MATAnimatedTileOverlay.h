@@ -8,7 +8,7 @@
 
 #import <MapKit/MapKit.h>
 
-@interface TCCMapTileOverlay : NSObject <MKOverlay>
+@interface MATAnimatedTileOverlay : NSObject <MKOverlay>
 
 @property (readwrite, strong) NSArray *mapTiles;
 

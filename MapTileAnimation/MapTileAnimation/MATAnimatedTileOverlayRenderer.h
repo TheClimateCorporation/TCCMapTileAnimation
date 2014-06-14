@@ -8,6 +8,6 @@
 
 #import <MapKit/MapKit.h>
 
-@interface TCCMapTileRenderer : MKOverlayRenderer
+@interface MATAnimatedTileOverlayRenderer : MKOverlayRenderer
 
 @end

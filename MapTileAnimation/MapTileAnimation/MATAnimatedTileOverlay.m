@@ -6,9 +6,9 @@
 //  Copyright (c) 2014 The Climate Corporation. All rights reserved.
 //
 
-#import "TCCMapTileOverlay.h"
+#import "MATAnimatedTileOverlay.h"
 
-@implementation TCCMapTileOverlay
+@implementation MATAnimatedTileOverlay
 
 - (id) initWithTileArray: (NSArray *)anArray
 {

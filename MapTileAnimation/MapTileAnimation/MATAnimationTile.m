@@ -6,9 +6,9 @@
 //  Copyright (c) 2014 The Climate Corporation. All rights reserved.
 //
 
-#import "TCCMapTile.h"
+#import "MATAnimationTile.h"
 
-@implementation TCCMapTile
+@implementation MATAnimationTile
 //=================================================================================
 - (id) initWithFrame:(MKMapRect)aTileFrame tileCoordinate:(NSString *)aTileCoordinate
 {
