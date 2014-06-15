@@ -43,8 +43,8 @@
 	
     // Set the starting  location.
     CLLocationCoordinate2D startingLocation;
-    startingLocation.latitude = 38.6272;
-    startingLocation.longitude = -90.1978;
+    startingLocation.latitude = 44.9833;
+    startingLocation.longitude = -93.2667;
 
 	[self.mapView setCenterCoordinate: startingLocation zoomLevel: 6 animated: NO];
 
@@ -105,21 +105,23 @@
 {
 	if (fullyRendered == YES) {
 		
-//		NSArray *templateURLs = self.timeFrameParser.templateFrameTimeURLs;
-//		NSString *templateURL = [templateURLs firstObject];
-//		
+		NSArray *templateURLs = self.timeFrameParser.templateFrameTimeURLs;
+		NSString *templateURL = [templateURLs firstObject];
+		
+		MATAnimatedTileOverlay *overlay = [[MATAnimatedTileOverlay alloc] initWithTemplateURL: templateURL numberOfAnimationFrames: 25 frameDuration: 1.0];
+		
 //		MKTileOverlay *tileOverlay = [[MKTileOverlay alloc] initWithURLTemplate: templateURL];
 //		[self.mapView addOverlay: tileOverlay];
 
 		static dispatch_once_t onceToken;
 		dispatch_once(&onceToken, ^{
-			__block TCCMapViewController *controller = self;
+			TCCMapViewController *controller = self;
 			
 			//start downloading the image tiles for the time frame indexes
 			[self.tileProvider fetchTilesForMapRect: self.mapView.visibleMapRect zoomScale: [self.mapView currentZoomScale] timeIndex: self.currentTimeIndex completionBlock:^(NSArray *tileArray) {
 				
-				MATAnimatedTileOverlay *overlay = [[MATAnimatedTileOverlay alloc] initWithTileArray: tileArray];
-				[controller.mapView addOverlay: overlay];
+//				MATAnimatedTileOverlay *overlay = [[MATAnimatedTileOverlay alloc] initWithTileArray: tileArray];
+//				[controller.mapView addOverlay: overlay];
 				
 			}];
 		});

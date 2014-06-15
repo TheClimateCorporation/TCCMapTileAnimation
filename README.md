@@ -57,6 +57,7 @@ The following MATAnimatedTileOverlay
 
     @protocol MATAnimatedTileOverlayDelegate
     // Do we need will, didStart, and did callbacks?
+    - (NSString *)keyForAnimationTimeIndex: (NSInteger)animationTimeIndex //returns a key for a given animation time index - used for constructing the url for fetching the animation tiles
     - (void)animatedTileOverlay:(MATAnimatedTileOverlay *)animatedTileOverlay willStartAnimatingWithAnimationFrameIndex:(NSInteger)animationFrameIndex;
 	- (void)animatedTileOverlay:(MATAnimatedTileOverlay *)animatedTileOverlay didStartAnimatingWithAnimationFrameIndex:(NSInteger)animationFrameIndex;
     - (void)animatedTileOverlay:(MATAnimatedTileOverlay *)animatedTileOverlay didAnimateWithAnimationFrameIndex:(NSInteger)animationFrameIndex;

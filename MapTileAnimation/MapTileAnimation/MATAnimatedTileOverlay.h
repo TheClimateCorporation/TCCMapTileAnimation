@@ -1,5 +1,5 @@
 //
-//  TCCMapTileOverlay.h
+//  MATAnimatedTileOverlay.h
 //  MapTileAnimationDemo
 //
 //  Created by Bruce Johnson on 6/12/14.
@@ -11,6 +11,8 @@
 @interface MATAnimatedTileOverlay : NSObject <MKOverlay>
 
 @property (readwrite, strong) NSArray *mapTiles;
+
+- (id) initWithTemplateURL: (NSString *)aTemplateURLstring numberOfAnimationFrames:(NSUInteger)numberOfAnimationFrames frameDuration:(NSTimeInterval)frameDuration;
 
 - (id) initWithTileArray: (NSArray *)anArray;
 
