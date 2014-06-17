@@ -11,15 +11,16 @@
 @interface MATAnimatedTileOverlay : NSObject <MKOverlay>
 
 @property (readwrite, assign) NSInteger currentTimeIndex;
+@property (readwrite, assign) NSInteger tileSize;
 
 @property (readwrite, strong) NSArray *mapTiles;
 
 - (id) initWithTemplateURLs: (NSArray *)templateURLs numberOfAnimationFrames:(NSUInteger)numberOfAnimationFrames frameDuration:(NSTimeInterval)frameDuration;
 
-- (id) initWithTileArray: (NSArray *)anArray;
+- (void) cancelAllOperations;
 
 - (void) updateWithTileArray: (NSArray *)aTileArray;
 
-- (void) fetchTilesForMapRect: (MKMapRect)aMapRect zoomScale: (MKZoomScale)aScale completionBlock: (void (^)(NSArray *tileArray))block;
+- (void) fetchTilesForMapRect: (MKMapRect)aMapRect zoomScale: (MKZoomScale)aScale progressBlock:(void(^)(NSUInteger currentTimeIndex, NSError *error))progressBlock completionBlock: (void (^)(BOOL success, NSError *error))completionBlock;
 
 @end

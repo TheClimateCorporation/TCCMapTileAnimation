@@ -35,7 +35,7 @@
 	
     NSArray *rectTiles = mapOverlay.mapTiles;
     
-    CGContextSetAlpha(context, 1.0);
+    CGContextSetAlpha(context, 0.75);
     
     for (MATAnimationTile *tile in rectTiles)
     {

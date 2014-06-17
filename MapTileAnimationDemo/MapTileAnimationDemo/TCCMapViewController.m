@@ -42,8 +42,8 @@
     startingLocation.longitude = -111.8833;
 
 	[self.mapView setCenterCoordinate: startingLocation zoomLevel: 6 animated: NO];
-
 	self.timeFrameParser = [[TCCTimeFrameParser alloc] initWithURLString: @FUTURE_RADAR_FRAMES_URI];
+	
 }
 //============================================================
 - (void)didReceiveMemoryWarning
@@ -60,11 +60,14 @@
 
 	TCCMapViewController *controller = self;
 	
-	[self.animatedTileOverlay fetchTilesForMapRect: self.mapView.visibleMapRect zoomScale: [self.mapView currentZoomScale] completionBlock:^(NSArray *tileArray) {
-		[controller.animatedTileRenderer setNeedsDisplay];
-		NSLog(@"done");
+	[self.animatedTileOverlay fetchTilesForMapRect: self.mapView.visibleMapRect zoomScale: [self.mapView currentZoomScale] progressBlock:^(NSUInteger currentTimeIndex, NSError *error) {
+		
+	} completionBlock:^(BOOL success, NSError *error) {
+		if (success) {
+			[controller.animatedTileRenderer setNeedsDisplay];
+			NSLog(@"done");
+		}
 	}];
-
 }
 //============================================================
 #pragma mark - MKMapViewDelegate Protocol
@@ -72,8 +75,6 @@
 - (void)mapViewDidFinishRenderingMap:(MKMapView *)mapView fullyRendered:(BOOL)fullyRendered
 {
 	if (fullyRendered == YES) {
-		
-		
 //		MKTileOverlay *tileOverlay = [[MKTileOverlay alloc] initWithURLTemplate: [templateURLs firstObject]];
 //		[self.mapView addOverlay: tileOverlay];
 
@@ -85,11 +86,16 @@
 			//start downloading the image tiles for the time frame indexes
 			NSArray *templateURLs = self.timeFrameParser.templateFrameTimeURLs;
 			MATAnimatedTileOverlay *overlay = [[MATAnimatedTileOverlay alloc] initWithTemplateURLs: templateURLs numberOfAnimationFrames: templateURLs.count frameDuration: 1.0];
-			[overlay fetchTilesForMapRect: self.mapView.visibleMapRect zoomScale: [self.mapView currentZoomScale] completionBlock:^(NSArray *tileArray) {
-				[controller.mapView addOverlay: overlay];
+			[overlay fetchTilesForMapRect: self.mapView.visibleMapRect zoomScale: [self.mapView currentZoomScale] progressBlock: ^(NSUInteger currentTimeIndex, NSError *error) {
+				
+				NSLog(@"current Index %lu", (unsigned long)currentTimeIndex);
+				
+			} completionBlock: ^(BOOL success, NSError *error) {
+				if (success) {
+					[controller.mapView addOverlay: overlay level: MKOverlayLevelAboveRoads];
+				}
 			}];
 		});
-
 	}
 }
 //============================================================

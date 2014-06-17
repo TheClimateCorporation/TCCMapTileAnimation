@@ -15,13 +15,12 @@
 #define Y_INDEX "{y}"
 #define T_INDEX "{t}"
 
-#define OVERLAY_SIZE 256.0
 
-static NSInteger zoomScaleToZoomLevel(MKZoomScale scale)
+static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 {
     // Conver an MKZoomScale to a zoom level where level 0 contains
     // four square tiles.
-    double numberOfTilesAt1_0 = MKMapSizeWorld.width / OVERLAY_SIZE;
+    double numberOfTilesAt1_0 = MKMapSizeWorld.width / overlaySize;
     
     //Add 1 to account for virtual tile
     NSInteger zoomLevelAt1_0 = log2(numberOfTilesAt1_0);
@@ -56,16 +55,8 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale)
 		self.imageTileCache = [[NSCache alloc] init];
 		self.imageTileCache.name = NSStringFromClass([MATAnimatedTileOverlay class]);
 		self.imageTileCache.countLimit = 450;
+		self.tileSize = 256;
 
-	}
-	return self;
-}
-
-- (id) initWithTileArray: (NSArray *)anArray
-{
-	self = [super init];
-	if (self) {
-		self.mapTiles = anArray;
 	}
 	return self;
 }
@@ -78,6 +69,11 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale)
 - (void) updateWithTileArray: (NSArray *)aTileArray
 {
 	self.mapTiles = aTileArray;
+}
+
+- (void) cancelAllOperations
+{
+	[self.operationQueue cancelAllOperations];
 }
 
 - (NSString *) URLStringForX: (NSInteger)xValue Y: (NSInteger)yValue Z: (NSInteger)zValue
@@ -106,34 +102,35 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale)
     return MKMapRectWorld;
 }
 
-- (void) fetchTilesForMapRect: (MKMapRect)aMapRect zoomScale: (MKZoomScale)aScale completionBlock: (void (^)(NSArray *tileArray))block
+- (void) fetchTilesForMapRect: (MKMapRect)aMapRect zoomScale: (MKZoomScale)aScale progressBlock:(void(^)(NSUInteger currentTimeIndex, NSError *error))progressBlock completionBlock: (void (^)(BOOL success, NSError *error))completionBlock
 {
 	NSArray *mapTiles = [self mapTilesInMapRect: aMapRect zoomScale: aScale];
-	
+	NSInteger counter = 0;
 	for (MATAnimationTile *tile in mapTiles) {
 		
 		NSString *tileURL = [self URLStringForX: tile.xCoordinate Y: tile.yCoordinate Z: tile.zCoordinate];
 		[self fetchTileImage: tile URLString: tileURL];
+		counter++;
 	}
 	
 	[self.operationQueue waitUntilAllOperationsAreFinished];
 	
 	self.mapTiles = mapTiles;
-	block(mapTiles);
+	completionBlock(YES, nil);
 }
 
 - (NSArray *) mapTilesInMapRect: (MKMapRect)aRect zoomScale: (MKZoomScale)aScale
 {
-    NSInteger z = zoomScaleToZoomLevel(aScale);
+    NSInteger z = zoomScaleToZoomLevel(aScale, (double)self.tileSize);
     NSMutableArray *tiles = nil;
 	
     // The number of tiles either wide or high.
 	//	NSInteger zTiles = pow(2, z);
     
-    NSInteger minX = floor((MKMapRectGetMinX(aRect) * aScale) / OVERLAY_SIZE);
-    NSInteger maxX = floor((MKMapRectGetMaxX(aRect) * aScale) / OVERLAY_SIZE);
-    NSInteger minY = floor((MKMapRectGetMinY(aRect) * aScale) / OVERLAY_SIZE);
-    NSInteger maxY = floor((MKMapRectGetMaxY(aRect) * aScale) / OVERLAY_SIZE);
+    NSInteger minX = floor((MKMapRectGetMinX(aRect) * aScale) / self.tileSize);
+    NSInteger maxX = floor((MKMapRectGetMaxX(aRect) * aScale) / self.tileSize);
+    NSInteger minY = floor((MKMapRectGetMinY(aRect) * aScale) / self.tileSize);
+    NSInteger maxY = floor((MKMapRectGetMaxY(aRect) * aScale) / self.tileSize);
 	
 	for(NSInteger x = minX; x <= maxX; x++) {
         for(NSInteger y = minY; y <=maxY; y++) {
@@ -144,14 +141,14 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale)
 			if (!tiles) {
 				tiles = [NSMutableArray array];
 			}
-			MKMapRect frame = MKMapRectMake((double)(x * OVERLAY_SIZE) / aScale, (double)(y * OVERLAY_SIZE) / aScale, OVERLAY_SIZE / aScale, OVERLAY_SIZE / aScale);
+			MKMapRect frame = MKMapRectMake((double)(x * self.tileSize) / aScale, (double)(y * self.tileSize) / aScale, self.tileSize / aScale, self.tileSize / aScale);
 			MATAnimationTile *tile = [[MATAnimationTile alloc] initWithFrame: frame xCord: x yCord: y zCord: z];
 			[tiles addObject:tile];
         }
     }
     return [NSArray arrayWithArray: tiles];
 }
-//============================================================
+
 - (void) fetchTileImage: (MATAnimationTile *)aMapTile URLString: (NSString *)aURLString;
 {
 	MATAnimationTile *mapTile = aMapTile;
