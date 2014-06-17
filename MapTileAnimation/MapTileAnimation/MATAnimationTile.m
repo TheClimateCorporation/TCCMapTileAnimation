@@ -10,11 +10,14 @@
 
 @implementation MATAnimationTile
 //=================================================================================
-- (id) initWithFrame:(MKMapRect)aTileFrame tileCoordinate:(NSString *)aTileCoordinate
+- (id) initWithFrame:(MKMapRect)aTileFrame xCord: (NSInteger)aXCord yCord: (NSInteger)aYCord zCord: (NSInteger)aZCord
 {
     self = [super init];
 	if (self) {
-		self.tileCoordinate = aTileCoordinate;
+		self.tileCoordinate = nil;
+		self.xCoordinate = aXCord;
+		self.yCoordinate = aYCord;
+		self.zCoordinate = aZCord;
         self.mapRectFrame = aTileFrame;
 		self.imageTile = nil;
     }

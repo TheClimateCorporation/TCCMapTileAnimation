@@ -28,7 +28,6 @@
 		9B49BC0019490AAE00094005 /* TCCMapViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B49BBFD19490AAE00094005 /* TCCMapViewController.m */; };
 		9B49BC0119490AAE00094005 /* TCCTimeFrameParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B49BBFF19490AAE00094005 /* TCCTimeFrameParser.m */; };
 		9B49BC5D19490CA500094005 /* MATAnimationTile.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B49BC5919490CA500094005 /* MATAnimationTile.m */; };
-		9B49BC5E19490CA500094005 /* TCCMapTileProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B49BC5B19490CA500094005 /* TCCMapTileProvider.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -73,9 +72,6 @@
 		9B49BBFF19490AAE00094005 /* TCCTimeFrameParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCCTimeFrameParser.m; sourceTree = "<group>"; };
 		9B49BC5819490CA500094005 /* MATAnimationTile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MATAnimationTile.h; sourceTree = "<group>"; };
 		9B49BC5919490CA500094005 /* MATAnimationTile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MATAnimationTile.m; sourceTree = "<group>"; };
-		9B49BC5A19490CA500094005 /* TCCMapTileProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCCMapTileProvider.h; sourceTree = "<group>"; };
-		9B49BC5B19490CA500094005 /* TCCMapTileProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCCMapTileProvider.m; sourceTree = "<group>"; };
-		9B49BC5C19490CA500094005 /* TCCMapTileProviderProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCCMapTileProviderProtocol.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -190,9 +186,6 @@
 				32446D8A194A1BE500664240 /* MATAnimatedTileOverlay.m */,
 				9B49BC5819490CA500094005 /* MATAnimationTile.h */,
 				9B49BC5919490CA500094005 /* MATAnimationTile.m */,
-				9B49BC5C19490CA500094005 /* TCCMapTileProviderProtocol.h */,
-				9B49BC5A19490CA500094005 /* TCCMapTileProvider.h */,
-				9B49BC5B19490CA500094005 /* TCCMapTileProvider.m */,
 				3269A4F319491E0A003F1AE3 /* MKMapView+Extras.h */,
 				3269A4F419491E0A003F1AE3 /* MKMapView+Extras.m */,
 			);
@@ -305,7 +298,6 @@
 				3269A4F519491E0A003F1AE3 /* MKMapView+Extras.m in Sources */,
 				9B49BC5D19490CA500094005 /* MATAnimationTile.m in Sources */,
 				32446D8E194A1CAA00664240 /* MATAnimatedTileOverlayRenderer.m in Sources */,
-				9B49BC5E19490CA500094005 /* TCCMapTileProvider.m in Sources */,
 				32446D8B194A1BE500664240 /* MATAnimatedTileOverlay.m in Sources */,
 				9B49BBD519490A5700094005 /* TCCAppDelegate.m in Sources */,
 			);

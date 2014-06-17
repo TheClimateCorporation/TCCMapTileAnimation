@@ -8,12 +8,15 @@
 
 #import "TCCTimeFrameParser.h"
 
-#define TIMEFRAME_TEMPLATE_STRING "http://qa1-twi.climate.com/assets/wdt-future-radar/%@/%@/{z}/{x}/{y}.png"
-#define TIMEFRAME_URI "http://qa1-twi.climate.com/assets/wdt-future-radar/%@/%@"
+#define TIMEFRAME_TEMPLATE_STRING "http://climate.com/assets/wdt-future-radar/%@/%@/{z}/{x}/{y}.png"
+#define TIMEFRAME_URI "http://climate.com/assets/wdt-future-radar/%@/%@"
 
 @interface TCCTimeFrameParser ()
 
+@property (nonatomic, readwrite, strong) NSOperationQueue *operationQueue;
 @property (readwrite, strong) NSDictionary *timeStampsBackingDictionary;
+
+- (void) fetchTimeStampsAtURL: (NSURL *)aURL;
 
 @end
 
@@ -21,6 +24,18 @@
 {
 	NSArray *_templateFrameTimeURLs;
 	NSArray *_timeFrameURLs;
+}
+
+- (id) initWithURLString: (NSString *)aURLString
+{
+	self = [super init];
+	if (self) {
+		self.operationQueue = [[NSOperationQueue alloc] init];
+
+		[self fetchTimeStampsAtURL: [NSURL URLWithString: aURLString]];
+		
+	}
+	return self;
 }
 
 - (id) initWithData: (NSData *)timeStampData
@@ -31,6 +46,28 @@
 	}
 	return self;
 }
+
+- (void) fetchTimeStampsAtURL: (NSURL *)aURL
+{
+	[self.operationQueue addOperationWithBlock: ^{
+		NSURLSession *session = [NSURLSession sharedSession];
+		NSURLSessionTask *task = [session dataTaskWithURL: aURL completionHandler: ^(NSData *data, NSURLResponse *response, NSError *error) {
+			
+			NSHTTPURLResponse *urlResponse = (NSHTTPURLResponse *)response;
+			
+			if (data) {
+				if (urlResponse.statusCode == 200) {
+					self.timeStampsBackingDictionary = [NSJSONSerialization JSONObjectWithData: data options: 0 error: nil];
+				}
+			} else {
+				NSLog(@"error = %@", error);
+			}
+			
+		}];
+		[task resume];
+	}];
+}
+
 //=================================================================================
 - (NSString *)ingestTimeStampString
 {

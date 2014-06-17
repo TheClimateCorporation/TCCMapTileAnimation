@@ -11,11 +11,15 @@
 
 @interface MATAnimationTile : NSObject
 
+@property (nonatomic, readwrite, assign) NSInteger xCoordinate;
+@property (nonatomic, readwrite, assign) NSInteger yCoordinate;
+@property (nonatomic, readwrite, assign) NSInteger zCoordinate;
+
 @property (nonatomic, readwrite, strong) NSString *tileCoordinate;
 @property (nonatomic, readwrite, assign) MKMapRect mapRectFrame;
 @property (nonatomic, readwrite, strong) UIImage *imageTile;
 
-- (id) initWithFrame:(MKMapRect)aTileFrame tileCoordinate:(NSString *)aTileCoordinate;
+- (id) initWithFrame:(MKMapRect)aTileFrame xCord: (NSInteger)aXCord yCord: (NSInteger)aYCord zCord: (NSInteger)aZCord;
 
 
 @end

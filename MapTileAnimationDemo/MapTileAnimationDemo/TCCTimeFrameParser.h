@@ -17,6 +17,8 @@
 
 @property (readonly) NSUInteger countOfTimeIndexes;
 
+- (id) initWithURLString: (NSString *)aURLString;
+
 - (id) initWithData: (NSData *)timeStampData;
 
 @end
