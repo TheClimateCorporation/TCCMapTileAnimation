@@ -16,4 +16,6 @@
 -(MKCoordinateRegion)coordinateRegionWithMapView:(MKMapView *)mapView centerCoordinate:(CLLocationCoordinate2D)centerCoordinate andZoomLevel:(NSUInteger)zoomLevel;
 - (NSUInteger)zoomLevel;
 
+NSString *NSStringFromMapRect(MKMapRect aRect);
+
 @end

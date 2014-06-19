@@ -44,7 +44,7 @@
     startingLocation.latitude = 34.1811;
     startingLocation.longitude = -97.1294;
 
-	[self.mapView setCenterCoordinate: startingLocation zoomLevel: 6 animated: NO];
+	[self.mapView setCenterCoordinate: startingLocation zoomLevel: 4 animated: NO];
 	self.timeFrameParser = [[TCCTimeFrameParser alloc] initWithURLString: @FUTURE_RADAR_FRAMES_URI];
 	
 }
@@ -65,6 +65,33 @@
 	[self.animatedTileRenderer setNeedsDisplay];
 
 }
+
+- (IBAction) onHandleStartStopAction: (id)sender
+{
+	[self.tileOverlayRenderer setAlpha: 1.0];
+
+		TCCMapViewController *controller = self;
+		
+		//start downloading the image tiles for the time frame indexes
+		self.downloadProgressView.hidden = NO;
+		NSLog(@"I rect %@, scale %lf", NSStringFromMapRect(self.mapView.visibleMapRect), [self.mapView currentZoomScale]);
+
+		[self.animatedTileOverlay fetchTilesForMapRect: self.mapView.visibleMapRect zoomScale: [self.mapView currentZoomScale] progressBlock: ^(NSUInteger currentTimeIndex, NSError *error) {
+			
+			CGFloat progressValue = (CGFloat)currentTimeIndex / (CGFloat)(self.animatedTileOverlay.numberOfAnimationFrames - 1);
+			[controller.downloadProgressView setProgress: progressValue animated: YES];
+			
+		} completionBlock: ^(BOOL success, NSError *error) {
+			
+			if (success) {
+				[self.tileOverlayRenderer setAlpha: 0.0];
+				controller.timeIndexStepper.maximumValue = (double)self.animatedTileOverlay.numberOfAnimationFrames - 1;
+				controller.downloadProgressView.hidden = YES;
+				[controller.downloadProgressView setProgress: 0.0];
+				[controller.animatedTileRenderer setNeedsDisplay];
+			}
+		}];
+}
 //============================================================
 #pragma mark - MKMapViewDelegate Protocol
 //============================================================
@@ -77,28 +104,10 @@
 			
 			MKTileOverlay *tileOverlay = [[MKTileOverlay alloc] initWithURLTemplate: [self.timeFrameParser.templateFrameTimeURLs firstObject]];
 			[self.mapView addOverlay: tileOverlay level: MKOverlayLevelAboveRoads];
-
-			TCCMapViewController *controller = self;
-
-			//start downloading the image tiles for the time frame indexes
+			
 			NSArray *templateURLs = self.timeFrameParser.templateFrameTimeURLs;
 			MATAnimatedTileOverlay *overlay = [[MATAnimatedTileOverlay alloc] initWithTemplateURLs: templateURLs numberOfAnimationFrames: templateURLs.count frameDuration: 1.0];
-			self.downloadProgressView.hidden = NO;
-			[overlay fetchTilesForMapRect: self.mapView.visibleMapRect zoomScale: [self.mapView currentZoomScale] progressBlock: ^(NSUInteger currentTimeIndex, NSError *error) {
-				
-				CGFloat progressValue = (CGFloat)currentTimeIndex / (CGFloat)(templateURLs.count - 1);
-				[controller.downloadProgressView setProgress: progressValue animated: YES];
-				
-			} completionBlock: ^(BOOL success, NSError *error) {
-				
-				if (success) {
-					[self.tileOverlayRenderer setAlpha: 0.0];
-					controller.timeIndexStepper.maximumValue = (double)templateURLs.count - 1;
-					[controller.mapView addOverlay: overlay level: MKOverlayLevelAboveRoads];
-					controller.downloadProgressView.hidden = YES;
-					[controller.downloadProgressView setProgress: 0.0];
-				}
-			}];
+			[self.mapView addOverlay: overlay level: MKOverlayLevelAboveRoads];
 
 		});
 	}
@@ -106,7 +115,11 @@
 //============================================================
 - (void)mapView:(MKMapView *)mapView regionDidChangeAnimated:(BOOL)animated
 {
-	
+	if (animated == NO) {
+		
+		NSLog(@"O rect %@, scale %lf", NSStringFromMapRect(self.mapView.visibleMapRect), [self.mapView currentZoomScale]);
+		
+	}
 }
 //============================================================
 - (MKOverlayRenderer *)mapView:(MKMapView *)mapView rendererForOverlay:(id < MKOverlay >)overlay

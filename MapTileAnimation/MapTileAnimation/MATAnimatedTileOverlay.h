@@ -10,6 +10,7 @@
 
 @interface MATAnimatedTileOverlay : NSObject <MKOverlay>
 
+@property (nonatomic, assign) NSInteger numberOfAnimationFrames;
 @property (readwrite, assign) NSInteger currentTimeIndex;
 @property (readwrite, assign) NSInteger tileSize;
 

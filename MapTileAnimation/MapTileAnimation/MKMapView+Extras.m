@@ -169,4 +169,8 @@
 	return zoomLevel;
 }
 
+NSString *NSStringFromMapRect(MKMapRect aRect)
+{
+	return [NSString stringWithFormat: @"(%lf-%lf), (%lf-%lf)",aRect.origin.x, aRect.origin.y, aRect.size.width, aRect.size.height];
+}
 @end

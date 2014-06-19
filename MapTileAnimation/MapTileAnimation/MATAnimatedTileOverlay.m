@@ -13,12 +13,11 @@
 #define Z_INDEX "{z}"
 #define X_INDEX "{x}"
 #define Y_INDEX "{y}"
-#define T_INDEX "{t}"
 
 
 static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 {
-    // Conver an MKZoomScale to a zoom level where level 0 contains
+    // Convert an MKZoomScale to a zoom level where level 0 contains
     // four square tiles.
     double numberOfTilesAt1_0 = MKMapSizeWorld.width / overlaySize;
     //Add 1 to account for virtual tile
@@ -33,11 +32,10 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 @property (nonatomic, readwrite, strong) NSOperationQueue *downLoadOperationQueue;
 @property (nonatomic, readwrite, strong) NSCache *imageTileCache;
 @property (nonatomic, readwrite, strong) NSArray *templateURLs;
-@property (nonatomic, assign) NSInteger numberOfAnimationFrames;
 @property (nonatomic, assign) NSTimeInterval frameDuration;
 
 - (NSString *) URLStringForX: (NSInteger)xValue Y: (NSInteger)yValue Z: (NSInteger)zValue timeIndex: (NSInteger)aTimeIndex;
-- (void) fetchAndCacheTileAtURL: (NSString *)aUrlString;
+- (void) fetchAndCacheImageTileAtURL: (NSString *)aUrlString;
 
 @end
 
@@ -116,14 +114,14 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 			}
 			tile.tileURLs = [NSArray arrayWithArray: array];
 		}
-		
-		//start downloading the tiles for a given time index
+		//start downloading the tiles for a given time index, we want to download all the tiles for a time index
+		//before we move onto the next time index
 		for (NSUInteger timeIndex = 0; timeIndex < self.numberOfAnimationFrames; timeIndex++) {
 			
 			for (MATAnimationTile *tile in mapTiles) {
 				NSString *tileURL = [tile.tileURLs objectAtIndex: timeIndex];
 				//this will return right away
-				[self fetchAndCacheTileAtURL: tileURL];
+				[self fetchAndCacheImageTileAtURL: tileURL];
 			}
 			//wait for all the tiles in this time index to download before proceeding the next time index
 			[self.downLoadOperationQueue waitUntilAllOperationsAreFinished];
@@ -133,7 +131,7 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 		}
 		
 		[self.downLoadOperationQueue waitUntilAllOperationsAreFinished];
-		NSLog(@"done downloading");
+		//update the tile array with new tile objects
 		self.mapTiles = mapTiles;
 		//set the current image to the first time index
 		[self updateImageTilesToCurrentTimeIndex];
@@ -162,9 +160,6 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
     NSInteger z = zoomScaleToZoomLevel(aScale, (double)self.tileSize);
     NSMutableArray *tiles = nil;
 	
-    // The number of tiles either wide or high.
-	//	NSInteger zTiles = pow(2, z);
-    
     NSInteger minX = floor((MKMapRectGetMinX(aRect) * aScale) / self.tileSize);
     NSInteger maxX = floor((MKMapRectGetMaxX(aRect) * aScale) / self.tileSize);
     NSInteger minY = floor((MKMapRectGetMinY(aRect) * aScale) / self.tileSize);
@@ -172,9 +167,6 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 	
 	for(NSInteger x = minX; x <= maxX; x++) {
         for(NSInteger y = minY; y <=maxY; y++) {
-            // Flip the y index to properly reference overlay files.
-			//			NSInteger flippedY = abs(y + 1 - zTiles);
-//            NSString *tileCoord = [[NSString alloc] initWithFormat:@"%ld/%ld/%ld", (long)z, (long)x, (long)y];
 			
 			if (!tiles) {
 				tiles = [NSMutableArray array];
@@ -187,9 +179,8 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
     return [NSArray arrayWithArray: tiles];
 }
 
-- (void) fetchAndCacheTileAtURL: (NSString *)aUrlString
+- (void) fetchAndCacheImageTileAtURL: (NSString *)aUrlString
 {
-//	NSLog(@"%s", __PRETTY_FUNCTION__);
 	MATAnimatedTileOverlay *overlay = self;
 
 	[self.downLoadOperationQueue addOperationWithBlock: ^{

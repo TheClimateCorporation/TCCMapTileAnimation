@@ -32,29 +32,30 @@
     MATAnimatedTileOverlay *mapOverlay = (MATAnimatedTileOverlay *)self.overlay;
     
     // Get a list of one or more tile images for this map's rect.
-	
-    NSArray *rectTiles = mapOverlay.mapTiles;
-    
-    CGContextSetAlpha(context, 0.75);
-    
-    for (MATAnimationTile *tile in rectTiles)
-    {
-		if (tile.currentImageTile == nil)
-			continue;
+	if (mapOverlay.mapTiles) {
+		NSArray *rectTiles = mapOverlay.mapTiles;
 		
-        // draw each tile in its frame
-        CGRect rect = [self rectForMapRect: tile.mapRectFrame];
+		CGContextSetAlpha(context, 0.75);
 		
-        UIImage *image = tile.currentImageTile;
-        
-        CGContextSaveGState(context);
-        CGContextTranslateCTM(context, CGRectGetMinX(rect), CGRectGetMinY(rect));
-        CGContextScaleCTM(context, 1 / zoomScale, 1 / zoomScale);
-        CGContextTranslateCTM(context, 0, image.size.height);
-        CGContextScaleCTM(context, 1, -1);
-        CGContextDrawImage(context, CGRectMake(0, 0, image.size.width, image.size.height), [image CGImage]);
-        CGContextRestoreGState(context);
-    }
+		for (MATAnimationTile *tile in rectTiles)
+		{
+			if (tile.currentImageTile == nil)
+				continue;
+			
+			// draw each tile in its frame
+			CGRect rect = [self rectForMapRect: tile.mapRectFrame];
+			
+			UIImage *image = tile.currentImageTile;
+			
+			CGContextSaveGState(context);
+			CGContextTranslateCTM(context, CGRectGetMinX(rect), CGRectGetMinY(rect));
+			CGContextScaleCTM(context, 1 / zoomScale, 1 / zoomScale);
+			CGContextTranslateCTM(context, 0, image.size.height);
+			CGContextScaleCTM(context, 1, -1);
+			CGContextDrawImage(context, CGRectMake(0, 0, image.size.width, image.size.height), [image CGImage]);
+			CGContextRestoreGState(context);
+		}
+	}
 }
 
 @end
