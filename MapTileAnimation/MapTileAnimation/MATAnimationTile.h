@@ -17,7 +17,9 @@
 
 @property (nonatomic, readwrite, strong) NSString *tileCoordinate;
 @property (nonatomic, readwrite, assign) MKMapRect mapRectFrame;
-@property (nonatomic, readwrite, strong) UIImage *imageTile;
+@property (nonatomic, readwrite, strong) UIImage *currentImageTile;
+
+@property (nonatomic, readwrite, strong) NSArray *tileURLs;
 
 - (id) initWithFrame:(MKMapRect)aTileFrame xCord: (NSInteger)aXCord yCord: (NSInteger)aYCord zCord: (NSInteger)aZCord;
 

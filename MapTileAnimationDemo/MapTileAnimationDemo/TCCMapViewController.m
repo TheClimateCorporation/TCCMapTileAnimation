@@ -38,8 +38,8 @@
 
     // Set the starting  location.
     CLLocationCoordinate2D startingLocation;
-    startingLocation.latitude = 40.7500;
-    startingLocation.longitude = -111.8833;
+    startingLocation.latitude = 34.1811;
+    startingLocation.longitude = -97.1294;
 
 	[self.mapView setCenterCoordinate: startingLocation zoomLevel: 6 animated: NO];
 	self.timeFrameParser = [[TCCTimeFrameParser alloc] initWithURLString: @FUTURE_RADAR_FRAMES_URI];
@@ -58,16 +58,9 @@
 	
 	self.timeIndexLabel.text = [NSString stringWithFormat: @"%lu", (unsigned long)self.animatedTileOverlay.currentTimeIndex];
 
-	TCCMapViewController *controller = self;
-	
-	[self.animatedTileOverlay fetchTilesForMapRect: self.mapView.visibleMapRect zoomScale: [self.mapView currentZoomScale] progressBlock:^(NSUInteger currentTimeIndex, NSError *error) {
-		
-	} completionBlock:^(BOOL success, NSError *error) {
-		if (success) {
-			[controller.animatedTileRenderer setNeedsDisplay];
-			NSLog(@"done");
-		}
-	}];
+	[self.animatedTileOverlay updateImageTilesToCurrentTimeIndex];
+	[self.animatedTileRenderer setNeedsDisplay];
+
 }
 //============================================================
 #pragma mark - MKMapViewDelegate Protocol
@@ -75,14 +68,15 @@
 - (void)mapViewDidFinishRenderingMap:(MKMapView *)mapView fullyRendered:(BOOL)fullyRendered
 {
 	if (fullyRendered == YES) {
-//		MKTileOverlay *tileOverlay = [[MKTileOverlay alloc] initWithURLTemplate: [templateURLs firstObject]];
-//		[self.mapView addOverlay: tileOverlay];
 
 		static dispatch_once_t onceToken;
 		dispatch_once(&onceToken, ^{
 			
+			MKTileOverlay *tileOverlay = [[MKTileOverlay alloc] initWithURLTemplate: [self.timeFrameParser.templateFrameTimeURLs firstObject]];
+			[self.mapView addOverlay: tileOverlay level: MKOverlayLevelAboveRoads];
+
 			TCCMapViewController *controller = self;
-			
+
 			//start downloading the image tiles for the time frame indexes
 			NSArray *templateURLs = self.timeFrameParser.templateFrameTimeURLs;
 			MATAnimatedTileOverlay *overlay = [[MATAnimatedTileOverlay alloc] initWithTemplateURLs: templateURLs numberOfAnimationFrames: templateURLs.count frameDuration: 1.0];
@@ -92,9 +86,11 @@
 				
 			} completionBlock: ^(BOOL success, NSError *error) {
 				if (success) {
+					controller.timeIndexStepper.maximumValue = (double)templateURLs.count - 1;
 					[controller.mapView addOverlay: overlay level: MKOverlayLevelAboveRoads];
 				}
 			}];
+
 		});
 	}
 }

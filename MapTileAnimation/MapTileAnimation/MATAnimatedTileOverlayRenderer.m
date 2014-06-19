@@ -39,13 +39,13 @@
     
     for (MATAnimationTile *tile in rectTiles)
     {
-		if (tile.imageTile == nil)
+		if (tile.currentImageTile == nil)
 			continue;
 		
         // draw each tile in its frame
         CGRect rect = [self rectForMapRect: tile.mapRectFrame];
 		
-        UIImage *image = tile.imageTile;
+        UIImage *image = tile.currentImageTile;
         
         CGContextSaveGState(context);
         CGContextTranslateCTM(context, CGRectGetMinX(rect), CGRectGetMinY(rect));

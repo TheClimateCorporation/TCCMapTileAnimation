@@ -19,7 +19,7 @@
 		self.yCoordinate = aYCord;
 		self.zCoordinate = aZCord;
         self.mapRectFrame = aTileFrame;
-		self.imageTile = nil;
+		self.currentImageTile = nil;
     }
     return self;
 }

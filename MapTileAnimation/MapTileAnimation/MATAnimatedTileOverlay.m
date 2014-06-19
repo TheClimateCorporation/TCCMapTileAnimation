@@ -21,7 +21,6 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
     // Conver an MKZoomScale to a zoom level where level 0 contains
     // four square tiles.
     double numberOfTilesAt1_0 = MKMapSizeWorld.width / overlaySize;
-    
     //Add 1 to account for virtual tile
     NSInteger zoomLevelAt1_0 = log2(numberOfTilesAt1_0);
     NSInteger zoomLevel = MAX(0, zoomLevelAt1_0 + floor(log2f(scale) + 0.5));
@@ -31,12 +30,14 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 @interface MATAnimatedTileOverlay ()
 
 @property (nonatomic, readwrite, strong) NSOperationQueue *operationQueue;
+@property (nonatomic, readwrite, strong) NSOperationQueue *downLoadOperationQueue;
 @property (nonatomic, readwrite, strong) NSCache *imageTileCache;
 @property (nonatomic, readwrite, strong) NSArray *templateURLs;
 @property (nonatomic, assign) NSInteger numberOfAnimationFrames;
 @property (nonatomic, assign) NSTimeInterval frameDuration;
 
-- (NSString *) URLStringForX: (NSInteger)xValue Y: (NSInteger)yValue Z: (NSInteger)zValue;
+- (NSString *) URLStringForX: (NSInteger)xValue Y: (NSInteger)yValue Z: (NSInteger)zValue timeIndex: (NSInteger)aTimeIndex;
+- (void) fetchAndCacheTileAtURL: (NSString *)aUrlString;
 
 @end
 
@@ -52,11 +53,11 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 		self.frameDuration = frameDuration;
 		self.currentTimeIndex = 0;
 		self.operationQueue = [[NSOperationQueue alloc] init];
+		self.downLoadOperationQueue = [[NSOperationQueue alloc] init];
 		self.imageTileCache = [[NSCache alloc] init];
 		self.imageTileCache.name = NSStringFromClass([MATAnimatedTileOverlay class]);
-		self.imageTileCache.countLimit = 450;
+		self.imageTileCache.countLimit = 512;
 		self.tileSize = 256;
-
 	}
 	return self;
 }
@@ -66,19 +67,15 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 	[self.imageTileCache removeAllObjects];
 }
 
-- (void) updateWithTileArray: (NSArray *)aTileArray
-{
-	self.mapTiles = aTileArray;
-}
-
 - (void) cancelAllOperations
 {
 	[self.operationQueue cancelAllOperations];
+	[self.downLoadOperationQueue cancelAllOperations];
 }
 
-- (NSString *) URLStringForX: (NSInteger)xValue Y: (NSInteger)yValue Z: (NSInteger)zValue
+- (NSString *) URLStringForX: (NSInteger)xValue Y: (NSInteger)yValue Z: (NSInteger)zValue timeIndex: (NSInteger)aTimeIndex
 {
-	NSString *currentTemplateURL = [self.templateURLs objectAtIndex: self.currentTimeIndex];
+	NSString *currentTemplateURL = [self.templateURLs objectAtIndex: aTimeIndex];
 	NSString *returnString = nil;
 	NSString *xString = [NSString stringWithFormat: @"%ld", (long)xValue];
 	NSString *yString = [NSString stringWithFormat: @"%ld", (long)yValue];
@@ -104,19 +101,60 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 
 - (void) fetchTilesForMapRect: (MKMapRect)aMapRect zoomScale: (MKZoomScale)aScale progressBlock:(void(^)(NSUInteger currentTimeIndex, NSError *error))progressBlock completionBlock: (void (^)(BOOL success, NSError *error))completionBlock
 {
-	NSArray *mapTiles = [self mapTilesInMapRect: aMapRect zoomScale: aScale];
-	NSInteger counter = 0;
-	for (MATAnimationTile *tile in mapTiles) {
+	[self.operationQueue addOperationWithBlock:^{
+		//calculate the tiles rects needed for a given maprect and create the MATAnimationTile objects
+		NSArray *mapTiles = [self mapTilesInMapRect: aMapRect zoomScale: aScale];
 		
-		NSString *tileURL = [self URLStringForX: tile.xCoordinate Y: tile.yCoordinate Z: tile.zCoordinate];
-		[self fetchTileImage: tile URLString: tileURL];
-		counter++;
+		//at this point we have an array of MATAnimationTiles we need to derive the urls for each tile, for each time index
+		for (MATAnimationTile *tile in mapTiles) {
+			
+			NSMutableArray *array = [NSMutableArray arrayWithCapacity: self.templateURLs.count];
+			
+			for (NSUInteger timeIndex = 0; timeIndex < self.numberOfAnimationFrames; timeIndex++) {
+				NSString *tileURL = [self URLStringForX: tile.xCoordinate Y: tile.yCoordinate Z: tile.zCoordinate timeIndex: timeIndex];
+				[array addObject: tileURL];
+			}
+			tile.tileURLs = [NSArray arrayWithArray: array];
+		}
+		
+		//start downloading the tiles for a given time index
+		for (NSUInteger timeIndex = 0; timeIndex < self.numberOfAnimationFrames; timeIndex++) {
+			
+			for (MATAnimationTile *tile in mapTiles) {
+				NSString *tileURL = [tile.tileURLs objectAtIndex: timeIndex];
+				//this will return right away
+				[self fetchAndCacheTileAtURL: tileURL];
+			}
+			//wait for all the tiles in this time index to download before proceeding the next time index
+			[self.downLoadOperationQueue waitUntilAllOperationsAreFinished];
+			dispatch_async(dispatch_get_main_queue(), ^{
+				progressBlock(timeIndex, nil);
+			});
+		}
+		
+		[self.downLoadOperationQueue waitUntilAllOperationsAreFinished];
+		NSLog(@"done downloading");
+		self.mapTiles = mapTiles;
+		//set the current image to the first time index
+		[self updateImageTilesToCurrentTimeIndex];
+		
+		dispatch_async(dispatch_get_main_queue(), ^{
+			completionBlock(YES, nil);
+		});
+	}];
+}
+
+- (void) updateImageTilesToCurrentTimeIndex
+{
+	for (MATAnimationTile *tile in self.mapTiles) {
+		
+		NSString *cacheKey = [tile.tileURLs objectAtIndex: self.currentTimeIndex];
+		NSData *cachedData = [self.imageTileCache objectForKey: cacheKey];
+		if (cachedData) {
+			UIImage *img = [[UIImage alloc] initWithData: cachedData];
+			tile.currentImageTile = img;
+		}
 	}
-	
-	[self.operationQueue waitUntilAllOperationsAreFinished];
-	
-	self.mapTiles = mapTiles;
-	completionBlock(YES, nil);
 }
 
 - (NSArray *) mapTilesInMapRect: (MKMapRect)aRect zoomScale: (MKZoomScale)aScale
@@ -149,12 +187,49 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
     return [NSArray arrayWithArray: tiles];
 }
 
+- (void) fetchAndCacheTileAtURL: (NSString *)aUrlString
+{
+//	NSLog(@"%s", __PRETTY_FUNCTION__);
+	MATAnimatedTileOverlay *overlay = self;
+
+	[self.downLoadOperationQueue addOperationWithBlock: ^{
+		
+		NSData *cachedData = [overlay.imageTileCache objectForKey: aUrlString];
+
+		if (cachedData != nil) {
+			
+		} else {
+			dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+			
+			NSURLSession *session = [NSURLSession sharedSession];
+			NSURLSessionTask *task = [session dataTaskWithURL: [NSURL URLWithString: aUrlString] completionHandler: ^(NSData *data, NSURLResponse *response, NSError *error) {
+				
+				NSHTTPURLResponse *urlResponse = (NSHTTPURLResponse *)response;
+				
+				if (data) {
+					if (urlResponse.statusCode == 200) {
+						[overlay.imageTileCache setObject: data forKey: aUrlString];
+					}
+				} else {
+					NSLog(@"error = %@", error);
+				}
+				
+				dispatch_semaphore_signal(semaphore);
+			}];
+			[task resume];
+			// have the thread wait until the download task is done
+			dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * 10));
+		}
+	}];
+}
+
+
 - (void) fetchTileImage: (MATAnimationTile *)aMapTile URLString: (NSString *)aURLString;
 {
 	MATAnimationTile *mapTile = aMapTile;
 	MATAnimatedTileOverlay *overlay = self;
 	
-	[self.operationQueue addOperationWithBlock: ^{
+	[self.downLoadOperationQueue addOperationWithBlock: ^{
 		dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
 		
 		NSString *cacheKey = aURLString;
@@ -164,7 +239,7 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 		{
 //			NSLog(@"using cached data");
 			UIImage *img = [[UIImage alloc] initWithData: cachedData];
-			mapTile.imageTile = img;
+			mapTile.currentImageTile = img;
 			dispatch_semaphore_signal(semaphore);
 		}
 		else
@@ -182,7 +257,7 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 					if (urlResponse.statusCode == 200) {
 						[overlay.imageTileCache setObject: data forKey: cacheKey];
 						UIImage *img = [[UIImage alloc] initWithData: data];
-						mapTile.imageTile = img;
+						mapTile.currentImageTile = img;
 					}
 				} else {
 					NSLog(@"error = %@", error);
@@ -194,7 +269,7 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 		}
 		
 		// have the thread wait until the download task is done
-		dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+		dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * 10));
 	}];
 }
 
