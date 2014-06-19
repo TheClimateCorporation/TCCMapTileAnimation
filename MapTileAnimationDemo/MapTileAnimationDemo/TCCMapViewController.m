@@ -23,8 +23,11 @@
 @property (nonatomic, readwrite, weak) IBOutlet MKMapView *mapView;
 @property (weak, nonatomic) IBOutlet UIStepper *timeIndexStepper;
 @property (weak, nonatomic) IBOutlet UILabel *timeIndexLabel;
+@property (weak, nonatomic) IBOutlet UIProgressView *downloadProgressView;
+
 @property (nonatomic, readwrite, strong) TCCTimeFrameParser *timeFrameParser;
 
+@property (readwrite, weak) MKTileOverlayRenderer *tileOverlayRenderer;
 @property (readwrite, weak) MATAnimatedTileOverlay *animatedTileOverlay;
 @property (readwrite, weak) MATAnimatedTileOverlayRenderer *animatedTileRenderer;
 
@@ -80,14 +83,20 @@
 			//start downloading the image tiles for the time frame indexes
 			NSArray *templateURLs = self.timeFrameParser.templateFrameTimeURLs;
 			MATAnimatedTileOverlay *overlay = [[MATAnimatedTileOverlay alloc] initWithTemplateURLs: templateURLs numberOfAnimationFrames: templateURLs.count frameDuration: 1.0];
+			self.downloadProgressView.hidden = NO;
 			[overlay fetchTilesForMapRect: self.mapView.visibleMapRect zoomScale: [self.mapView currentZoomScale] progressBlock: ^(NSUInteger currentTimeIndex, NSError *error) {
 				
-				NSLog(@"current Index %lu", (unsigned long)currentTimeIndex);
+				CGFloat progressValue = (CGFloat)currentTimeIndex / (CGFloat)(templateURLs.count - 1);
+				[controller.downloadProgressView setProgress: progressValue animated: YES];
 				
 			} completionBlock: ^(BOOL success, NSError *error) {
+				
 				if (success) {
+					[self.tileOverlayRenderer setAlpha: 0.0];
 					controller.timeIndexStepper.maximumValue = (double)templateURLs.count - 1;
 					[controller.mapView addOverlay: overlay level: MKOverlayLevelAboveRoads];
+					controller.downloadProgressView.hidden = YES;
+					[controller.downloadProgressView setProgress: 0.0];
 				}
 			}];
 
@@ -105,7 +114,8 @@
 	if ([overlay isKindOfClass: [MKTileOverlay class]])
 	{
 		MKTileOverlayRenderer *renderer = [[MKTileOverlayRenderer alloc] initWithTileOverlay: (MKTileOverlay *)overlay];
-		return renderer;
+		self.tileOverlayRenderer = renderer;
+		return self.tileOverlayRenderer;
 	}
 	else if ([overlay isKindOfClass: [MATAnimatedTileOverlay class]])
 	{
