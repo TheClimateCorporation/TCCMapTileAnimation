@@ -15,7 +15,13 @@
 
 - (MKZoomScale) currentZoomScale
 {
-	return (self.bounds.size.width / self.visibleMapRect.size.width) * 2.0;
+//	CLLocationDegrees longitudeDelta = self.region.span.longitudeDelta;
+//	CGFloat mapWidthInPixels = self.bounds.size.width;
+//    double scale1 = longitudeDelta * MERCATOR_RADIUS * M_PI / (180.0 * mapWidthInPixels);
+	
+	double scale2 = (self.bounds.size.width / self.visibleMapRect.size.width) * [UIScreen mainScreen].scale;
+	
+	return scale2;
 }
 
 #pragma mark - Map conversion methods
@@ -91,6 +97,7 @@
 	
 	// use the zoom level to compute the region
 	MKCoordinateSpan span = [self coordinateSpanWithMapView:self centerCoordinate:centerCoordinate andZoomLevel:zoomLevel];
+	NSLog(@"span %lf %lf", span.latitudeDelta, span.longitudeDelta);
 	MKCoordinateRegion region = MKCoordinateRegionMake(centerCoordinate, span);
 	
 	// set the region like normal

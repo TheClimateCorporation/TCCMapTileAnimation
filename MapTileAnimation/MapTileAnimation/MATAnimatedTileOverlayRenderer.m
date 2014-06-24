@@ -24,37 +24,32 @@
 
 - (BOOL)canDrawMapRect:(MKMapRect)mapRect zoomScale:(MKZoomScale)zoomScale
 {
-	return YES;
+	self.zoomScale = zoomScale;
+
+    MATAnimatedTileOverlay *mapOverlay = (MATAnimatedTileOverlay *)self.overlay;
+    MATAnimationTile *tile = [mapOverlay tileForMapRect: mapRect zoomScale: zoomScale];
+	if (tile) {
+		return YES;
+	}
+	
+	return NO;
 }
 
 -(void)drawMapRect:(MKMapRect)mapRect zoomScale:(MKZoomScale)zoomScale inContext:(CGContextRef)context
 {
     MATAnimatedTileOverlay *mapOverlay = (MATAnimatedTileOverlay *)self.overlay;
-    
-    // Get a list of one or more tile images for this map's rect.
-	if (mapOverlay.mapTiles) {
-		NSArray *rectTiles = mapOverlay.mapTiles;
+    MATAnimationTile *tile = [mapOverlay tileForMapRect: mapRect zoomScale: zoomScale];
+
+	if (tile) {
+		// draw each tile in its frame
+		CGRect rect = [self rectForMapRect: mapRect];
 		
-		CGContextSetAlpha(context, 0.75);
-		
-		for (MATAnimationTile *tile in rectTiles)
-		{
-			if (tile.currentImageTile == nil)
-				continue;
-			
-			// draw each tile in its frame
-			CGRect rect = [self rectForMapRect: tile.mapRectFrame];
-			
-			UIImage *image = tile.currentImageTile;
-			
-			CGContextSaveGState(context);
-			CGContextTranslateCTM(context, CGRectGetMinX(rect), CGRectGetMinY(rect));
-			CGContextScaleCTM(context, 1 / zoomScale, 1 / zoomScale);
-			CGContextTranslateCTM(context, 0, image.size.height);
-			CGContextScaleCTM(context, 1, -1);
-			CGContextDrawImage(context, CGRectMake(0, 0, image.size.width, image.size.height), [image CGImage]);
-			CGContextRestoreGState(context);
-		}
+		UIImage *image = tile.currentImageTile;
+		UIGraphicsPushContext(context);
+		[image drawInRect: rect
+				blendMode: kCGBlendModeNormal
+					alpha: 0.75];
+		UIGraphicsPopContext();
 	}
 }
 

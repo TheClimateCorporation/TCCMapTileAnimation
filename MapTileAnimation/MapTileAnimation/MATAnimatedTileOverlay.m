@@ -30,32 +30,42 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 
 @property (nonatomic, readwrite, strong) NSOperationQueue *fetchOperationQueue;
 @property (nonatomic, readwrite, strong) NSOperationQueue *downLoadOperationQueue;
-@property (nonatomic, readwrite, strong) NSCache *imageTileCache;
+@property (nonatomic, readwrite, strong) NSCache *cache;
 @property (nonatomic, readwrite, strong) NSArray *templateURLs;
 @property (nonatomic, assign) NSTimeInterval frameDuration;
 
 - (NSString *) URLStringForX: (NSInteger)xValue Y: (NSInteger)yValue Z: (NSInteger)zValue timeIndex: (NSInteger)aTimeIndex;
-- (NSArray *) mapTilesInMapRect: (MKMapRect)aRect zoomScale: (MKZoomScale)aScale;
+- (NSSet *) mapTilesInMapRect: (MKMapRect)aRect zoomScale: (MKZoomScale)aScale;
 - (void) fetchAndCacheImageTileAtURL: (NSString *)aUrlString;
 
 @end
 
 @implementation MATAnimatedTileOverlay
+{
+    dispatch_queue_t _lockedQueue;
+}
 
 - (id) initWithTemplateURLs: (NSArray *)templateURLs numberOfAnimationFrames:(NSUInteger)numberOfAnimationFrames frameDuration:(NSTimeInterval)frameDuration
 {
 	self = [super init];
 	if (self)
 	{
+		NSString *queueName = [NSString stringWithFormat: @"com.%@.lockqueue", NSStringFromClass([self class])];
+		_lockedQueue = dispatch_queue_create([queueName UTF8String], DISPATCH_QUEUE_CONCURRENT);
+
 		self.templateURLs = templateURLs;
 		self.numberOfAnimationFrames = numberOfAnimationFrames;
 		self.frameDuration = frameDuration;
 		self.currentTimeIndex = 0;
 		self.fetchOperationQueue = [[NSOperationQueue alloc] init];
 		self.downLoadOperationQueue = [[NSOperationQueue alloc] init];
-		self.imageTileCache = [[NSCache alloc] init];
-		self.imageTileCache.name = NSStringFromClass([MATAnimatedTileOverlay class]);
-		self.imageTileCache.countLimit = 512;
+		[self.downLoadOperationQueue setMaxConcurrentOperationCount: 2];
+		
+		self.cache = [[NSCache alloc] init];
+		self.cache.name = NSStringFromClass([MATAnimatedTileOverlay class]);
+		self.cache.countLimit = 512;
+		[self.cache setEvictsObjectsWithDiscardedContent: YES];
+		[self.cache setTotalCostLimit: 512];
 		self.tileSize = 256;
 	}
 	return self;
@@ -63,7 +73,7 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 
 - (void) dealloc
 {
-	[self.imageTileCache removeAllObjects];
+	[self.cache removeAllObjects];
 }
 
 #pragma mark - MKOverlay protocol
@@ -80,6 +90,11 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 
 #pragma mark - Public
 
+- (void) flushTileCache
+{
+	[[self imageTileCache] removeAllObjects];
+}
+
 - (void) cancelAllOperations
 {
 	[self.fetchOperationQueue cancelAllOperations];
@@ -92,12 +107,12 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 {
 	[self.fetchOperationQueue addOperationWithBlock:^{
 		//calculate the tiles rects needed for a given mapRect and create the MATAnimationTile objects
-		NSArray *mapTiles = [self mapTilesInMapRect: aMapRect zoomScale: aScale];
+		NSSet *mapTiles = [self mapTilesInMapRect: aMapRect zoomScale: aScale];
 		
 		//at this point we have an array of MATAnimationTiles we need to derive the urls for each tile, for each time index
 		for (MATAnimationTile *tile in mapTiles) {
 			
-			NSMutableArray *array = [NSMutableArray arrayWithCapacity: self.templateURLs.count];
+			NSMutableArray *array = [NSMutableArray arrayWithCapacity: self.numberOfAnimationFrames];
 			
 			for (NSUInteger timeIndex = 0; timeIndex < self.numberOfAnimationFrames; timeIndex++) {
 				NSString *tileURL = [self URLStringForX: tile.xCoordinate Y: tile.yCoordinate Z: tile.zCoordinate timeIndex: timeIndex];
@@ -120,6 +135,7 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 				progressBlock(timeIndex, nil);
 			});
 		}
+		[self.downLoadOperationQueue waitUntilAllOperationsAreFinished];
 		//update the tile array with new tile objects
 		self.mapTiles = mapTiles;
 		//set the current image to the first time index
@@ -138,15 +154,57 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 	for (MATAnimationTile *tile in self.mapTiles) {
 		
 		NSString *cacheKey = [tile.tileURLs objectAtIndex: self.currentTimeIndex];
-		NSData *cachedData = [self.imageTileCache objectForKey: cacheKey];
+		// Load the image from cache.
+		NSData *cachedData = [[self imageTileCache] objectForKey: cacheKey];
 		if (cachedData) {
 			UIImage *img = [[UIImage alloc] initWithData: cachedData];
 			tile.currentImageTile = img;
+		} else {
+			tile.currentImageTile = nil;
 		}
 	}
 }
 
+- (MATTileCoordinate) tileCoordianteForMapRect: (MKMapRect)aMapRect zoomScale:(MKZoomScale)aZoomScale
+{
+	MATTileCoordinate coord = {0 , 0, 0};
+	
+	NSUInteger zoomLevel = [self zoomLevelForZoomScale: aZoomScale];
+    CGPoint mercatorPoint = [self mercatorTileOriginForMapRect: aMapRect];
+    NSUInteger tilex = floor(mercatorPoint.x * [self worldTileWidthForZoomLevel:zoomLevel]);
+    NSUInteger tiley = floor(mercatorPoint.y * [self worldTileWidthForZoomLevel:zoomLevel]);
+
+	coord.xCoordinate = tilex;
+	coord.yCoordinate = tiley;
+	coord.zCoordiante = zoomLevel;
+	
+	return coord;
+}
+
+- (MATAnimationTile *) tileForMapRect: (MKMapRect)aMapRect zoomScale:(MKZoomScale)aZoomScale;
+{
+	if (self.mapTiles) {
+		MATTileCoordinate coord = [self tileCoordianteForMapRect: aMapRect zoomScale: aZoomScale];
+		for (MATAnimationTile *tile in self.mapTiles) {
+			if (coord.xCoordinate == tile.xCoordinate && coord.yCoordinate == tile.yCoordinate && coord.zCoordiante == tile.zCoordinate) {
+				return tile;
+			}
+		}
+	}
+	
+	return nil;
+}
+
 #pragma  mark - Private
+
+- (NSCache *)imageTileCache
+{
+	__block NSCache *value;
+	dispatch_sync(_lockedQueue, ^{
+		value = _cache;
+	});
+	return value;
+}
 /*
  derives a URL string from the template URLs, needs tile coordinates and a time index
  */
@@ -169,10 +227,10 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
  calculates the number of tiles, the tile coordinates and tile MapRect frame given a MapView's MapRect and zoom scale
  returns an array MATAnimationTile objects
  */
-- (NSArray *) mapTilesInMapRect: (MKMapRect)aRect zoomScale: (MKZoomScale)aScale
+- (NSSet *) mapTilesInMapRect: (MKMapRect)aRect zoomScale: (MKZoomScale)aScale
 {
-    NSInteger z = zoomScaleToZoomLevel(aScale, (double)self.tileSize);
-    NSMutableArray *tiles = nil;
+    NSInteger z = [self zoomLevelForZoomScale: aScale];//zoomScaleToZoomLevel(aScale, (double)self.tileSize);
+    NSMutableSet *tiles = nil;
 	
     NSInteger minX = floor((MKMapRectGetMinX(aRect) * aScale) / self.tileSize);
     NSInteger maxX = floor((MKMapRectGetMaxX(aRect) * aScale) / self.tileSize);
@@ -183,14 +241,14 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
         for(NSInteger y = minY; y <=maxY; y++) {
 			
 			if (!tiles) {
-				tiles = [NSMutableArray array];
+				tiles = [NSMutableSet set];
 			}
 			MKMapRect frame = MKMapRectMake((double)(x * self.tileSize) / aScale, (double)(y * self.tileSize) / aScale, self.tileSize / aScale, self.tileSize / aScale);
 			MATAnimationTile *tile = [[MATAnimationTile alloc] initWithFrame: frame xCord: x yCord: y zCord: z];
 			[tiles addObject:tile];
         }
     }
-    return [NSArray arrayWithArray: tiles];
+    return [NSSet setWithSet: tiles];
 }
 /*
  will fetch a tile image and cache it to NSCache.  The cache key is the url string itself
@@ -201,13 +259,12 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 
 	[self.downLoadOperationQueue addOperationWithBlock: ^{
 		
-		NSData *cachedData = [overlay.imageTileCache objectForKey: aUrlString];
-
-		if (cachedData != nil) {
+		NSData *cachedData = [[overlay imageTileCache] objectForKey: aUrlString];
+		if (cachedData) {
 			//do we want to do anything if we already have the cached tile data?
 		} else {
 			dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
-			
+
 			NSURLSession *session = [NSURLSession sharedSession];
 			NSURLSessionTask *task = [session dataTaskWithURL: [NSURL URLWithString: aUrlString] completionHandler: ^(NSData *data, NSURLResponse *response, NSError *error) {
 				
@@ -215,20 +272,69 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 				
 				if (data) {
 					if (urlResponse.statusCode == 200) {
-						[overlay.imageTileCache setObject: data forKey: aUrlString];
+						[[overlay imageTileCache] setObject: data forKey: aUrlString];
+					} else {
+						NSLog(@"response status = %ld", (long)urlResponse.statusCode);
 					}
 				} else {
 					NSLog(@"error = %@", error);
 				}
-				
 				dispatch_semaphore_signal(semaphore);
 			}];
 			[task resume];
 			// have the thread wait until the download task is done
-			dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * 10));
+			dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * 60)); //timeout is 10 secs.
 		}
 	}];
 }
 
+/**
+ * Shortcut to determine the number of tiles wide *or tall* the
+ * world is, at the given zoomLevel. (In the Spherical Mercator
+ * projection, the poles are cut off so that the resulting 2D
+ * map is "square".)
+ */
+- (NSUInteger)worldTileWidthForZoomLevel:(NSUInteger)zoomLevel
+{
+    return (NSUInteger)(pow(2,zoomLevel));
+}
+
+/**
+ * Similar to above, but uses a MKZoomScale to determine the
+ * Mercator zoomLevel. (MKZoomScale is a ratio of screen points to
+ * map points.)
+ */
+- (NSUInteger)zoomLevelForZoomScale:(MKZoomScale)zoomScale
+{
+    CGFloat realScale = zoomScale / [[UIScreen mainScreen] scale];
+    NSUInteger z = (NSUInteger)(log(realScale)/log(2.0)+20.0);
+	
+    z += ([[UIScreen mainScreen] scale] - 1.0);
+    return z;
+}
+
+/**
+ * Given a MKMapRect, this reprojects the center of the mapRect
+ * into the Mercator projection and calculates the rect's top-left point
+ * (so that we can later figure out the tile coordinate).
+ *
+ * See http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames#Derivation_of_tile_names
+ */
+- (CGPoint)mercatorTileOriginForMapRect:(MKMapRect)mapRect
+{
+    MKCoordinateRegion region = MKCoordinateRegionForMapRect(mapRect);
+    
+    // Convert lat/lon to radians
+    CGFloat x = (region.center.longitude) * (M_PI/180.0); // Convert lon to radians
+    CGFloat y = (region.center.latitude) * (M_PI/180.0); // Convert lat to radians
+    y = log(tan(y)+1.0/cos(y));
+    
+    // X and Y should actually be the top-left of the rect (the values above represent
+    // the center of the rect)
+    x = (1.0 + (x/M_PI)) / 2.0;
+    y = (1.0 - (y/M_PI)) / 2.0;
+	
+    return CGPointMake(x, y);
+}
 
 @end
