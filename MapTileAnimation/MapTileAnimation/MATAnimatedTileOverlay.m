@@ -109,7 +109,7 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 		//calculate the tiles rects needed for a given mapRect and create the MATAnimationTile objects
 		NSSet *mapTiles = [self mapTilesInMapRect: aMapRect zoomScale: aScale];
 		
-		//at this point we have an array of MATAnimationTiles we need to derive the urls for each tile, for each time index
+		//at this point we have a set of MATAnimationTiles we need to derive the urls for each tile, for each time index
 		for (MATAnimationTile *tile in mapTiles) {
 			
 			NSMutableArray *array = [NSMutableArray arrayWithCapacity: self.numberOfAnimationFrames];
@@ -196,7 +196,9 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 }
 
 #pragma  mark - Private
-
+/*
+ locks access to the cache so that only one thread at a time can read/write to the cache
+ */
 - (NSCache *)imageTileCache
 {
 	__block NSCache *value;
@@ -287,12 +289,9 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 		}
 	}];
 }
-
-/**
- * Shortcut to determine the number of tiles wide *or tall* the
- * world is, at the given zoomLevel. (In the Spherical Mercator
- * projection, the poles are cut off so that the resulting 2D
- * map is "square".)
+/*
+ Determine the number of tiles wide *or tall* the world is, at the given zoomLevel. 
+ (In the Spherical Mercator projection, the poles are cut off so that the resulting 2D map is "square".)
  */
 - (NSUInteger)worldTileWidthForZoomLevel:(NSUInteger)zoomLevel
 {
