@@ -77,19 +77,29 @@
 	
 	//start downloading the image tiles for the time frame indexes
 	self.downloadProgressView.hidden = NO;
+	self.timeIndexStepper.maximumValue = (double)self.animatedTileOverlay.numberOfAnimationFrames - 1;
 
 	[self.animatedTileOverlay fetchTilesForMapRect: self.mapView.visibleMapRect zoomScale: self.animatedTileRenderer.zoomScale progressBlock: ^(NSUInteger currentTimeIndex, NSError *error) {
 		
 		CGFloat progressValue = (CGFloat)currentTimeIndex / (CGFloat)(self.animatedTileOverlay.numberOfAnimationFrames - 1);
 		[controller.downloadProgressView setProgress: progressValue animated: YES];
 		
+		if (currentTimeIndex == 0) {
+			[controller.tileOverlayRenderer setAlpha: 0.0];
+		}
+		controller.animatedTileOverlay.currentTimeIndex = currentTimeIndex;
+		[controller.animatedTileOverlay updateImageTilesToCurrentTimeIndex];
+		[controller.animatedTileRenderer setNeedsDisplayInMapRect: self.mapView.visibleMapRect zoomScale: self.animatedTileRenderer.zoomScale];
+		
 	} completionBlock: ^(BOOL success, NSError *error) {
 		
 		if (success) {
-			[self.tileOverlayRenderer setAlpha: 0.0];
-			controller.timeIndexStepper.maximumValue = (double)self.animatedTileOverlay.numberOfAnimationFrames - 1;
+//			[self.tileOverlayRenderer setAlpha: 0.0];
 			controller.downloadProgressView.hidden = YES;
 			[controller.downloadProgressView setProgress: 0.0];
+			controller.animatedTileOverlay.currentTimeIndex = 0;
+			[controller.animatedTileOverlay updateImageTilesToCurrentTimeIndex];
+
 			[controller.animatedTileRenderer setNeedsDisplayInMapRect: self.mapView.visibleMapRect zoomScale: self.animatedTileRenderer.zoomScale];
 		}
 	}];

@@ -50,11 +50,11 @@
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <progressView hidden="YES" opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mS9-2f-HPy">
+                            <progressView hidden="YES" opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="mS9-2f-HPy">
                                 <rect key="frame" x="0.0" y="520" width="320" height="2"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             </progressView>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="w8o-LB-Opa">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="w8o-LB-Opa">
                                 <rect key="frame" x="5" y="530" width="53" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="Play">
@@ -69,14 +69,22 @@
                         <constraints>
                             <constraint firstItem="l32-pv-Rsy" firstAttribute="top" secondItem="kh9-bI-dsS" secondAttribute="top" id="0se-Dk-RdH"/>
                             <constraint firstItem="2fi-mo-0CV" firstAttribute="top" secondItem="JMu-CT-4Da" secondAttribute="bottom" constant="11" id="A8Y-7C-QSx"/>
+                            <constraint firstItem="JMu-CT-4Da" firstAttribute="top" secondItem="mS9-2f-HPy" secondAttribute="bottom" constant="6" id="BFo-hS-Jmx"/>
                             <constraint firstItem="JMu-CT-4Da" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" constant="113" id="FbN-GR-8A5"/>
                             <constraint firstItem="orF-6A-5Ok" firstAttribute="leading" secondItem="JMu-CT-4Da" secondAttribute="trailing" constant="51" id="GiB-0y-USH"/>
                             <constraint firstAttribute="trailing" secondItem="orF-6A-5Ok" secondAttribute="trailing" constant="20" id="KKU-1q-WdW"/>
                             <constraint firstItem="orF-6A-5Ok" firstAttribute="top" secondItem="l32-pv-Rsy" secondAttribute="bottom" constant="15" id="OQU-s5-l6A"/>
+                            <constraint firstItem="2fi-mo-0CV" firstAttribute="top" secondItem="w8o-LB-Opa" secondAttribute="bottom" constant="8" id="Q7E-HR-4md"/>
+                            <constraint firstItem="mS9-2f-HPy" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" id="UfH-Ya-hU0"/>
                             <constraint firstAttribute="trailing" secondItem="l32-pv-Rsy" secondAttribute="trailing" id="Vg3-00-7NE"/>
                             <constraint firstItem="JMu-CT-4Da" firstAttribute="top" secondItem="l32-pv-Rsy" secondAttribute="bottom" constant="11" id="W2i-HC-QAW"/>
+                            <constraint firstItem="JMu-CT-4Da" firstAttribute="leading" secondItem="w8o-LB-Opa" secondAttribute="trailing" constant="55" id="dOI-7x-xcg"/>
                             <constraint firstItem="2fi-mo-0CV" firstAttribute="top" secondItem="orF-6A-5Ok" secondAttribute="bottom" constant="15" id="mNG-e9-WrX"/>
                             <constraint firstItem="l32-pv-Rsy" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" id="myg-Qi-JyI"/>
+                            <constraint firstItem="mS9-2f-HPy" firstAttribute="top" secondItem="l32-pv-Rsy" secondAttribute="bottom" constant="3" id="nsQ-ZU-uPf"/>
+                            <constraint firstAttribute="trailing" secondItem="mS9-2f-HPy" secondAttribute="trailing" id="rHZ-60-Tfw"/>
+                            <constraint firstItem="w8o-LB-Opa" firstAttribute="top" secondItem="mS9-2f-HPy" secondAttribute="bottom" constant="8" id="sKZ-Yz-2vy"/>
+                            <constraint firstItem="w8o-LB-Opa" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" constant="5" id="v22-1M-rAy"/>
                         </constraints>
                     </view>
                     <connections>

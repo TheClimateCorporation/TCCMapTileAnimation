@@ -34,6 +34,8 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 @property (nonatomic, readwrite, strong) NSArray *templateURLs;
 @property (nonatomic, assign) NSTimeInterval frameDuration;
 
+@property (nonatomic, readwrite, strong) NSLock *cacheLock;
+
 - (NSString *) URLStringForX: (NSInteger)xValue Y: (NSInteger)yValue Z: (NSInteger)zValue timeIndex: (NSInteger)aTimeIndex;
 - (NSSet *) mapTilesInMapRect: (MKMapRect)aRect zoomScale: (MKZoomScale)aScale;
 - (void) fetchAndCacheImageTileAtURL: (NSString *)aUrlString;
@@ -59,14 +61,16 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 		self.currentTimeIndex = 0;
 		self.fetchOperationQueue = [[NSOperationQueue alloc] init];
 		self.downLoadOperationQueue = [[NSOperationQueue alloc] init];
-		[self.downLoadOperationQueue setMaxConcurrentOperationCount: 2];
+		[self.downLoadOperationQueue setMaxConcurrentOperationCount: NSOperationQueueDefaultMaxConcurrentOperationCount];
 		
 		self.cache = [[NSCache alloc] init];
 		self.cache.name = NSStringFromClass([MATAnimatedTileOverlay class]);
-		self.cache.countLimit = 512;
+		self.cache.countLimit = 2048;
 		[self.cache setEvictsObjectsWithDiscardedContent: YES];
-		[self.cache setTotalCostLimit: 512];
+		[self.cache setTotalCostLimit: 2048];
 		self.tileSize = 256;
+		
+		self.cacheLock = [[NSLock alloc] init];
 	}
 	return self;
 }
@@ -120,27 +124,31 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 			}
 			tile.tileURLs = [NSArray arrayWithArray: array];
 		}
+		
+		//update the tile array with new tile objects
+		self.mapTiles = mapTiles;
+
+		
 		//start downloading the tiles for a given time index, we want to download all the tiles for a time index
 		//before we move onto the next time index
 		for (NSUInteger timeIndex = 0; timeIndex < self.numberOfAnimationFrames; timeIndex++) {
 			//loop over all the tiles for this time index
-			for (MATAnimationTile *tile in mapTiles) {
+			for (MATAnimationTile *tile in self.mapTiles) {
 				NSString *tileURL = [tile.tileURLs objectAtIndex: timeIndex];
 				//this will return right away
 				[self fetchAndCacheImageTileAtURL: tileURL];
 			}
 			//wait for all the tiles in this time index to download before proceeding the next time index
 			[self.downLoadOperationQueue waitUntilAllOperationsAreFinished];
+
 			dispatch_async(dispatch_get_main_queue(), ^{
 				progressBlock(timeIndex, nil);
 			});
 		}
 		[self.downLoadOperationQueue waitUntilAllOperationsAreFinished];
-		//update the tile array with new tile objects
-		self.mapTiles = mapTiles;
 		//set the current image to the first time index
 		[self updateImageTilesToCurrentTimeIndex];
-		
+
 		dispatch_async(dispatch_get_main_queue(), ^{
 			completionBlock(YES, nil);
 		});
@@ -155,7 +163,9 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 		
 		NSString *cacheKey = [tile.tileURLs objectAtIndex: self.currentTimeIndex];
 		// Load the image from cache.
+		[self.cacheLock lock];
 		NSData *cachedData = [[self imageTileCache] objectForKey: cacheKey];
+		[self.cacheLock unlock];
 		if (cachedData) {
 			UIImage *img = [[UIImage alloc] initWithData: cachedData];
 			tile.currentImageTile = img;
@@ -261,20 +271,26 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 
 	[self.downLoadOperationQueue addOperationWithBlock: ^{
 		
-		NSData *cachedData = [[overlay imageTileCache] objectForKey: aUrlString];
+		NSString *urlString = [aUrlString copy];
+		
+		[overlay.cacheLock lock];
+		NSData *cachedData = [[overlay imageTileCache] objectForKey: urlString];
+		[overlay.cacheLock unlock];
 		if (cachedData) {
 			//do we want to do anything if we already have the cached tile data?
 		} else {
 			dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
 
 			NSURLSession *session = [NSURLSession sharedSession];
-			NSURLSessionTask *task = [session dataTaskWithURL: [NSURL URLWithString: aUrlString] completionHandler: ^(NSData *data, NSURLResponse *response, NSError *error) {
+			NSURLSessionTask *task = [session dataTaskWithURL: [NSURL URLWithString: urlString] completionHandler: ^(NSData *data, NSURLResponse *response, NSError *error) {
 				
 				NSHTTPURLResponse *urlResponse = (NSHTTPURLResponse *)response;
 				
 				if (data) {
 					if (urlResponse.statusCode == 200) {
-						[[overlay imageTileCache] setObject: data forKey: aUrlString];
+						[overlay.cacheLock lock];
+						[[overlay imageTileCache] setObject: data forKey: urlString];
+						[overlay.cacheLock unlock];
 					} else {
 						NSLog(@"response status = %ld", (long)urlResponse.statusCode);
 					}
