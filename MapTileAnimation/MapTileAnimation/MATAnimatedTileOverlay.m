@@ -243,9 +243,9 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
     NSMutableSet *tiles = nil;
 	
     NSInteger minX = floor((MKMapRectGetMinX(aRect) * aScale) / self.tileSize);
-    NSInteger maxX = floor((MKMapRectGetMaxX(aRect) * aScale) / self.tileSize);
+    NSInteger maxX = ceil((MKMapRectGetMaxX(aRect) * aScale) / self.tileSize);
     NSInteger minY = floor((MKMapRectGetMinY(aRect) * aScale) / self.tileSize);
-    NSInteger maxY = floor((MKMapRectGetMaxY(aRect) * aScale) / self.tileSize);
+    NSInteger maxY = ceil((MKMapRectGetMaxY(aRect) * aScale) / self.tileSize);
 	
 	for(NSInteger x = minX; x <= maxX; x++) {
         for(NSInteger y = minY; y <=maxY; y++) {
