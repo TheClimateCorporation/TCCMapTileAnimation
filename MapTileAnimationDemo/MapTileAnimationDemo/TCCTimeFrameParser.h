@@ -8,7 +8,15 @@
 
 #import <Foundation/Foundation.h>
 
+@protocol TCCTimeFrameParserDelegateProtocol <NSObject>
+
+- (void) didLoadTimeStampData;
+
+@end
+
 @interface TCCTimeFrameParser : NSObject
+
+@property (readwrite, weak) id<TCCTimeFrameParserDelegateProtocol>delegate;
 
 @property (readonly) NSString *ingestTimeStampString;
 @property (readonly) NSArray *frameTimeStamps;
@@ -17,8 +25,7 @@
 
 @property (readonly) NSUInteger countOfTimeIndexes;
 
-- (id) initWithURLString: (NSString *)aURLString;
+- (id) initWithURLString: (NSString *)aURLString delegate: (id)aDelegate;
 
-- (id) initWithData: (NSData *)timeStampData;
 
 @end

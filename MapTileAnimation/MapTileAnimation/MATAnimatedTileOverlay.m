@@ -292,7 +292,7 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 						[[overlay imageTileCache] setObject: data forKey: urlString];
 						[overlay.cacheLock unlock];
 					} else {
-						NSLog(@"response status = %ld", (long)urlResponse.statusCode);
+						NSLog(@"%s response status = %ld", __PRETTY_FUNCTION__, (long)urlResponse.statusCode);
 					}
 				} else {
 					NSLog(@"error = %@", error);

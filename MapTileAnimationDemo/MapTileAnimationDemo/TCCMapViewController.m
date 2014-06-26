@@ -18,7 +18,7 @@
 //#define FUTURE_RADAR_FRAMES_URI "https://qa1-twi.climate.com/assets/wdt-future-radar/LKG.txt?grower_apps=true"
 #define FUTURE_RADAR_FRAMES_URI "http://climate.com/assets/wdt-future-radar/LKG.txt?grower_apps=true"
 
-@interface TCCMapViewController () <MKMapViewDelegate>
+@interface TCCMapViewController () <MKMapViewDelegate, TCCTimeFrameParserDelegateProtocol>
 
 @property (nonatomic, readwrite, weak) IBOutlet MKMapView *mapView;
 @property (weak, nonatomic) IBOutlet UIStepper *timeIndexStepper;
@@ -34,7 +34,7 @@
 @end
 
 @implementation TCCMapViewController
-//============================================================
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -49,15 +49,21 @@
 	[self.mapView setRegion: region animated: NO];
 	
 //	[self.mapView setCenterCoordinate: startingLocation zoomLevel: 5 animated: NO];
-	self.timeFrameParser = [[TCCTimeFrameParser alloc] initWithURLString: @FUTURE_RADAR_FRAMES_URI];
 }
-//============================================================
+
+- (void) viewDidAppear:(BOOL)animated
+{
+	[super viewDidAppear: animated];
+	self.timeFrameParser = [[TCCTimeFrameParser alloc] initWithURLString: @FUTURE_RADAR_FRAMES_URI delegate: self];
+
+}
+
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
-//============================================================
+
 - (IBAction)onHandleTimeIndexChange:(id)sender
 {
 	self.animatedTileOverlay.currentTimeIndex = (NSInteger)self.timeIndexStepper.value;
@@ -94,7 +100,6 @@
 	} completionBlock: ^(BOOL success, NSError *error) {
 		
 		if (success) {
-//			[self.tileOverlayRenderer setAlpha: 0.0];
 			controller.downloadProgressView.hidden = YES;
 			[controller.downloadProgressView setProgress: 0.0];
 			controller.animatedTileOverlay.currentTimeIndex = 0;
@@ -104,34 +109,37 @@
 		}
 	}];
 }
-//============================================================
+
+#pragma mark - TCCTimeFrameParserDelegateProtocol
+
+- (void) didLoadTimeStampData;
+{
+	MKTileOverlay *tileOverlay = [[MKTileOverlay alloc] initWithURLTemplate: [self.timeFrameParser.templateFrameTimeURLs firstObject]];
+	[self.mapView addOverlay: tileOverlay level: MKOverlayLevelAboveRoads];
+	
+	NSArray *templateURLs = self.timeFrameParser.templateFrameTimeURLs;
+	MATAnimatedTileOverlay *overlay = [[MATAnimatedTileOverlay alloc] initWithTemplateURLs: templateURLs numberOfAnimationFrames: templateURLs.count frameDuration: 1.0];
+	[self.mapView addOverlay: overlay level: MKOverlayLevelAboveRoads];
+
+}
+
 #pragma mark - MKMapViewDelegate Protocol
-//============================================================
+
 - (void)mapViewDidFinishRenderingMap:(MKMapView *)mapView fullyRendered:(BOOL)fullyRendered
 {
 	if (fullyRendered == YES) {
 
-		static dispatch_once_t onceToken;
-		dispatch_once(&onceToken, ^{
-			
-			MKTileOverlay *tileOverlay = [[MKTileOverlay alloc] initWithURLTemplate: [self.timeFrameParser.templateFrameTimeURLs firstObject]];
-			[self.mapView addOverlay: tileOverlay level: MKOverlayLevelAboveRoads];
-			
-			NSArray *templateURLs = self.timeFrameParser.templateFrameTimeURLs;
-			MATAnimatedTileOverlay *overlay = [[MATAnimatedTileOverlay alloc] initWithTemplateURLs: templateURLs numberOfAnimationFrames: templateURLs.count frameDuration: 1.0];
-			[self.mapView addOverlay: overlay level: MKOverlayLevelAboveRoads];
 
-		});
 	}
 }
-//============================================================
+
 - (void)mapView:(MKMapView *)mapView regionDidChangeAnimated:(BOOL)animated
 {
 	if (animated == NO) {
 		
 	}
 }
-//============================================================
+
 - (MKOverlayRenderer *)mapView:(MKMapView *)mapView rendererForOverlay:(id < MKOverlay >)overlay
 {
 	if ([overlay isKindOfClass: [MKTileOverlay class]])
@@ -150,8 +158,8 @@
 	}
 	return nil;
 }
-//============================================================
 
-//============================================================
+
+
 
 @end

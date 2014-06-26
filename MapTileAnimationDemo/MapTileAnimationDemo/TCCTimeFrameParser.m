@@ -26,29 +26,22 @@
 	NSArray *_timeFrameURLs;
 }
 
-- (id) initWithURLString: (NSString *)aURLString
+- (id) initWithURLString: (NSString *)aURLString delegate: (id)aDelegate
 {
 	self = [super init];
 	if (self) {
 		self.operationQueue = [[NSOperationQueue alloc] init];
-
+		self.delegate = aDelegate;
 		[self fetchTimeStampsAtURL: [NSURL URLWithString: aURLString]];
 		
 	}
 	return self;
 }
 
-- (id) initWithData: (NSData *)timeStampData
-{
-	self = [super init];
-	if (self) {
-		self.timeStampsBackingDictionary = [NSJSONSerialization JSONObjectWithData: timeStampData options: 0 error: nil];
-	}
-	return self;
-}
-
 - (void) fetchTimeStampsAtURL: (NSURL *)aURL
 {
+	__weak TCCTimeFrameParser *parser = self;
+	
 	[self.operationQueue addOperationWithBlock: ^{
 		NSURLSession *session = [NSURLSession sharedSession];
 		NSURLSessionTask *task = [session dataTaskWithURL: aURL completionHandler: ^(NSData *data, NSURLResponse *response, NSError *error) {
@@ -57,7 +50,12 @@
 			
 			if (data) {
 				if (urlResponse.statusCode == 200) {
-					self.timeStampsBackingDictionary = [NSJSONSerialization JSONObjectWithData: data options: 0 error: nil];
+					parser.timeStampsBackingDictionary = [NSJSONSerialization JSONObjectWithData: data options: 0 error: nil];
+					dispatch_async(dispatch_get_main_queue(), ^{
+						[parser.delegate didLoadTimeStampData];
+					});
+				} else {
+					NSLog(@"%s status code %ld", __PRETTY_FUNCTION__, (long)urlResponse.statusCode);
 				}
 			} else {
 				NSLog(@"error = %@", error);
