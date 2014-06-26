@@ -92,6 +92,7 @@
 		
 		if (currentTimeIndex == 0) {
 			[controller.tileOverlayRenderer setAlpha: 0.0];
+			[controller.animatedTileRenderer setAlpha: 1.0];
 		}
 		controller.animatedTileOverlay.currentTimeIndex = currentTimeIndex;
 		[controller.animatedTileOverlay updateImageTilesToCurrentTimeIndex];
@@ -119,6 +120,7 @@
 	
 	NSArray *templateURLs = self.timeFrameParser.templateFrameTimeURLs;
 	MATAnimatedTileOverlay *overlay = [[MATAnimatedTileOverlay alloc] initWithTemplateURLs: templateURLs numberOfAnimationFrames: templateURLs.count frameDuration: 1.0];
+	[self.animatedTileRenderer setAlpha: 0.0];
 	[self.mapView addOverlay: overlay level: MKOverlayLevelAboveRoads];
 
 }
@@ -131,6 +133,13 @@
 
 
 	}
+}
+
+- (void)mapView:(MKMapView *)mapView regionWillChangeAnimated:(BOOL)animated
+{
+	[self.tileOverlayRenderer setAlpha: 1.0];
+	[self.animatedTileRenderer setAlpha: 0.0];
+
 }
 
 - (void)mapView:(MKMapView *)mapView regionDidChangeAnimated:(BOOL)animated
