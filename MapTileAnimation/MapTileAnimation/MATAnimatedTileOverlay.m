@@ -127,7 +127,6 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 		
 		//update the tile array with new tile objects
 		self.mapTiles = mapTiles;
-
 		
 		//start downloading the tiles for a given time index, we want to download all the tiles for a time index
 		//before we move onto the next time index
@@ -145,7 +144,6 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 				progressBlock(timeIndex, nil);
 			});
 		}
-		[self.downLoadOperationQueue waitUntilAllOperationsAreFinished];
 		//set the current image to the first time index
 		[self updateImageTilesToCurrentTimeIndex];
 
