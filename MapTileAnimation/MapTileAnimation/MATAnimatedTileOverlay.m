@@ -279,6 +279,15 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 		} else {
 			dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
 
+            // Exploring caching in NSURLSession
+            // Open questions:
+            //   1. How do you configure the caching options for NSURLSession? (max size?)
+            //   2. Can you tell before performing the request with the NSURLSession whether
+            //      a cached copy exists?
+            //   3. Is the eviction policy for this cache "deterministic"? We want newer tiles
+            //      to stay in the cache longer than older tiles.
+            //   4. What's the best compromise between cache size vs. performance? How many
+            //      tiles do we really need?
 			NSURLSession *session = [NSURLSession sharedSession];
 			NSURLSessionTask *task = [session dataTaskWithURL: [NSURL URLWithString: urlString] completionHandler: ^(NSData *data, NSURLResponse *response, NSError *error) {
 				
