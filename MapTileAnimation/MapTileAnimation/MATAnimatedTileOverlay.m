@@ -123,7 +123,7 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 /*
  will fetch all the tiles for a mapview's map rect and zoom scale.  Provides a download progres block and download completetion block
  */
-- (void) fetchTilesForMapRect: (MKMapRect)aMapRect zoomScale: (MKZoomScale)aScale progressBlock:(void(^)(NSUInteger currentTimeIndex, BOOL *stop, NSError *error))progressBlock completionBlock: (void (^)(BOOL success, NSError *error))completionBlock
+- (void) fetchTilesForMapRect: (MKMapRect)aMapRect zoomScale: (MKZoomScale)aScale progressBlock:(void(^)(NSUInteger currentTimeIndex, BOOL *stop))progressBlock completionBlock: (void (^)(BOOL success, NSError *error))completionBlock
 {
 
 	[self.fetchOperationQueue addOperationWithBlock:^{
@@ -164,7 +164,7 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 			[self.downLoadOperationQueue waitUntilAllOperationsAreFinished];
 
 			dispatch_async(dispatch_get_main_queue(), ^{
-				progressBlock(timeIndex, &didStopFlag, nil);
+				progressBlock(timeIndex, &didStopFlag);
 			});
 		}
 		

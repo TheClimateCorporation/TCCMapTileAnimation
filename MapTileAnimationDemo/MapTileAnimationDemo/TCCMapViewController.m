@@ -33,6 +33,7 @@
 @property (readwrite, weak) MATAnimatedTileOverlay *animatedTileOverlay;
 @property (readwrite, weak) MATAnimatedTileOverlayRenderer *animatedTileRenderer;
 
+@property (readwrite, assign) BOOL shouldStop;
 @end
 
 @implementation TCCMapViewController
@@ -51,6 +52,7 @@
 	
 	[self.mapView setRegion: region animated: NO];
 	
+	self.shouldStop = NO;
 //	[self.mapView setCenterCoordinate: startingLocation zoomLevel: 5 animated: NO];
 }
 
@@ -92,12 +94,13 @@
 		[self.startStopButton setTitle: @"Stop" forState: UIControlStateNormal];
 		self.startStopButton.tag = 1;
 
-		[self.animatedTileOverlay fetchTilesForMapRect: self.mapView.visibleMapRect zoomScale: self.animatedTileRenderer.zoomScale progressBlock: ^(NSUInteger currentTimeIndex, BOOL *stop, NSError *error) {
+		[self.animatedTileOverlay fetchTilesForMapRect: self.mapView.visibleMapRect zoomScale: self.animatedTileRenderer.zoomScale progressBlock: ^(NSUInteger currentTimeIndex, BOOL *stop) {
 			
 			
 			CGFloat progressValue = (CGFloat)currentTimeIndex / (CGFloat)(self.animatedTileOverlay.numberOfAnimationFrames - 1);
 			[controller.downloadProgressView setProgress: progressValue animated: YES];
-			
+			controller.timeIndexLabel.text = [NSString stringWithFormat: @"%lu", (unsigned long)currentTimeIndex];
+
 			if (currentTimeIndex == 0) {
 				[controller.tileOverlayRenderer setAlpha: 0.0];
 				[controller.animatedTileRenderer setAlpha: 1.0];
@@ -106,6 +109,7 @@
 			controller.animatedTileOverlay.currentTimeIndex = currentTimeIndex;
 			[controller.animatedTileOverlay updateImageTilesToCurrentTimeIndex];
 			[controller.animatedTileRenderer setNeedsDisplayInMapRect: self.mapView.visibleMapRect zoomScale: self.animatedTileRenderer.zoomScale];
+			*stop = controller.shouldStop;
 			
 		} completionBlock: ^(BOOL success, NSError *error) {
 			
@@ -120,23 +124,18 @@
 				[controller.animatedTileOverlay startAnimating];
 			} else {
 				
-				self.startStopButton.tag = 0;
-				[self.startStopButton setTitle: @"Play" forState: UIControlStateNormal];
-				[self.tileOverlayRenderer setAlpha: 1.0];
-				[self.animatedTileRenderer setAlpha: 0.0];
-				[self.tileOverlayRenderer setNeedsDisplay];
-				[self.animatedTileRenderer setNeedsDisplay];
-
+				controller.startStopButton.tag = 0;
+				[controller.startStopButton setTitle: @"Play" forState: UIControlStateNormal];
+				[controller.tileOverlayRenderer setAlpha: 1.0];
+				[controller.animatedTileRenderer setAlpha: 0.0];
+				[controller.tileOverlayRenderer setNeedsDisplay];
+				[controller.animatedTileRenderer setNeedsDisplay];
+				controller.shouldStop = NO;
 			}
 		}];
 	} else {
-		
-		[self.animatedTileOverlay stopAnimating];
+		self.shouldStop = YES;
 		self.startStopButton.tag = 0;
-		[self.startStopButton setTitle: @"Play" forState: UIControlStateNormal];
-		[self.tileOverlayRenderer setAlpha: 1.0];
-		[self.animatedTileRenderer setAlpha: 0.0];
-		[self.mapView setNeedsDisplay];
 	}
 }
 
