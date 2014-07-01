@@ -22,7 +22,6 @@
 @interface TCCMapViewController () <MKMapViewDelegate, MATAnimatedTileOverlayDelegate, TCCTimeFrameParserDelegateProtocol>
 
 @property (nonatomic, readwrite, weak) IBOutlet MKMapView *mapView;
-@property (weak, nonatomic) IBOutlet UIStepper *timeIndexStepper;
 @property (weak, nonatomic) IBOutlet UILabel *timeIndexLabel;
 @property (weak, nonatomic) IBOutlet UIProgressView *downloadProgressView;
 @property (weak, nonatomic) IBOutlet UIButton *startStopButton;
@@ -71,10 +70,7 @@
 
 - (IBAction)onHandleTimeIndexChange:(id)sender
 {
-	self.animatedTileOverlay.currentTimeIndex = (NSInteger)self.timeIndexStepper.value;
-	
 	self.timeIndexLabel.text = [NSString stringWithFormat: @"%lu", (unsigned long)self.animatedTileOverlay.currentTimeIndex];
-
 	[self.animatedTileOverlay updateImageTilesToCurrentTimeIndex];
 	[self.animatedTileRenderer setNeedsDisplayInMapRect: self.mapView.visibleMapRect zoomScale: self.animatedTileRenderer.zoomScale];
 
@@ -90,12 +86,9 @@
 		
 		//start downloading the image tiles for the time frame indexes
 		self.downloadProgressView.hidden = NO;
-		self.timeIndexStepper.maximumValue = (double)self.animatedTileOverlay.numberOfAnimationFrames - 1;
-		[self.startStopButton setTitle: @"Stop" forState: UIControlStateNormal];
-		self.startStopButton.tag = 1;
+		[self toggleUIState: NO];
 
 		[self.animatedTileOverlay fetchTilesForMapRect: self.mapView.visibleMapRect zoomScale: self.animatedTileRenderer.zoomScale progressBlock: ^(NSUInteger currentTimeIndex, BOOL *stop) {
-			
 			
 			CGFloat progressValue = (CGFloat)currentTimeIndex / (CGFloat)(self.animatedTileOverlay.numberOfAnimationFrames - 1);
 			[controller.downloadProgressView setProgress: progressValue animated: YES];
@@ -124,18 +117,24 @@
 				[controller.animatedTileOverlay startAnimating];
 			} else {
 				
-				controller.startStopButton.tag = 0;
-				[controller.startStopButton setTitle: @"Play" forState: UIControlStateNormal];
-				[controller.tileOverlayRenderer setAlpha: 1.0];
-				[controller.animatedTileRenderer setAlpha: 0.0];
-				[controller.tileOverlayRenderer setNeedsDisplay];
-				[controller.animatedTileRenderer setNeedsDisplay];
+				[self toggleUIState: YES];
 				controller.shouldStop = NO;
 			}
 		}];
 	} else {
 		self.shouldStop = YES;
 		self.startStopButton.tag = 0;
+	}
+}
+
+- (void) toggleUIState: (BOOL) isEnabled
+{
+	if (isEnabled == YES) {
+		self.startStopButton.tag = 0;
+		[self.startStopButton setTitle: @"Play" forState: UIControlStateNormal];
+	} else {
+		self.startStopButton.tag = 1;
+		[self.startStopButton setTitle: @"Stop" forState: UIControlStateNormal];
 	}
 }
 
@@ -159,7 +158,6 @@
 
 - (void)animatedTileOverlay:(MATAnimatedTileOverlay *)animatedTileOverlay didAnimateWithAnimationFrameIndex:(NSInteger)animationFrameIndex
 {
-	self.timeIndexStepper.value = (double)animationFrameIndex;
 	self.timeIndexLabel.text = [NSString stringWithFormat: @"%lu", (unsigned long)animationFrameIndex];
 	[self.animatedTileRenderer setNeedsDisplayInMapRect: self.mapView.visibleMapRect zoomScale: self.animatedTileRenderer.zoomScale];
 
@@ -185,8 +183,7 @@
 {
 	if (self.startStopButton.tag != 0) {
 		[self.animatedTileOverlay stopAnimating];
-		self.startStopButton.tag = 0;
-		[self.startStopButton setTitle: @"Play" forState: UIControlStateNormal];
+		[self toggleUIState: YES];
 	}
 
 	[self.tileOverlayRenderer setAlpha: 1.0];
@@ -201,16 +198,13 @@
 	}
 }
 
-- (MKOverlayRenderer *)mapView:(MKMapView *)mapView rendererForOverlay:(id < MKOverlay >)overlay
+- (MKOverlayRenderer *)mapView:(MKMapView *)mapView rendererForOverlay:(id<MKOverlay>)overlay
 {
-	if ([overlay isKindOfClass: [MKTileOverlay class]])
-	{
+	if ([overlay isKindOfClass: [MKTileOverlay class]]) {
 		MKTileOverlayRenderer *renderer = [[MKTileOverlayRenderer alloc] initWithTileOverlay: (MKTileOverlay *)overlay];
 		self.tileOverlayRenderer = renderer;
 		return self.tileOverlayRenderer;
-	}
-	else if ([overlay isKindOfClass: [MATAnimatedTileOverlay class]])
-	{
+	} else if ([overlay isKindOfClass: [MATAnimatedTileOverlay class]]) {
 		self.animatedTileOverlay = (MATAnimatedTileOverlay *)overlay;
 		MATAnimatedTileOverlayRenderer *renderer = [[MATAnimatedTileOverlayRenderer alloc] initWithOverlay: overlay];
 		self.animatedTileRenderer = renderer;

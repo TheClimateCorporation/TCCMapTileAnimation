@@ -23,20 +23,7 @@
                                     <outlet property="delegate" destination="BYZ-38-t0r" id="DeJ-O1-qot"/>
                                 </connections>
                             </mapView>
-                            <stepper opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" ambiguous="YES" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" wraps="YES" maximumValue="100" translatesAutoresizingMaskIntoConstraints="NO" id="BVj-OV-jpm">
-                                <rect key="frame" x="355" y="988" width="94" height="29"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <color key="backgroundColor" red="0.2033266024" green="0.24029508990000001" blue="0.25415826609999997" alpha="1" colorSpace="deviceRGB"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="29" id="2ZN-pJ-xZM"/>
-                                    <constraint firstAttribute="width" constant="94" id="hzM-Zu-PJj"/>
-                                </constraints>
-                                <color key="tintColor" red="0.0" green="1" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
-                                <connections>
-                                    <action selector="onHandleTimeIndexChange:" destination="BYZ-38-t0r" eventType="valueChanged" id="Ca4-Kq-vxN"/>
-                                </connections>
-                            </stepper>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" misplaced="YES" text="0" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Znf-mz-Av0">
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" text="0" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Znf-mz-Av0">
                                 <rect key="frame" x="500" y="992" width="42" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <constraints>
@@ -64,9 +51,6 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="BVj-OV-jpm" firstAttribute="leading" secondItem="nfb-E5-mle" secondAttribute="trailing" constant="55" id="1re-cQ-fl9"/>
-                            <constraint firstItem="Znf-mz-Av0" firstAttribute="leading" secondItem="BVj-OV-jpm" secondAttribute="trailing" constant="51" id="HE3-NB-qe8"/>
-                            <constraint firstItem="BVj-OV-jpm" firstAttribute="top" secondItem="WjH-ln-t63" secondAttribute="bottom" constant="6" id="LXw-k4-CbR"/>
                             <constraint firstItem="nfb-E5-mle" firstAttribute="top" secondItem="WjH-ln-t63" secondAttribute="bottom" constant="8" id="iWK-ZV-snh"/>
                         </constraints>
                     </view>
@@ -75,7 +59,6 @@
                         <outlet property="mapView" destination="ac8-nG-8th" id="BJX-ov-euC"/>
                         <outlet property="startStopButton" destination="nfb-E5-mle" id="WIx-lf-9Y6"/>
                         <outlet property="timeIndexLabel" destination="Znf-mz-Av0" id="svH-7d-o3K"/>
-                        <outlet property="timeIndexStepper" destination="BVj-OV-jpm" id="D86-ay-5GF"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
