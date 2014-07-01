@@ -7,6 +7,7 @@
 //
 
 #import <MapKit/MapKit.h>
+#import "MATAnimatedTileOverlayDelegate.h"
 
 @class MATAnimationTile;
 
@@ -17,20 +18,30 @@ typedef struct
 	NSUInteger zCoordiante;
 } MATTileCoordinate;
 
+typedef NS_ENUM(BOOL, MATAnimating) {
+	kIsAnimating = YES,
+	kStopped = NO
+};
+
 @interface MATAnimatedTileOverlay : NSObject <MKOverlay>
 
+@property (nonatomic, weak) id<MATAnimatedTileOverlayDelegate>delegate;
 @property (nonatomic, assign) NSInteger numberOfAnimationFrames;
 @property (readwrite, assign) NSInteger currentTimeIndex;
 @property (readwrite, assign) NSInteger tileSize;
 
 @property (readwrite, strong) NSSet *mapTiles;
+@property (readonly) MATAnimating animating;
 
 - (id) initWithTemplateURLs: (NSArray *)templateURLs numberOfAnimationFrames:(NSUInteger)numberOfAnimationFrames frameDuration:(NSTimeInterval)frameDuration;
+
+- (void) startAnimating;
+- (void) stopAnimating;
 
 - (void) flushTileCache;
 - (void) cancelAllOperations;
 
-- (void) fetchTilesForMapRect: (MKMapRect)aMapRect zoomScale: (MKZoomScale)aScale progressBlock:(void(^)(NSUInteger currentTimeIndex, NSError *error))progressBlock completionBlock: (void (^)(BOOL success, NSError *error))completionBlock;
+- (void) fetchTilesForMapRect: (MKMapRect)aMapRect zoomScale: (MKZoomScale)aScale progressBlock:(void(^)(NSUInteger currentTimeIndex, BOOL *stop, NSError *error))progressBlock completionBlock: (void (^)(BOOL success, NSError *error))completionBlock;
 
 - (void) updateImageTilesToCurrentTimeIndex;
 

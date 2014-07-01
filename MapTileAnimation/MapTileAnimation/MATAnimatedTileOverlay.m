@@ -10,6 +10,7 @@
 #import "MATAnimatedTileOverlay.h"
 #import "MATAnimationTile.h"
 
+
 #define Z_INDEX "{z}"
 #define X_INDEX "{x}"
 #define Y_INDEX "{y}"
@@ -35,6 +36,8 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 @property (nonatomic, assign) NSTimeInterval frameDuration;
 
 @property (nonatomic, readwrite, strong) NSLock *cacheLock;
+@property (nonatomic, readwrite, strong) NSTimer *playBackTimer;
+
 
 - (NSString *) URLStringForX: (NSInteger)xValue Y: (NSInteger)yValue Z: (NSInteger)zValue timeIndex: (NSInteger)aTimeIndex;
 - (NSSet *) mapTilesInMapRect: (MKMapRect)aRect zoomScale: (MKZoomScale)aScale;
@@ -61,7 +64,7 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 		self.currentTimeIndex = 0;
 		self.fetchOperationQueue = [[NSOperationQueue alloc] init];
 		self.downLoadOperationQueue = [[NSOperationQueue alloc] init];
-		[self.downLoadOperationQueue setMaxConcurrentOperationCount: NSOperationQueueDefaultMaxConcurrentOperationCount];
+		[self.downLoadOperationQueue setMaxConcurrentOperationCount: 25];
 		
 		self.cache = [[NSCache alloc] init];
 		self.cache.name = NSStringFromClass([MATAnimatedTileOverlay class]);
@@ -94,6 +97,19 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 
 #pragma mark - Public
 
+- (void) startAnimating;
+{
+	self.playBackTimer = [NSTimer scheduledTimerWithTimeInterval: self.frameDuration target: self selector: @selector(updateImageTileAnimation:) userInfo: nil repeats: YES];
+	[self.playBackTimer fire];
+}
+
+- (void) stopAnimating
+{
+	[self.playBackTimer invalidate];
+	[self cancelAllOperations];
+	self.playBackTimer = nil;
+}
+
 - (void) flushTileCache
 {
 	[[self imageTileCache] removeAllObjects];
@@ -101,14 +117,15 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 
 - (void) cancelAllOperations
 {
-	[self.fetchOperationQueue cancelAllOperations];
 	[self.downLoadOperationQueue cancelAllOperations];
+	[self.fetchOperationQueue cancelAllOperations];
 }
 /*
  will fetch all the tiles for a mapview's map rect and zoom scale.  Provides a download progres block and download completetion block
  */
-- (void) fetchTilesForMapRect: (MKMapRect)aMapRect zoomScale: (MKZoomScale)aScale progressBlock:(void(^)(NSUInteger currentTimeIndex, NSError *error))progressBlock completionBlock: (void (^)(BOOL success, NSError *error))completionBlock
+- (void) fetchTilesForMapRect: (MKMapRect)aMapRect zoomScale: (MKZoomScale)aScale progressBlock:(void(^)(NSUInteger currentTimeIndex, BOOL *stop, NSError *error))progressBlock completionBlock: (void (^)(BOOL success, NSError *error))completionBlock
 {
+
 	[self.fetchOperationQueue addOperationWithBlock:^{
 		//calculate the tiles rects needed for a given mapRect and create the MATAnimationTile objects
 		NSSet *mapTiles = [self mapTilesInMapRect: aMapRect zoomScale: aScale];
@@ -127,10 +144,16 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 		
 		//update the tile array with new tile objects
 		self.mapTiles = mapTiles;
-		
+		//set and check a flag to see if the calling object has stopped tile loading
+		__block BOOL didStopFlag = NO;
 		//start downloading the tiles for a given time index, we want to download all the tiles for a time index
 		//before we move onto the next time index
 		for (NSUInteger timeIndex = 0; timeIndex < self.numberOfAnimationFrames; timeIndex++) {
+			if (didStopFlag == YES) {
+				NSLog(@"User Stopped");
+				[self.downLoadOperationQueue cancelAllOperations];
+				break;
+			}
 			//loop over all the tiles for this time index
 			for (MATAnimationTile *tile in self.mapTiles) {
 				NSString *tileURL = [tile.tileURLs objectAtIndex: timeIndex];
@@ -141,14 +164,21 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 			[self.downLoadOperationQueue waitUntilAllOperationsAreFinished];
 
 			dispatch_async(dispatch_get_main_queue(), ^{
-				progressBlock(timeIndex, nil);
+				progressBlock(timeIndex, &didStopFlag, nil);
 			});
 		}
+		
+		[self.downLoadOperationQueue waitUntilAllOperationsAreFinished];
+
 		//set the current image to the first time index
 		[self updateImageTilesToCurrentTimeIndex];
-
+		
 		dispatch_async(dispatch_get_main_queue(), ^{
-			completionBlock(YES, nil);
+			if (didStopFlag == NO) {
+				completionBlock(YES, nil);
+			} else {
+				completionBlock(NO, nil);
+			}
 		});
 	}];
 }
@@ -204,6 +234,17 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 }
 
 #pragma  mark - Private
+
+- (void) updateImageTileAnimation: (NSTimer *)aTimer
+{
+	self.currentTimeIndex++;
+	if (self.currentTimeIndex > self.numberOfAnimationFrames - 1) {
+		self.currentTimeIndex = 0;
+	}
+	
+	[self updateImageTilesToCurrentTimeIndex];
+	[self.delegate animatedTileOverlay: self didAnimateWithAnimationFrameIndex: self.currentTimeIndex];
+}
 /*
  locks access to the cache so that only one thread at a time can read/write to the cache
  */

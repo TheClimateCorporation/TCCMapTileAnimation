@@ -11,6 +11,7 @@
 
 #import "MATAnimatedTileOverlayRenderer.h"
 #import "MATAnimatedTileOverlay.h"
+#import "MATAnimatedTileOverlayDelegate.h"
 
 #import "MKMapView+Extras.h"
 
@@ -18,12 +19,13 @@
 //#define FUTURE_RADAR_FRAMES_URI "https://qa1-twi.climate.com/assets/wdt-future-radar/LKG.txt?grower_apps=true"
 #define FUTURE_RADAR_FRAMES_URI "http://climate.com/assets/wdt-future-radar/LKG.txt?grower_apps=true"
 
-@interface TCCMapViewController () <MKMapViewDelegate, TCCTimeFrameParserDelegateProtocol>
+@interface TCCMapViewController () <MKMapViewDelegate, MATAnimatedTileOverlayDelegate, TCCTimeFrameParserDelegateProtocol>
 
 @property (nonatomic, readwrite, weak) IBOutlet MKMapView *mapView;
 @property (weak, nonatomic) IBOutlet UIStepper *timeIndexStepper;
 @property (weak, nonatomic) IBOutlet UILabel *timeIndexLabel;
 @property (weak, nonatomic) IBOutlet UIProgressView *downloadProgressView;
+@property (weak, nonatomic) IBOutlet UIButton *startStopButton;
 
 @property (nonatomic, readwrite, strong) TCCTimeFrameParser *timeFrameParser;
 
@@ -40,10 +42,11 @@
     [super viewDidLoad];
 
     // Set the starting  location.
-    CLLocationCoordinate2D startingLocation = {42.2814, -83.7483};
+    CLLocationCoordinate2D startingLocation = {41.5908, -93.6208};
 //	MKCoordinateSpan span = {8.403266, 7.031250};
 	MKCoordinateSpan span = {7.0, 7.0};
-
+	//calling regionThatFits: is very important, this will line up the visible map rect with the screen aspect ratio
+	//which is important for calculating the number of tiles, their coordinates and map rect frame
 	MKCoordinateRegion region = [self.mapView regionThatFits: MKCoordinateRegionMake(startingLocation, span)];
 	
 	[self.mapView setRegion: region animated: NO];
@@ -77,41 +80,67 @@
 
 - (IBAction) onHandleStartStopAction: (id)sender
 {
-	[self.tileOverlayRenderer setAlpha: 1.0];
-
-	TCCMapViewController *controller = self;
 	
-	//start downloading the image tiles for the time frame indexes
-	self.downloadProgressView.hidden = NO;
-	self.timeIndexStepper.maximumValue = (double)self.animatedTileOverlay.numberOfAnimationFrames - 1;
+	if (self.startStopButton.tag == 0) {
+		[self.tileOverlayRenderer setAlpha: 1.0];
+		
+		TCCMapViewController *controller = self;
+		
+		//start downloading the image tiles for the time frame indexes
+		self.downloadProgressView.hidden = NO;
+		self.timeIndexStepper.maximumValue = (double)self.animatedTileOverlay.numberOfAnimationFrames - 1;
+		[self.startStopButton setTitle: @"Stop" forState: UIControlStateNormal];
+		self.startStopButton.tag = 1;
 
-	[self.animatedTileOverlay fetchTilesForMapRect: self.mapView.visibleMapRect zoomScale: self.animatedTileRenderer.zoomScale progressBlock: ^(NSUInteger currentTimeIndex, NSError *error) {
-		
-		CGFloat progressValue = (CGFloat)currentTimeIndex / (CGFloat)(self.animatedTileOverlay.numberOfAnimationFrames - 1);
-		[controller.downloadProgressView setProgress: progressValue animated: YES];
-		
-		if (currentTimeIndex == 0) {
-			[controller.tileOverlayRenderer setAlpha: 0.0];
-			[controller.animatedTileRenderer setAlpha: 1.0];
-		}
-		controller.animatedTileOverlay.currentTimeIndex = currentTimeIndex;
-		[controller.animatedTileOverlay updateImageTilesToCurrentTimeIndex];
-		[controller.animatedTileRenderer setNeedsDisplayInMapRect: self.mapView.visibleMapRect zoomScale: self.animatedTileRenderer.zoomScale];
-		
-	} completionBlock: ^(BOOL success, NSError *error) {
-		
-		if (success) {
+		[self.animatedTileOverlay fetchTilesForMapRect: self.mapView.visibleMapRect zoomScale: self.animatedTileRenderer.zoomScale progressBlock: ^(NSUInteger currentTimeIndex, BOOL *stop, NSError *error) {
+			
+			
+			CGFloat progressValue = (CGFloat)currentTimeIndex / (CGFloat)(self.animatedTileOverlay.numberOfAnimationFrames - 1);
+			[controller.downloadProgressView setProgress: progressValue animated: YES];
+			
+			if (currentTimeIndex == 0) {
+				[controller.tileOverlayRenderer setAlpha: 0.0];
+				[controller.animatedTileRenderer setAlpha: 1.0];
+			}
+			
+			controller.animatedTileOverlay.currentTimeIndex = currentTimeIndex;
+			[controller.animatedTileOverlay updateImageTilesToCurrentTimeIndex];
+			[controller.animatedTileRenderer setNeedsDisplayInMapRect: self.mapView.visibleMapRect zoomScale: self.animatedTileRenderer.zoomScale];
+			
+		} completionBlock: ^(BOOL success, NSError *error) {
+			
 			controller.downloadProgressView.hidden = YES;
 			[controller.downloadProgressView setProgress: 0.0];
 			controller.animatedTileOverlay.currentTimeIndex = 0;
-			[controller.animatedTileOverlay updateImageTilesToCurrentTimeIndex];
 
-			[controller.animatedTileRenderer setNeedsDisplayInMapRect: self.mapView.visibleMapRect zoomScale: self.animatedTileRenderer.zoomScale];
-		}
-	}];
+			if (success) {
+				[controller.animatedTileOverlay updateImageTilesToCurrentTimeIndex];
+				
+				[controller.animatedTileRenderer setNeedsDisplayInMapRect: self.mapView.visibleMapRect zoomScale: self.animatedTileRenderer.zoomScale];
+				[controller.animatedTileOverlay startAnimating];
+			} else {
+				
+				self.startStopButton.tag = 0;
+				[self.startStopButton setTitle: @"Play" forState: UIControlStateNormal];
+				[self.tileOverlayRenderer setAlpha: 1.0];
+				[self.animatedTileRenderer setAlpha: 0.0];
+				[self.tileOverlayRenderer setNeedsDisplay];
+				[self.animatedTileRenderer setNeedsDisplay];
+
+			}
+		}];
+	} else {
+		
+		[self.animatedTileOverlay stopAnimating];
+		self.startStopButton.tag = 0;
+		[self.startStopButton setTitle: @"Play" forState: UIControlStateNormal];
+		[self.tileOverlayRenderer setAlpha: 1.0];
+		[self.animatedTileRenderer setAlpha: 0.0];
+		[self.mapView setNeedsDisplay];
+	}
 }
 
-#pragma mark - TCCTimeFrameParserDelegateProtocol
+#pragma mark - TCCTimeFrameParserDelegate Protocol
 
 - (void) didLoadTimeStampData;
 {
@@ -119,11 +148,29 @@
 	[self.mapView addOverlay: tileOverlay level: MKOverlayLevelAboveRoads];
 	
 	NSArray *templateURLs = self.timeFrameParser.templateFrameTimeURLs;
-	MATAnimatedTileOverlay *overlay = [[MATAnimatedTileOverlay alloc] initWithTemplateURLs: templateURLs numberOfAnimationFrames: templateURLs.count frameDuration: 1.0];
+	MATAnimatedTileOverlay *overlay = [[MATAnimatedTileOverlay alloc] initWithTemplateURLs: templateURLs numberOfAnimationFrames: templateURLs.count frameDuration: 0.66];
+	overlay.delegate = self;
+	
 	[self.animatedTileRenderer setAlpha: 0.0];
 	[self.mapView addOverlay: overlay level: MKOverlayLevelAboveRoads];
 
 }
+
+#pragma mark - MATAnimatedTileOverlayDelegate Protocol
+
+- (void)animatedTileOverlay:(MATAnimatedTileOverlay *)animatedTileOverlay didAnimateWithAnimationFrameIndex:(NSInteger)animationFrameIndex
+{
+	self.timeIndexStepper.value = (double)animationFrameIndex;
+	self.timeIndexLabel.text = [NSString stringWithFormat: @"%lu", (unsigned long)animationFrameIndex];
+	[self.animatedTileRenderer setNeedsDisplayInMapRect: self.mapView.visibleMapRect zoomScale: self.animatedTileRenderer.zoomScale];
+
+}
+
+- (void)animatedTileOverlay:(MATAnimatedTileOverlay *)animatedTileOverlay didHaveError:(NSError *) error
+{
+	
+}
+
 
 #pragma mark - MKMapViewDelegate Protocol
 
@@ -137,6 +184,12 @@
 
 - (void)mapView:(MKMapView *)mapView regionWillChangeAnimated:(BOOL)animated
 {
+	if (self.startStopButton.tag != 0) {
+		[self.animatedTileOverlay stopAnimating];
+		self.startStopButton.tag = 0;
+		[self.startStopButton setTitle: @"Play" forState: UIControlStateNormal];
+	}
+
 	[self.tileOverlayRenderer setAlpha: 1.0];
 	[self.animatedTileRenderer setAlpha: 0.0];
 

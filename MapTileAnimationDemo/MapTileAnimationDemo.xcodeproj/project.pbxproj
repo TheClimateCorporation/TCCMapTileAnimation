@@ -41,6 +41,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		3213A3021962213F0058D302 /* MATAnimatedTileOverlayDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MATAnimatedTileOverlayDelegate.h; sourceTree = "<group>"; };
 		32446D89194A1BE500664240 /* MATAnimatedTileOverlay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MATAnimatedTileOverlay.h; sourceTree = "<group>"; };
 		32446D8A194A1BE500664240 /* MATAnimatedTileOverlay.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MATAnimatedTileOverlay.m; sourceTree = "<group>"; };
 		32446D8C194A1CAA00664240 /* MATAnimatedTileOverlayRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MATAnimatedTileOverlayRenderer.h; sourceTree = "<group>"; };
@@ -182,6 +183,7 @@
 			children = (
 				32446D8C194A1CAA00664240 /* MATAnimatedTileOverlayRenderer.h */,
 				32446D8D194A1CAA00664240 /* MATAnimatedTileOverlayRenderer.m */,
+				3213A3021962213F0058D302 /* MATAnimatedTileOverlayDelegate.h */,
 				32446D89194A1BE500664240 /* MATAnimatedTileOverlay.h */,
 				32446D8A194A1BE500664240 /* MATAnimatedTileOverlay.m */,
 				9B49BC5819490CA500094005 /* MATAnimationTile.h */,

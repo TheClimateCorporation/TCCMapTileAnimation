@@ -90,6 +90,7 @@
                     <connections>
                         <outlet property="downloadProgressView" destination="mS9-2f-HPy" id="343-bQ-AVx"/>
                         <outlet property="mapView" destination="l32-pv-Rsy" id="haA-QL-1lD"/>
+                        <outlet property="startStopButton" destination="w8o-LB-Opa" id="dPD-ev-Qp6"/>
                         <outlet property="timeIndexLabel" destination="orF-6A-5Ok" id="YkP-Bf-EkO"/>
                         <outlet property="timeIndexStepper" destination="JMu-CT-4Da" id="5eo-lf-ahg"/>
                     </connections>
