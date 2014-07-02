@@ -64,6 +64,7 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 		self.frameDuration = frameDuration;
 		self.currentTimeIndex = 0;
 		self.fetchOperationQueue = [[NSOperationQueue alloc] init];
+		[self.fetchOperationQueue setMaxConcurrentOperationCount: 1];  //essentially a serial queue
 		self.downLoadOperationQueue = [[NSOperationQueue alloc] init];
 		[self.downLoadOperationQueue setMaxConcurrentOperationCount: 25];
 		
@@ -241,16 +242,24 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 }
 
 #pragma  mark - Private
-
+/*
+ called from the animation timer on a periodic basis
+ */
 - (void) updateImageTileAnimation: (NSTimer *)aTimer
 {
-	self.currentTimeIndex++;
-	if (self.currentTimeIndex > self.numberOfAnimationFrames - 1) {
-		self.currentTimeIndex = 0;
-	}
-	
-	[self updateImageTilesToCurrentTimeIndex];
-	[self.delegate animatedTileOverlay: self didAnimateWithAnimationFrameIndex: self.currentTimeIndex];
+	[self.fetchOperationQueue addOperationWithBlock:^{
+		
+		self.currentTimeIndex++;
+		//reset the index counter if we have rolled over
+		if (self.currentTimeIndex > self.numberOfAnimationFrames - 1) {
+			self.currentTimeIndex = 0;
+		}
+
+		[self updateImageTilesToCurrentTimeIndex];
+		dispatch_async(dispatch_get_main_queue(), ^{
+			[self.delegate animatedTileOverlay: self didAnimateWithAnimationFrameIndex: self.currentTimeIndex];
+		});
+	}];
 }
 /*
  locks access to the cache so that only one thread at a time can read/write to the cache
