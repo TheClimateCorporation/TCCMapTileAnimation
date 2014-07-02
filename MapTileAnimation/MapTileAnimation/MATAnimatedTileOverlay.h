@@ -18,9 +18,10 @@ typedef struct
 	NSUInteger zCoordiante;
 } MATTileCoordinate;
 
-typedef NS_ENUM(BOOL, MATAnimating) {
-	kIsAnimating = YES,
-	kStopped = NO
+typedef NS_ENUM(NSUInteger, MATAnimatingState) {
+	MATAnimatingState_stopped = 0,
+	MATAnimatingState_loading = 1,
+	MATAnimatingState_animating = 2
 };
 
 @interface MATAnimatedTileOverlay : NSObject <MKOverlay>
@@ -31,7 +32,7 @@ typedef NS_ENUM(BOOL, MATAnimating) {
 @property (readwrite, assign) NSInteger tileSize;
 
 @property (readwrite, strong) NSSet *mapTiles;
-@property (readonly) MATAnimating animating;
+@property (readonly) MATAnimatingState currentAnimatingState;
 
 - (id) initWithTemplateURLs: (NSArray *)templateURLs numberOfAnimationFrames:(NSUInteger)numberOfAnimationFrames frameDuration:(NSTimeInterval)frameDuration;
 

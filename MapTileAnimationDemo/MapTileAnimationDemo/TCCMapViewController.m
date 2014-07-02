@@ -79,14 +79,13 @@
 - (IBAction) onHandleStartStopAction: (id)sender
 {
 	
-	if (self.startStopButton.tag == 0) {
+	if (self.startStopButton.tag == MATAnimatingState_stopped) {
 		[self.tileOverlayRenderer setAlpha: 1.0];
 		
 		TCCMapViewController *controller = self;
 		
 		//start downloading the image tiles for the time frame indexes
 		self.downloadProgressView.hidden = NO;
-		[self toggleUIState: NO];
 
 		[self.animatedTileOverlay fetchTilesForMapRect: self.mapView.visibleMapRect zoomScale: self.animatedTileRenderer.zoomScale progressBlock: ^(NSUInteger currentTimeIndex, BOOL *stop) {
 			
@@ -117,24 +116,34 @@
 				[controller.animatedTileOverlay startAnimating];
 			} else {
 				
-				[self toggleUIState: YES];
 				controller.shouldStop = NO;
 			}
 		}];
-	} else {
+	} else if (self.startStopButton.tag == MATAnimatingState_loading) {
 		self.shouldStop = YES;
-		self.startStopButton.tag = 0;
+	} else if (self.startStopButton.tag == MATAnimatingState_animating) {
+		[self.animatedTileOverlay stopAnimating];
 	}
 }
 
-- (void) toggleUIState: (BOOL) isEnabled
+
+- (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
-	if (isEnabled == YES) {
-		self.startStopButton.tag = 0;
-		[self.startStopButton setTitle: @"Play" forState: UIControlStateNormal];
-	} else {
-		self.startStopButton.tag = 1;
-		[self.startStopButton setTitle: @"Stop" forState: UIControlStateNormal];
+	if ([keyPath isEqualToString: @"currentAnimatingState"]) {
+		NSNumber *animatingState = [change objectForKey: NSKeyValueChangeNewKey];
+		self.startStopButton.tag = [animatingState integerValue];
+		
+		switch ([animatingState integerValue]) {
+			case MATAnimatingState_loading:
+				[self.startStopButton setTitle: @"Cancel" forState: UIControlStateNormal];
+				break;
+			case MATAnimatingState_animating:
+				[self.startStopButton setTitle: @"Stop" forState: UIControlStateNormal];
+				break;
+			default:
+				[self.startStopButton setTitle: @"Play" forState: UIControlStateNormal];
+				break;
+		}
 	}
 }
 
@@ -148,6 +157,8 @@
 	NSArray *templateURLs = self.timeFrameParser.templateFrameTimeURLs;
 	MATAnimatedTileOverlay *overlay = [[MATAnimatedTileOverlay alloc] initWithTemplateURLs: templateURLs numberOfAnimationFrames: templateURLs.count frameDuration: 0.66];
 	overlay.delegate = self;
+	
+	[overlay addObserver: self forKeyPath: @"currentAnimatingState" options: NSKeyValueObservingOptionNew context: nil];
 	
 	[self.animatedTileRenderer setAlpha: 0.0];
 	[self.mapView addOverlay: overlay level: MKOverlayLevelAboveRoads];
@@ -183,7 +194,6 @@
 {
 	if (self.startStopButton.tag != 0) {
 		[self.animatedTileOverlay stopAnimating];
-		[self toggleUIState: YES];
 	}
 
 	[self.tileOverlayRenderer setAlpha: 1.0];

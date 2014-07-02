@@ -37,6 +37,7 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 
 @property (nonatomic, readwrite, strong) NSLock *cacheLock;
 @property (nonatomic, readwrite, strong) NSTimer *playBackTimer;
+@property (readwrite, assign) MATAnimatingState currentAnimatingState;
 
 
 - (NSString *) URLStringForX: (NSInteger)xValue Y: (NSInteger)yValue Z: (NSInteger)zValue timeIndex: (NSInteger)aTimeIndex;
@@ -74,6 +75,8 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 		self.tileSize = 256;
 		
 		self.cacheLock = [[NSLock alloc] init];
+		self.currentAnimatingState = MATAnimatingState_stopped;
+		
 	}
 	return self;
 }
@@ -101,6 +104,7 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 {
 	self.playBackTimer = [NSTimer scheduledTimerWithTimeInterval: self.frameDuration target: self selector: @selector(updateImageTileAnimation:) userInfo: nil repeats: YES];
 	[self.playBackTimer fire];
+	self.currentAnimatingState = MATAnimatingState_animating;
 }
 
 - (void) stopAnimating
@@ -108,6 +112,7 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 	[self.playBackTimer invalidate];
 	[self cancelAllOperations];
 	self.playBackTimer = nil;
+	self.currentAnimatingState = MATAnimatingState_stopped;
 }
 
 - (void) flushTileCache
@@ -125,6 +130,8 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
  */
 - (void) fetchTilesForMapRect: (MKMapRect)aMapRect zoomScale: (MKZoomScale)aScale progressBlock:(void(^)(NSUInteger currentTimeIndex, BOOL *stop))progressBlock completionBlock: (void (^)(BOOL success, NSError *error))completionBlock
 {
+
+	self.currentAnimatingState = MATAnimatingState_loading;
 
 	[self.fetchOperationQueue addOperationWithBlock:^{
 		//calculate the tiles rects needed for a given mapRect and create the MATAnimationTile objects
@@ -152,6 +159,7 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 			if (didStopFlag == YES) {
 				NSLog(@"User Stopped");
 				[self.downLoadOperationQueue cancelAllOperations];
+				self.currentAnimatingState = MATAnimatingState_stopped;
 				break;
 			}
 			//loop over all the tiles for this time index
@@ -167,7 +175,6 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 				progressBlock(timeIndex, &didStopFlag);
 			});
 		}
-		
 		[self.downLoadOperationQueue waitUntilAllOperationsAreFinished];
 
 		//set the current image to the first time index
