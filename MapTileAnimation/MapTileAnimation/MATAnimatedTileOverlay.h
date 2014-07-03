@@ -11,6 +11,7 @@
 
 @class MATAnimationTile;
 
+// TODO: put this into its own header file, have MATAnimationTile use this
 typedef struct
 {
 	NSUInteger xCoordinate;
@@ -18,6 +19,7 @@ typedef struct
 	NSUInteger zCoordiante;
 } MATTileCoordinate;
 
+// TODO: rename to use proper enum convention
 typedef NS_ENUM(NSUInteger, MATAnimatingState) {
 	MATAnimatingState_stopped = 0,
 	MATAnimatingState_loading = 1,
@@ -26,21 +28,29 @@ typedef NS_ENUM(NSUInteger, MATAnimatingState) {
 
 @interface MATAnimatedTileOverlay : NSObject <MKOverlay>
 
-@property (nonatomic, weak) id<MATAnimatedTileOverlayDelegate>delegate;
-@property (readonly, nonatomic, assign) NSInteger numberOfAnimationFrames;
-@property (readwrite, assign) NSInteger currentTimeIndex;
-@property (readwrite, assign) NSInteger tileSize;
-@property (readwrite, strong) NSSet *mapTiles;
-@property (readonly) MATAnimatingState currentAnimatingState;
+@property (weak, nonatomic) id<MATAnimatedTileOverlayDelegate>delegate;
+@property (readonly, nonatomic) NSInteger numberOfAnimationFrames;
+// TODO: make it currentFrameIndex
+@property (nonatomic) NSInteger currentTimeIndex;
+@property (readonly, nonatomic) MATAnimatingState currentAnimatingState;
+// TODO: Make it private
+@property (nonatomic) NSInteger tileSize;
+// TODO: make it private
+@property (strong, nonatomic) NSSet *mapTiles;
 
-- (id) initWithTemplateURLs: (NSArray *)templateURLs numberOfAnimationFrames:(NSUInteger)numberOfAnimationFrames frameDuration:(NSTimeInterval)frameDuration;
-- (void) startAnimating;
-- (void) stopAnimating;
-- (void) flushTileCache;
-- (void) cancelAllOperations;
-- (void) fetchTilesForMapRect: (MKMapRect)aMapRect zoomScale: (MKZoomScale)aScale progressBlock:(void(^)(NSUInteger currentTimeIndex, BOOL *stop))progressBlock completionBlock: (void (^)(BOOL success, NSError *error))completionBlock;
-- (void) updateImageTilesToCurrentTimeIndex;
-- (MATTileCoordinate) tileCoordinateForMapRect: (MKMapRect)aMapRect zoomScale:(MKZoomScale)aZoomScale;
-- (MATAnimationTile *) tileForMapRect: (MKMapRect)aMapRect zoomScale:(MKZoomScale)aZoomScale;
+// TODO: remove numberOfAnimationFrames, have it be populated by templareURLs.count inside this initializer
+- (instancetype)initWithTemplateURLs: (NSArray *)templateURLs numberOfAnimationFrames:(NSUInteger)numberOfAnimationFrames frameDuration:(NSTimeInterval)frameDuration;
+- (void)startAnimating;
+- (void)stopAnimating;
+// TODO: What is the purpose of this?
+- (void)flushTileCache;
+// TODO: make this private
+- (void)cancelAllOperations;
+- (void)fetchTilesForMapRect:(MKMapRect)aMapRect zoomScale:(MKZoomScale)aScale progressBlock:(void(^)(NSUInteger currentTimeIndex, BOOL *stop))progressBlock completionBlock:(void (^)(BOOL success, NSError *error))completionBlock;
+// TODO: make this accept a animation frame index as a parameter, i.e. - (void)updateTilesToFrameIndex:(NSUInteger)animationFrameIndex;
+- (void)updateImageTilesToCurrentTimeIndex;
+// TODO: make this private
+- (MATTileCoordinate)tileCoordinateForMapRect:(MKMapRect)aMapRect zoomScale:(MKZoomScale)aZoomScale;
+- (MATAnimationTile *)tileForMapRect:(MKMapRect)aMapRect zoomScale:(MKZoomScale)aZoomScale;
 
 @end

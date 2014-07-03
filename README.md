@@ -56,26 +56,26 @@ Animation
 The following MATAnimatedTileOverlay
 
     @protocol MATAnimatedTileOverlayDelegate
-    // Do we need will, didStart, and did callbacks?
-    - (NSString *)keyForAnimationTimeIndex: (NSInteger)animationTimeIndex //returns a key for a given animation time index - used for constructing the url for fetching the animation tiles
-    - (void)animatedTileOverlay:(MATAnimatedTileOverlay *)animatedTileOverlay willStartAnimatingWithAnimationFrameIndex:(NSInteger)animationFrameIndex;
-	- (void)animatedTileOverlay:(MATAnimatedTileOverlay *)animatedTileOverlay didStartAnimatingWithAnimationFrameIndex:(NSInteger)animationFrameIndex;
-    - (void)animatedTileOverlay:(MATAnimatedTileOverlay *)animatedTileOverlay didAnimateWithAnimationFrameIndex:(NSInteger)animationFrameIndex;
-    - (void)animatedTileOverlay:(MATAnimatedTileOverlay *)animatedTileOverlay didHaveError:(NSError *) error; // Does not stop the fetching of other images, could have multiple errors
+    - (void)animatedTileOverlay:(MATAnimatedTileOverlay *)animatedTileOverlay didChangeAnimationState:(MATAnimatingState)currentAnimationState;
+    - (void)animatedTileOverlay:(MATAnimatedTileOverlay *)animatedTileOverlay didAnimateWithFrameIndex:(NSInteger)animationFrameIndex;
+     // Does not stop the fetching of other images, could have multiple errors
+    - (void)animatedTileOverlay:(MATAnimatedTileOverlay *)animatedTileOverlay didHaveError:(NSError *) error;
     @end
 
     @interface MATAnimatedTileOverlay : NSObject <MKOverlay>
 
     @property (weak, nonatomic) id <MATAnimatedTileOverlayDelegate> delegate;
-    @property (assign, nonatomic, readonly) NSUInteger numberOfAnimationFrames;
-    @property (assign, nonatomic, readonly) NSTimeInterval frameDuration;
-    @property (assign, nonatomic) NSUInteger currentAnimationFrameIndex; // If set this will nil the animationTiles
+    @property (nonatomic, readonly) NSUInteger numberOfAnimationFrames;
+    @property (nonatomic, readonly) NSTimeInterval frameDuration;
+    @property (nonatomic) NSUInteger currentFrameIndex; // If set this will nil the animationTiles
     @property (copy, nonatomic) NSArray *animationTiles; // of MATAnimationTile. Set to nil if the map moves
-    @property (assign, nonatomic, readonly) BOOL isAnimating;
-    - (id) initWithNumberOfAnimationFrames:(NSUInteger)numberOfAnimationFrames frameDuration:(NSTimeInterval)frameDuration;
-    - (void) loadAnimationFrames; // For preload purposes, but for Climate we wouldn't use.
-    - (void) startAnimating; // Loads and after loading starts the animations
-    - (void) stopAnimating;
+    @property (nonatomic, readonly) BOOL isAnimating;
+    - (id)initWithNumberOfAnimationFrames:(NSUInteger)numberOfAnimationFrames frameDuration:(NSTimeInterval)frameDuration;
+    - (void)startAnimating; // Loads and after loading starts the animations
+    - (void)stopAnimating;
+    - (void)fetchTilesForMapRect:(MKMapRect)aMapRect zoomScale:(MKZoomScale)aScale progressBlock:(void(^)(NSUInteger currentTimeIndex, BOOL *stop))progressBlock completionBlock:(void (^)(BOOL success, NSError *error))completionBlock;
+    - (void)updateTilesToFrameIndex:(NSUInteger)animationFrameIndex;
+    - (MATAnimationTile *)tileForMapRect:(MKMapRect)aMapRect zoomScale:(MKZoomScale)aZoomScale;
 
     @end
 
@@ -83,8 +83,17 @@ The following MATAnimatedTileOverlay
     @end
 
     @interface MATAnimationTile // Is this class necessary?
+    @property (nonatomic) MATTileCoordinate coordinate;
+    // TODO: review these again
     @property (assign, nonatomic, readonly) MKTileOverlayPath path;
     @property (assign, nonatomic, readonly) MKMapRect mapRect; // Do we need both mapRect and path?
     @property (strong, nonatomic, readonly) NSDictionary* animationImages; // Key is NSNumber of animationIndex
     - (id) initWithPath:(MKTileOverlayPath) path mapRect:(MKMapRect) mapRect animationImages:(NSDictionary*) animationImages;
     @end
+
+    // TODO: needs review
+    @property (nonatomic, readwrite, strong) NSString *tileCoordinate;
+    @property (nonatomic, readwrite, assign) MKMapRect mapRectFrame;
+    @property (nonatomic, readwrite, strong) UIImage *currentImageTile;
+    @property (nonatomic, readwrite, strong) NSArray *tileURLs;
+    - (id) initWithFrame:(MKMapRect)aTileFrame xCord: (NSInteger)aXCord yCord: (NSInteger)aYCord zCord: (NSInteger)aZCord;
