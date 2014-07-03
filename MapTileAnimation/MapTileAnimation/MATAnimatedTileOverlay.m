@@ -27,9 +27,15 @@
 @property (nonatomic, readwrite, strong) NSLock *cacheLock;
 @property (nonatomic, readwrite, strong) NSTimer *playBackTimer;
 @property (readwrite, assign) MATAnimatingState currentAnimatingState;
+@property (strong, nonatomic) NSSet *mapTiles;
+@property (nonatomic) NSInteger tileSize;
+
+
 - (NSString *) URLStringForX: (NSInteger)xValue Y: (NSInteger)yValue Z: (NSInteger)zValue timeIndex: (NSInteger)aTimeIndex;
 - (NSSet *) mapTilesInMapRect: (MKMapRect)aRect zoomScale: (MKZoomScale)aScale;
 - (void) fetchAndCacheImageTileAtURL: (NSString *)aUrlString;
+- (MATTileCoordinate)tileCoordinateForMapRect:(MKMapRect)aMapRect zoomScale:(MKZoomScale)aZoomScale;
+- (void)cancelAllOperations;
 
 @end
 
@@ -49,7 +55,7 @@
 		self.templateURLs = templateURLs;
 		self.numberOfAnimationFrames = numberOfAnimationFrames;
 		self.frameDuration = frameDuration;
-		self.currentTimeIndex = 0;
+		self.currentFrameIndex = 0;
 		self.fetchOperationQueue = [[NSOperationQueue alloc] init];
 		[self.fetchOperationQueue setMaxConcurrentOperationCount: 1];  //essentially a serial queue
 		self.downLoadOperationQueue = [[NSOperationQueue alloc] init];
@@ -182,7 +188,7 @@
 {
 	for (MATAnimationTile *tile in self.mapTiles) {
 		
-		NSString *cacheKey = [tile.tileURLs objectAtIndex: self.currentTimeIndex];
+		NSString *cacheKey = [tile.tileURLs objectAtIndex: self.currentFrameIndex];
 		// Load the image from cache.
 		[self.cacheLock lock];
 		NSData *cachedData = [[self imageTileCache] objectForKey: cacheKey];
@@ -234,15 +240,15 @@
 {
 	[self.fetchOperationQueue addOperationWithBlock:^{
 		
-		self.currentTimeIndex++;
+		self.currentFrameIndex++;
 		//reset the index counter if we have rolled over
-		if (self.currentTimeIndex > self.numberOfAnimationFrames - 1) {
-			self.currentTimeIndex = 0;
+		if (self.currentFrameIndex > self.numberOfAnimationFrames - 1) {
+			self.currentFrameIndex = 0;
 		}
 
 		[self updateImageTilesToCurrentTimeIndex];
 		dispatch_async(dispatch_get_main_queue(), ^{
-			[self.delegate animatedTileOverlay: self didAnimateWithAnimationFrameIndex: self.currentTimeIndex];
+			[self.delegate animatedTileOverlay: self didAnimateWithAnimationFrameIndex: self.currentFrameIndex];
 		});
 	}];
 }

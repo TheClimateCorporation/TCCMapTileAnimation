@@ -70,7 +70,7 @@
 
 - (IBAction)onHandleTimeIndexChange:(id)sender
 {
-	self.timeIndexLabel.text = [NSString stringWithFormat: @"%lu", (unsigned long)self.animatedTileOverlay.currentTimeIndex];
+	self.timeIndexLabel.text = [NSString stringWithFormat: @"%lu", (unsigned long)self.animatedTileOverlay.currentFrameIndex];
 	[self.animatedTileOverlay updateImageTilesToCurrentTimeIndex];
 	[self.animatedTileRenderer setNeedsDisplayInMapRect: self.mapView.visibleMapRect zoomScale: self.animatedTileRenderer.zoomScale];
 
@@ -108,7 +108,7 @@
 			
 			controller.downloadProgressView.hidden = YES;
 			[controller.downloadProgressView setProgress: 0.0];
-			controller.animatedTileOverlay.currentTimeIndex = 0;
+			controller.animatedTileOverlay.currentFrameIndex = 0;
 
 			if (success) {
 				[controller.animatedTileOverlay updateImageTilesToCurrentTimeIndex];
