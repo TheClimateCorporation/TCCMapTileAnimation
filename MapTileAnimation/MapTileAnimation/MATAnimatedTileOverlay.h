@@ -11,11 +11,10 @@
 
 @class MATAnimationTile;
 
-// TODO: rename to use proper enum convention
 typedef NS_ENUM(NSUInteger, MATAnimatingState) {
-	MATAnimatingState_stopped = 0,
-	MATAnimatingState_loading = 1,
-	MATAnimatingState_animating = 2
+	MATAnimatingStateStopped = 0,
+	MATAnimatingStateLoading = 1,
+	MATAnimatingStateAnimating = 2
 };
 
 @interface MATAnimatedTileOverlay : NSObject <MKOverlay>
@@ -29,11 +28,8 @@ typedef NS_ENUM(NSUInteger, MATAnimatingState) {
 - (instancetype)initWithTemplateURLs: (NSArray *)templateURLs numberOfAnimationFrames:(NSUInteger)numberOfAnimationFrames frameDuration:(NSTimeInterval)frameDuration;
 - (void)startAnimating;
 - (void)stopAnimating;
-// TODO: What is the purpose of this?
-- (void)flushTileCache;
 - (void)fetchTilesForMapRect:(MKMapRect)aMapRect zoomScale:(MKZoomScale)aScale progressBlock:(void(^)(NSUInteger currentTimeIndex, BOOL *stop))progressBlock completionBlock:(void (^)(BOOL success, NSError *error))completionBlock;
-// TODO: make this accept a animation frame index as a parameter, i.e. - (void)updateTilesToFrameIndex:(NSUInteger)animationFrameIndex;
-- (void)updateImageTilesToCurrentTimeIndex;
+- (void)updateImageTilesToCurrentFrameIndex: (NSUInteger)animationFrameIndex;
 - (MATAnimationTile *)tileForMapRect:(MKMapRect)aMapRect zoomScale:(MKZoomScale)aZoomScale;
 
 @end
