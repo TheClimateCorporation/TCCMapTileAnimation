@@ -156,7 +156,7 @@
 	[self.mapView addOverlay: tileOverlay level: MKOverlayLevelAboveRoads];
 	
 	NSArray *templateURLs = self.timeFrameParser.templateFrameTimeURLs;
-	MATAnimatedTileOverlay *overlay = [[MATAnimatedTileOverlay alloc] initWithTemplateURLs: templateURLs numberOfAnimationFrames: templateURLs.count frameDuration: 0.25];
+	MATAnimatedTileOverlay *overlay = [[MATAnimatedTileOverlay alloc] initWithTemplateURLs: templateURLs frameDuration: 0.25];
 	overlay.delegate = self;
 	
 	[overlay addObserver: self forKeyPath: @"currentAnimatingState" options: NSKeyValueObservingOptionNew context: nil];

@@ -48,7 +48,7 @@
     dispatch_queue_t _lockedQueue;
 }
 
-- (id) initWithTemplateURLs: (NSArray *)templateURLs numberOfAnimationFrames:(NSUInteger)numberOfAnimationFrames frameDuration:(NSTimeInterval)frameDuration
+- (id) initWithTemplateURLs: (NSArray *)templateURLs frameDuration:(NSTimeInterval)frameDuration
 {
 	self = [super init];
 	if (self)
@@ -57,7 +57,7 @@
 		_lockedQueue = dispatch_queue_create([queueName UTF8String], DISPATCH_QUEUE_CONCURRENT);
 
 		self.templateURLs = templateURLs;
-		self.numberOfAnimationFrames = numberOfAnimationFrames;
+		self.numberOfAnimationFrames = [templateURLs count];
 		self.frameDuration = frameDuration;
 		self.currentFrameIndex = 0;
 		self.fetchOperationQueue = [[NSOperationQueue alloc] init];

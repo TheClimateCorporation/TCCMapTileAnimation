@@ -20,12 +20,11 @@ typedef NS_ENUM(NSUInteger, MATAnimatingState) {
 @interface MATAnimatedTileOverlay : NSObject <MKOverlay>
 
 @property (weak, nonatomic) id<MATAnimatedTileOverlayDelegate>delegate;
-@property (readonly, nonatomic) NSInteger numberOfAnimationFrames;
 @property (nonatomic) NSInteger currentFrameIndex;
+@property (readonly, nonatomic) NSInteger numberOfAnimationFrames;
 @property (readonly, nonatomic) MATAnimatingState currentAnimatingState;
 
-// TODO: remove numberOfAnimationFrames, have it be populated by templareURLs.count inside this initializer
-- (instancetype)initWithTemplateURLs: (NSArray *)templateURLs numberOfAnimationFrames:(NSUInteger)numberOfAnimationFrames frameDuration:(NSTimeInterval)frameDuration;
+- (instancetype)initWithTemplateURLs: (NSArray *)templateURLs frameDuration:(NSTimeInterval)frameDuration;
 - (void)startAnimating;
 - (void)stopAnimating;
 - (void)fetchTilesForMapRect:(MKMapRect)aMapRect zoomScale:(MKZoomScale)aScale progressBlock:(void(^)(NSUInteger currentTimeIndex, BOOL *stop))progressBlock completionBlock:(void (^)(BOOL success, NSError *error))completionBlock;
