@@ -27,26 +27,20 @@ typedef NS_ENUM(NSUInteger, MATAnimatingState) {
 @interface MATAnimatedTileOverlay : NSObject <MKOverlay>
 
 @property (nonatomic, weak) id<MATAnimatedTileOverlayDelegate>delegate;
-@property (nonatomic, assign) NSInteger numberOfAnimationFrames;
+@property (readonly, nonatomic, assign) NSInteger numberOfAnimationFrames;
 @property (readwrite, assign) NSInteger currentTimeIndex;
 @property (readwrite, assign) NSInteger tileSize;
-
 @property (readwrite, strong) NSSet *mapTiles;
 @property (readonly) MATAnimatingState currentAnimatingState;
 
 - (id) initWithTemplateURLs: (NSArray *)templateURLs numberOfAnimationFrames:(NSUInteger)numberOfAnimationFrames frameDuration:(NSTimeInterval)frameDuration;
-
 - (void) startAnimating;
 - (void) stopAnimating;
-
 - (void) flushTileCache;
 - (void) cancelAllOperations;
-
 - (void) fetchTilesForMapRect: (MKMapRect)aMapRect zoomScale: (MKZoomScale)aScale progressBlock:(void(^)(NSUInteger currentTimeIndex, BOOL *stop))progressBlock completionBlock: (void (^)(BOOL success, NSError *error))completionBlock;
-
 - (void) updateImageTilesToCurrentTimeIndex;
-
-- (MATTileCoordinate) tileCoordianteForMapRect: (MKMapRect)aMapRect zoomScale:(MKZoomScale)aZoomScale;
-
+- (MATTileCoordinate) tileCoordinateForMapRect: (MKMapRect)aMapRect zoomScale:(MKZoomScale)aZoomScale;
 - (MATAnimationTile *) tileForMapRect: (MKMapRect)aMapRect zoomScale:(MKZoomScale)aZoomScale;
+
 @end

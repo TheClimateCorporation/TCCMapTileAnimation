@@ -82,7 +82,7 @@
 	if (self.startStopButton.tag == MATAnimatingState_stopped) {
 		[self.tileOverlayRenderer setAlpha: 1.0];
 		
-		TCCMapViewController *controller = self;
+        TCCMapViewController __weak *controller = self;
 		
 		//start downloading the image tiles for the time frame indexes
 		self.downloadProgressView.hidden = NO;
@@ -98,8 +98,9 @@
 				[controller.animatedTileRenderer setAlpha: 1.0];
 			}
 			
-			controller.animatedTileOverlay.currentTimeIndex = currentTimeIndex;
+			//controller.animatedTileOverlay.currentTimeIndex = currentTimeIndex;
 			[controller.animatedTileOverlay updateImageTilesToCurrentTimeIndex];
+            
 			[controller.animatedTileRenderer setNeedsDisplayInMapRect: self.mapView.visibleMapRect zoomScale: self.animatedTileRenderer.zoomScale];
 			*stop = controller.shouldStop;
 			
@@ -160,7 +161,6 @@
 	
 	[overlay addObserver: self forKeyPath: @"currentAnimatingState" options: NSKeyValueObservingOptionNew context: nil];
 	
-	[self.animatedTileRenderer setAlpha: 0.0];
 	[self.mapView addOverlay: overlay level: MKOverlayLevelAboveRoads];
 
 }

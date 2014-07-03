@@ -16,30 +16,17 @@
 #define Y_INDEX "{y}"
 
 
-static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
-{
-    // Convert an MKZoomScale to a zoom level where level 0 contains
-    // four square tiles.
-    double numberOfTilesAt1_0 = MKMapSizeWorld.width / overlaySize;
-    //Add 1 to account for virtual tile
-    NSInteger zoomLevelAt1_0 = log2(numberOfTilesAt1_0);
-    NSInteger zoomLevel = MAX(0, zoomLevelAt1_0 + floor(log2f(scale) + 0.5));
-    return zoomLevel;
-}
-
 @interface MATAnimatedTileOverlay ()
 
 @property (nonatomic, readwrite, strong) NSOperationQueue *fetchOperationQueue;
 @property (nonatomic, readwrite, strong) NSOperationQueue *downLoadOperationQueue;
 @property (nonatomic, readwrite, strong) NSCache *cache;
 @property (nonatomic, readwrite, strong) NSArray *templateURLs;
+@property (nonatomic, readwrite) NSInteger numberOfAnimationFrames;
 @property (nonatomic, assign) NSTimeInterval frameDuration;
-
 @property (nonatomic, readwrite, strong) NSLock *cacheLock;
 @property (nonatomic, readwrite, strong) NSTimer *playBackTimer;
 @property (readwrite, assign) MATAnimatingState currentAnimatingState;
-
-
 - (NSString *) URLStringForX: (NSInteger)xValue Y: (NSInteger)yValue Z: (NSInteger)zValue timeIndex: (NSInteger)aTimeIndex;
 - (NSSet *) mapTilesInMapRect: (MKMapRect)aRect zoomScale: (MKZoomScale)aScale;
 - (void) fetchAndCacheImageTileAtURL: (NSString *)aUrlString;
@@ -182,11 +169,9 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 		[self updateImageTilesToCurrentTimeIndex];
 		
 		dispatch_async(dispatch_get_main_queue(), ^{
-			if (didStopFlag == NO) {
-				completionBlock(YES, nil);
-			} else {
-				completionBlock(NO, nil);
-			}
+            
+            completionBlock(!didStopFlag, nil);
+            
 		});
 	}];
 }
@@ -211,7 +196,7 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 	}
 }
 
-- (MATTileCoordinate) tileCoordianteForMapRect: (MKMapRect)aMapRect zoomScale:(MKZoomScale)aZoomScale
+- (MATTileCoordinate) tileCoordinateForMapRect: (MKMapRect)aMapRect zoomScale:(MKZoomScale)aZoomScale
 {
 	MATTileCoordinate coord = {0 , 0, 0};
 	
@@ -230,7 +215,7 @@ static NSInteger zoomScaleToZoomLevel(MKZoomScale scale, double overlaySize)
 - (MATAnimationTile *) tileForMapRect: (MKMapRect)aMapRect zoomScale:(MKZoomScale)aZoomScale;
 {
 	if (self.mapTiles) {
-		MATTileCoordinate coord = [self tileCoordianteForMapRect: aMapRect zoomScale: aZoomScale];
+		MATTileCoordinate coord = [self tileCoordinateForMapRect: aMapRect zoomScale: aZoomScale];
 		for (MATAnimationTile *tile in self.mapTiles) {
 			if (coord.xCoordinate == tile.xCoordinate && coord.yCoordinate == tile.yCoordinate && coord.zCoordiante == tile.zCoordinate) {
 				return tile;
