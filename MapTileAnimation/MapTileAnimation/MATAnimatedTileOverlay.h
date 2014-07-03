@@ -24,11 +24,11 @@ typedef NS_ENUM(NSUInteger, MATAnimatingState) {
 @property (readonly, nonatomic) NSInteger numberOfAnimationFrames;
 @property (readonly, nonatomic) MATAnimatingState currentAnimatingState;
 
-- (instancetype)initWithTemplateURLs: (NSArray *)templateURLs frameDuration:(NSTimeInterval)frameDuration;
+- (instancetype)initWithTemplateURLs:(NSArray *)templateURLs frameDuration:(NSTimeInterval)frameDuration;
 - (void)startAnimating;
 - (void)stopAnimating;
 - (void)fetchTilesForMapRect:(MKMapRect)aMapRect zoomScale:(MKZoomScale)aScale progressBlock:(void(^)(NSUInteger currentTimeIndex, BOOL *stop))progressBlock completionBlock:(void (^)(BOOL success, NSError *error))completionBlock;
-- (void)updateImageTilesToCurrentFrameIndex: (NSUInteger)animationFrameIndex;
+- (void)updateImageTilesToFrameIndex: (NSUInteger)animationFrameIndex;
 - (MATAnimationTile *)tileForMapRect:(MKMapRect)aMapRect zoomScale:(MKZoomScale)aZoomScale;
 
 @end

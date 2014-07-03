@@ -71,7 +71,7 @@
 - (IBAction)onHandleTimeIndexChange:(id)sender
 {
 	self.timeIndexLabel.text = [NSString stringWithFormat: @"%lu", (unsigned long)self.animatedTileOverlay.currentFrameIndex];
-	[self.animatedTileOverlay updateImageTilesToCurrentFrameIndex: (unsigned long)self.animatedTileOverlay.currentFrameIndex];
+	[self.animatedTileOverlay updateImageTilesToFrameIndex: (unsigned long)self.animatedTileOverlay.currentFrameIndex];
 	[self.animatedTileRenderer setNeedsDisplayInMapRect: self.mapView.visibleMapRect zoomScale: self.animatedTileRenderer.zoomScale];
 
 }
@@ -99,7 +99,7 @@
 			}
 			
 			//controller.animatedTileOverlay.currentTimeIndex = currentTimeIndex;
-			[controller.animatedTileOverlay updateImageTilesToCurrentFrameIndex: currentTimeIndex];
+			[controller.animatedTileOverlay updateImageTilesToFrameIndex: currentTimeIndex];
             
 			[controller.animatedTileRenderer setNeedsDisplayInMapRect: self.mapView.visibleMapRect zoomScale: self.animatedTileRenderer.zoomScale];
 			*stop = controller.shouldStop;
@@ -111,7 +111,7 @@
 			controller.animatedTileOverlay.currentFrameIndex = 0;
 
 			if (success) {
-				[controller.animatedTileOverlay updateImageTilesToCurrentFrameIndex: controller.animatedTileOverlay.currentFrameIndex];
+				[controller.animatedTileOverlay updateImageTilesToFrameIndex: controller.animatedTileOverlay.currentFrameIndex];
 				
 				[controller.animatedTileRenderer setNeedsDisplayInMapRect: self.mapView.visibleMapRect zoomScale: self.animatedTileRenderer.zoomScale];
 				[controller.animatedTileOverlay startAnimating];

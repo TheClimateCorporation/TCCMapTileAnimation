@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 #import <MapKit/MapKit.h>
 
+// TODO: fix this up
 typedef struct
 {
 	NSUInteger xCoordinate;

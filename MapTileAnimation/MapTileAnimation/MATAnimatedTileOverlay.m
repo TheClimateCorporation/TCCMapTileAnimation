@@ -171,7 +171,7 @@
 		[self.downLoadOperationQueue waitUntilAllOperationsAreFinished];
 
 		//set the current image to the first time index
-		[self updateImageTilesToCurrentFrameIndex:self.currentFrameIndex];
+		[self updateImageTilesToFrameIndex:self.currentFrameIndex];
 		
 		dispatch_async(dispatch_get_main_queue(), ^{
             
@@ -183,7 +183,7 @@
 /*
  updates the MATAnimationTile tile image property to point to the tile image for the current time index
  */
-- (void) updateImageTilesToCurrentFrameIndex:(NSUInteger)animationFrameIndex
+- (void) updateImageTilesToFrameIndex:(NSUInteger)animationFrameIndex
 {
 	for (MATAnimationTile *tile in self.mapTiles) {
 		
@@ -245,7 +245,7 @@
 			self.currentFrameIndex = 0;
 		}
 
-		[self updateImageTilesToCurrentFrameIndex:self.currentFrameIndex];
+		[self updateImageTilesToFrameIndex:self.currentFrameIndex];
 		dispatch_async(dispatch_get_main_queue(), ^{
 			[self.delegate animatedTileOverlay: self didAnimateWithAnimationFrameIndex: self.currentFrameIndex];
 		});
