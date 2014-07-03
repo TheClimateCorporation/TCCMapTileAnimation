@@ -11,42 +11,24 @@
 
 @class MATAnimationTile;
 
-typedef struct
-{
-	NSUInteger xCoordinate;
-	NSUInteger yCoordinate;
-	NSUInteger zCoordiante;
-} MATTileCoordinate;
-
 typedef NS_ENUM(NSUInteger, MATAnimatingState) {
-	MATAnimatingState_stopped = 0,
-	MATAnimatingState_loading = 1,
-	MATAnimatingState_animating = 2
+	MATAnimatingStateStopped = 0,
+	MATAnimatingStateLoading = 1,
+	MATAnimatingStateAnimating = 2
 };
 
 @interface MATAnimatedTileOverlay : NSObject <MKOverlay>
 
-@property (nonatomic, weak) id<MATAnimatedTileOverlayDelegate>delegate;
-@property (nonatomic, assign) NSInteger numberOfAnimationFrames;
-@property (readwrite, assign) NSInteger currentTimeIndex;
-@property (readwrite, assign) NSInteger tileSize;
+@property (weak, nonatomic) id<MATAnimatedTileOverlayDelegate>delegate;
+@property (nonatomic) NSInteger currentFrameIndex;
+@property (readonly, nonatomic) NSInteger numberOfAnimationFrames;
+@property (readonly, nonatomic) MATAnimatingState currentAnimatingState;
 
-@property (readwrite, strong) NSSet *mapTiles;
-@property (readonly) MATAnimatingState currentAnimatingState;
+- (instancetype)initWithTemplateURLs:(NSArray *)templateURLs frameDuration:(NSTimeInterval)frameDuration;
+- (void)startAnimating;
+- (void)stopAnimating;
+- (void)fetchTilesForMapRect:(MKMapRect)aMapRect zoomScale:(MKZoomScale)aScale progressBlock:(void(^)(NSUInteger currentTimeIndex, BOOL *stop))progressBlock completionBlock:(void (^)(BOOL success, NSError *error))completionBlock;
+- (void)updateImageTilesToFrameIndex: (NSUInteger)animationFrameIndex;
+- (MATAnimationTile *)tileForMapRect:(MKMapRect)aMapRect zoomScale:(MKZoomScale)aZoomScale;
 
-- (id) initWithTemplateURLs: (NSArray *)templateURLs numberOfAnimationFrames:(NSUInteger)numberOfAnimationFrames frameDuration:(NSTimeInterval)frameDuration;
-
-- (void) startAnimating;
-- (void) stopAnimating;
-
-- (void) flushTileCache;
-- (void) cancelAllOperations;
-
-- (void) fetchTilesForMapRect: (MKMapRect)aMapRect zoomScale: (MKZoomScale)aScale progressBlock:(void(^)(NSUInteger currentTimeIndex, BOOL *stop))progressBlock completionBlock: (void (^)(BOOL success, NSError *error))completionBlock;
-
-- (void) updateImageTilesToCurrentTimeIndex;
-
-- (MATTileCoordinate) tileCoordianteForMapRect: (MKMapRect)aMapRect zoomScale:(MKZoomScale)aZoomScale;
-
-- (MATAnimationTile *) tileForMapRect: (MKMapRect)aMapRect zoomScale:(MKZoomScale)aZoomScale;
 @end

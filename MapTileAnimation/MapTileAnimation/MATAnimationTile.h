@@ -9,6 +9,14 @@
 #import <UIKit/UIKit.h>
 #import <MapKit/MapKit.h>
 
+// TODO: fix this up
+typedef struct
+{
+	NSUInteger xCoordinate;
+	NSUInteger yCoordinate;
+	NSUInteger zCoordiante;
+} MATTileCoordinate;
+
 @interface MATAnimationTile : NSObject
 
 @property (nonatomic, readwrite, assign) NSInteger xCoordinate;

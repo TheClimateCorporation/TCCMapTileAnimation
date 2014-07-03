@@ -40,7 +40,7 @@
 
 - (void) fetchTimeStampsAtURL: (NSURL *)aURL
 {
-	__weak TCCTimeFrameParser *parser = self;
+	TCCTimeFrameParser __weak *parser = self;
 	
 	[self.operationQueue addOperationWithBlock: ^{
 		NSURLSession *session = [NSURLSession sharedSession];

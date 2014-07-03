@@ -69,8 +69,7 @@ Animation
     @property (nonatomic) NSUInteger currentFrameIndex; // If set this will nil the animationTiles
     @property (copy, nonatomic) NSArray *animationTiles; // of MATAnimationTile. Set to nil if the map moves
     @property (nonatomic, readonly) BOOL isAnimating;
-
-    - (instancetype)initWithNumberOfAnimationFrames:(NSUInteger)numberOfAnimationFrames frameDuration:(NSTimeInterval)frameDuration;
+    - (instancetype)initWithTemplateURLs:(NSArray *)templateURLs frameDuration:(NSTimeInterval)frameDuration;
     - (void)startAnimating; // Loads and after loading starts the animations
     - (void)stopAnimating;
     - (void)fetchTilesForMapRect:(MKMapRect)aMapRect zoomScale:(MKZoomScale)aScale progressBlock:(void(^)(NSUInteger currentTimeIndex, BOOL *stop))progressBlock completionBlock:(void (^)(BOOL success, NSError *error))completionBlock;
@@ -90,5 +89,4 @@ Animation
     @property (strong, nonatomic) NSArray *tileURLs;
 
     - (instancetype)initWithMapRect:(MKMapRect)tileMapRect tileCoordinate:(MATTileCoordinate)tileCoordinate;
-    
     @end
