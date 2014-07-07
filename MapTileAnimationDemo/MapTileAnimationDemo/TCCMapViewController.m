@@ -53,6 +53,7 @@
 	
 	self.shouldStop = NO;
 //	[self.mapView setCenterCoordinate: startingLocation zoomLevel: 5 animated: NO];
+	self.startStopButton.tag = MATAnimatingStateStopped;
 }
 
 - (void) viewDidAppear:(BOOL)animated
@@ -127,27 +128,6 @@
 	}
 }
 
-
-- (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
-{
-	if ([keyPath isEqualToString: @"currentAnimatingState"]) {
-		NSNumber *animatingState = [change objectForKey: NSKeyValueChangeNewKey];
-		self.startStopButton.tag = [animatingState integerValue];
-		
-		switch ([animatingState integerValue]) {
-			case MATAnimatingStateLoading:
-				[self.startStopButton setTitle: @"Cancel" forState: UIControlStateNormal];
-				break;
-			case MATAnimatingStateAnimating:
-				[self.startStopButton setTitle: @"Stop" forState: UIControlStateNormal];
-				break;
-			default:
-				[self.startStopButton setTitle: @"Play" forState: UIControlStateNormal];
-				break;
-		}
-	}
-}
-
 #pragma mark - TCCTimeFrameParserDelegate Protocol
 
 - (void) didLoadTimeStampData;
@@ -156,11 +136,7 @@
 	[self.mapView addOverlay: tileOverlay level: MKOverlayLevelAboveRoads];
 	
 	NSArray *templateURLs = self.timeFrameParser.templateFrameTimeURLs;
-	MATAnimatedTileOverlay *overlay = [[MATAnimatedTileOverlay alloc] initWithTemplateURLs: templateURLs frameDuration: 0.25];
-	overlay.delegate = self;
-	
-	[overlay addObserver: self forKeyPath: @"currentAnimatingState" options: NSKeyValueObservingOptionNew context: nil];
-	
+	MATAnimatedTileOverlay *overlay = [[MATAnimatedTileOverlay alloc] initWithTemplateURLs: templateURLs frameDuration: 0.25 delegate: self];
 	[self.mapView addOverlay: overlay level: MKOverlayLevelAboveRoads];
 
 }
@@ -179,6 +155,23 @@
 	
 }
 
+- (void) animatedTileOverlay:(MATAnimatedTileOverlay *)animatedTileOverlay didChangeAnimatingState: (MATAnimatingState)animatingState
+{
+	self.startStopButton.tag = animatingState;
+	
+	switch (animatingState) {
+		case MATAnimatingStateLoading:
+			[self.startStopButton setTitle: @"Cancel" forState: UIControlStateNormal];
+			break;
+		case MATAnimatingStateAnimating:
+			[self.startStopButton setTitle: @"Stop" forState: UIControlStateNormal];
+			break;
+		case MATAnimatingStateStopped:
+		default:
+			[self.startStopButton setTitle: @"Play" forState: UIControlStateNormal];
+			break;
+	}
+}
 
 #pragma mark - MKMapViewDelegate Protocol
 

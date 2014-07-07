@@ -46,9 +46,12 @@
 @implementation MATAnimatedTileOverlay
 {
     dispatch_queue_t _lockedQueue;
+	MATAnimatingState _currentAnimatingState;
 }
 
-- (id) initWithTemplateURLs: (NSArray *)templateURLs frameDuration:(NSTimeInterval)frameDuration
+@dynamic currentAnimatingState;
+
+- (instancetype) initWithTemplateURLs: (NSArray *)templateURLs frameDuration:(NSTimeInterval)frameDuration delegate: (id)aDelegate
 {
 	self = [super init];
 	if (self)
@@ -73,7 +76,8 @@
 		self.tileSize = 256;
 		
 		self.cacheLock = [[NSLock alloc] init];
-		self.currentAnimatingState = MATAnimatingStateStopped;
+		_currentAnimatingState = MATAnimatingStateStopped;
+		self.delegate = aDelegate;
 		
 	}
 	return self;
@@ -261,6 +265,16 @@
 		value = _cache;
 	});
 	return value;
+}
+- (MATAnimatingState) currentAnimatingState
+{
+	return _currentAnimatingState;
+}
+
+- (void) setCurrentAnimatingState:(MATAnimatingState)currentAnimatingState
+{
+	_currentAnimatingState = currentAnimatingState;
+	[self.delegate animatedTileOverlay: self didChangeAnimatingState: _currentAnimatingState];
 }
 /*
  derives a URL string from the template URLs, needs tile coordinates and a time index

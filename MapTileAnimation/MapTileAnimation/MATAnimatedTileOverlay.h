@@ -11,11 +11,6 @@
 
 @class MATAnimationTile;
 
-typedef NS_ENUM(NSUInteger, MATAnimatingState) {
-	MATAnimatingStateStopped = 0,
-	MATAnimatingStateLoading = 1,
-	MATAnimatingStateAnimating = 2
-};
 
 @interface MATAnimatedTileOverlay : NSObject <MKOverlay>
 
@@ -24,7 +19,7 @@ typedef NS_ENUM(NSUInteger, MATAnimatingState) {
 @property (readonly, nonatomic) NSInteger numberOfAnimationFrames;
 @property (readonly, nonatomic) MATAnimatingState currentAnimatingState;
 
-- (instancetype)initWithTemplateURLs:(NSArray *)templateURLs frameDuration:(NSTimeInterval)frameDuration;
+- (instancetype) initWithTemplateURLs: (NSArray *)templateURLs frameDuration:(NSTimeInterval)frameDuration delegate: (id)aDelegate;
 - (void)startAnimating;
 - (void)stopAnimating;
 - (void)fetchTilesForMapRect:(MKMapRect)aMapRect zoomScale:(MKZoomScale)aScale progressBlock:(void(^)(NSUInteger currentTimeIndex, BOOL *stop))progressBlock completionBlock:(void (^)(BOOL success, NSError *error))completionBlock;
