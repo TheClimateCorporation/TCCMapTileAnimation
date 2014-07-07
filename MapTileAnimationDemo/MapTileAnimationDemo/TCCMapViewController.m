@@ -9,6 +9,8 @@
 #import "TCCMapViewController.h"
 #import "TCCTimeFrameParser.h"
 
+#import "MATTileOverlay.h"
+
 #import "MATAnimatedTileOverlayRenderer.h"
 #import "MATAnimatedTileOverlay.h"
 #import "MATAnimatedTileOverlayDelegate.h"
@@ -132,12 +134,11 @@
 
 - (void) didLoadTimeStampData;
 {
-	MKTileOverlay *tileOverlay = [[MKTileOverlay alloc] initWithURLTemplate: [self.timeFrameParser.templateFrameTimeURLs firstObject]];
-	[self.mapView addOverlay: tileOverlay level: MKOverlayLevelAboveRoads];
-	
 	NSArray *templateURLs = self.timeFrameParser.templateFrameTimeURLs;
 	MATAnimatedTileOverlay *overlay = [[MATAnimatedTileOverlay alloc] initWithTemplateURLs: templateURLs frameDuration: 0.25 delegate: self];
-	[self.mapView addOverlay: overlay level: MKOverlayLevelAboveRoads];
+	MATTileOverlay *tileOverlay = [[MATTileOverlay alloc] initWithAnimationTileOverlay: overlay];
+	
+	[self.mapView addOverlays: @[tileOverlay, overlay] level: MKOverlayLevelAboveRoads];
 
 }
 
@@ -203,7 +204,7 @@
 
 - (MKOverlayRenderer *)mapView:(MKMapView *)mapView rendererForOverlay:(id<MKOverlay>)overlay
 {
-	if ([overlay isKindOfClass: [MKTileOverlay class]]) {
+	if ([overlay isKindOfClass: [MATTileOverlay class]]) {
 		MKTileOverlayRenderer *renderer = [[MKTileOverlayRenderer alloc] initWithTileOverlay: (MKTileOverlay *)overlay];
 		self.tileOverlayRenderer = renderer;
 		return self.tileOverlayRenderer;

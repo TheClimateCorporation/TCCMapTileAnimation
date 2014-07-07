@@ -26,4 +26,6 @@
 - (void)updateImageTilesToFrameIndex: (NSUInteger)animationFrameIndex;
 - (MATAnimationTile *)tileForMapRect:(MKMapRect)aMapRect zoomScale:(MKZoomScale)aZoomScale;
 
+- (NSString *)templateURLStringForFrameIndex:(NSUInteger)animationFrameIndex;
+
 @end

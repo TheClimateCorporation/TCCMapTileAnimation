@@ -235,6 +235,11 @@
 	return nil;
 }
 
+- (NSString *)templateURLStringForFrameIndex:(NSUInteger)animationFrameIndex
+{
+	return [self.templateURLs objectAtIndex: animationFrameIndex];
+}
+
 #pragma  mark - Private
 /*
  called from the animation timer on a periodic basis
