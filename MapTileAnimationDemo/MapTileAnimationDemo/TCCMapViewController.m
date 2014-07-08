@@ -127,27 +127,6 @@
 	}
 }
 
-
-- (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
-{
-	if ([keyPath isEqualToString: @"currentAnimatingState"]) {
-		NSNumber *animatingState = [change objectForKey: NSKeyValueChangeNewKey];
-		self.startStopButton.tag = [animatingState integerValue];
-		
-		switch ([animatingState integerValue]) {
-			case MATAnimatingStateLoading:
-				[self.startStopButton setTitle: @"Cancel" forState: UIControlStateNormal];
-				break;
-			case MATAnimatingStateAnimating:
-				[self.startStopButton setTitle: @"Stop" forState: UIControlStateNormal];
-				break;
-			default:
-				[self.startStopButton setTitle: @"Play" forState: UIControlStateNormal];
-				break;
-		}
-	}
-}
-
 #pragma mark - TCCTimeFrameParserDelegate Protocol
 
 - (void) didLoadTimeStampData;
@@ -158,14 +137,30 @@
 	NSArray *templateURLs = self.timeFrameParser.templateFrameTimeURLs;
 	MATAnimatedTileOverlay *overlay = [[MATAnimatedTileOverlay alloc] initWithTemplateURLs: templateURLs frameDuration: 0.25];
 	overlay.delegate = self;
-	
-	[overlay addObserver: self forKeyPath: @"currentAnimatingState" options: NSKeyValueObservingOptionNew context: nil];
-	
+		
 	[self.mapView addOverlay: overlay level: MKOverlayLevelAboveRoads];
 
 }
 
 #pragma mark - MATAnimatedTileOverlayDelegate Protocol
+
+- (void)animatedTileOverlay:(MATAnimatedTileOverlay *)animatedTileOverlay didChangeAnimationState:(MATAnimatingState)currentAnimationState {
+   
+    //set titles of button to appropriate string based on currentAnimationState
+    if(currentAnimationState == MATAnimatingStateLoading) {
+        [self.startStopButton setTitle: @"Cancel" forState: UIControlStateNormal];
+    }
+    
+    else if(currentAnimationState == MATAnimatingStateStopped) {
+        [self.startStopButton setTitle: @"Stop" forState: UIControlStateNormal];
+
+    }
+    
+    else if(currentAnimationState == MATAnimatingStateAnimating) {
+        [self.startStopButton setTitle: @"Play" forState: UIControlStateNormal];
+    }
+    
+}
 
 - (void)animatedTileOverlay:(MATAnimatedTileOverlay *)animatedTileOverlay didAnimateWithAnimationFrameIndex:(NSInteger)animationFrameIndex
 {
