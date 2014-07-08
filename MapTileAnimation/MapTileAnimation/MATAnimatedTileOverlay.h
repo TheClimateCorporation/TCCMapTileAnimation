@@ -19,6 +19,7 @@ typedef NS_ENUM(NSUInteger, MATAnimatingState) {
 
 @interface MATAnimatedTileOverlay : NSObject <MKOverlay>
 
+//any object conforming to MATAnimatedTileOverlayDelegate protocol
 @property (weak, nonatomic) id<MATAnimatedTileOverlayDelegate>delegate;
 @property (nonatomic) NSInteger currentFrameIndex;
 @property (readonly, nonatomic) NSInteger numberOfAnimationFrames;

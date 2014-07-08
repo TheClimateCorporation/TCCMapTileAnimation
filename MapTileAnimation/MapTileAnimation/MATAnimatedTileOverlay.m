@@ -90,6 +90,18 @@
 	[self.tileDict removeAllObjects];
 }
 
+//setter for currentAnimatingState
+- (void) setCurrentAnimatingState:(MATAnimatingState)currentAnimatingState {
+    //set new animating state if state different than old value
+    if(currentAnimatingState != _currentAnimatingState){
+        _currentAnimatingState = currentAnimatingState;
+        //call the optional delegate method – ensure the delegate object actually implements an optional method before the method is called
+        if ([self.delegate respondsToSelector:@selector(animatedTileOverlay:didChangeAnimationState:)]) {
+            [self.delegate animatedTileOverlay:self didChangeAnimationState:_currentAnimatingState];
+        }
+    }
+}
+
 #pragma mark - MKOverlay protocol
 
 - (CLLocationCoordinate2D)coordinate
@@ -109,6 +121,7 @@
 	self.playBackTimer = [NSTimer scheduledTimerWithTimeInterval: self.frameDuration target: self selector: @selector(updateImageTileAnimation:) userInfo: nil repeats: YES];
 	[self.playBackTimer fire];
 	self.currentAnimatingState = MATAnimatingStateAnimating;
+    
 }
 
 - (void) stopAnimating
