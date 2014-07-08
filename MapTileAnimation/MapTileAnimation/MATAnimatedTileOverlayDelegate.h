@@ -8,6 +8,13 @@
 
 #import "MATAnimatedTileOverlay.h"
 
+typedef NS_ENUM(NSUInteger, MATAnimatingErrorCode) {
+	MATAnimatingErrorInvalidZoomLevel = 1001,
+	MATAnimatingErrorBadURLResponseCode = 1003,
+	MATAnimatingErrorNoImageData = 1003
+
+};
+
 typedef NS_ENUM(NSUInteger, MATAnimatingState) {
 	MATAnimatingStateStopped = 0,
 	MATAnimatingStateLoading = 1,

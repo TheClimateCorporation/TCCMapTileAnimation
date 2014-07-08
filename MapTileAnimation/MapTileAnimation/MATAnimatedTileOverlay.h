@@ -20,6 +20,9 @@
 @property (readonly, nonatomic) MATAnimatingState currentAnimatingState;
 @property (readonly) NSString *currentFrameTemplateURL;
 
+@property NSInteger minimumZ;
+@property NSInteger maximumZ;
+
 - (instancetype) initWithTemplateURLs: (NSArray *)templateURLs frameDuration:(NSTimeInterval)frameDuration delegate: (id)aDelegate;
 - (void)startAnimating;
 - (void)stopAnimating;

@@ -21,7 +21,7 @@
 //#define FUTURE_RADAR_FRAMES_URI "https://qa1-twi.climate.com/assets/wdt-future-radar/LKG.txt?grower_apps=true"
 #define FUTURE_RADAR_FRAMES_URI "http://climate.com/assets/wdt-future-radar/LKG.txt?grower_apps=true"
 
-@interface TCCMapViewController () <MKMapViewDelegate, MATAnimatedTileOverlayDelegate, TCCTimeFrameParserDelegateProtocol>
+@interface TCCMapViewController () <MKMapViewDelegate, MATAnimatedTileOverlayDelegate, TCCTimeFrameParserDelegateProtocol, UIAlertViewDelegate>
 
 @property (nonatomic, readwrite, weak) IBOutlet MKMapView *mapView;
 @property (weak, nonatomic) IBOutlet UILabel *timeIndexLabel;
@@ -58,7 +58,6 @@
 	[self.mapView setRegion: region animated: NO];
 	
 	self.shouldStop = NO;
-//	[self.mapView setCenterCoordinate: startingLocation zoomLevel: 5 animated: NO];
 	self.startStopButton.tag = MATAnimatingStateStopped;
 	_oldTimeSliderValue = 0.0f;
 	
@@ -93,6 +92,7 @@
 - (IBAction) onHandleStartStopAction: (id)sender
 {
 	if (self.startStopButton.tag == MATAnimatingStateStopped) {
+		
 		[self.tileOverlayRenderer setAlpha: 1.0];
 		
         TCCMapViewController __weak *controller = self;
@@ -167,7 +167,16 @@
 
 - (void)animatedTileOverlay:(MATAnimatedTileOverlay *)animatedTileOverlay didHaveError:(NSError *) error
 {
+	NSLog(@"%s ERROR %ld %@", __PRETTY_FUNCTION__, (long)error.code, error.localizedDescription);
 	
+	if (error.code == MATAnimatingErrorInvalidZoomLevel) {
+		UIAlertView *alert = [[UIAlertView alloc] initWithTitle: @"Invalid Zoom Level"
+														message: error.localizedDescription
+													   delegate: self
+											  cancelButtonTitle: @"Ok"
+											  otherButtonTitles: nil, nil];
+		[alert show];
+	}
 }
 
 - (void) animatedTileOverlay:(MATAnimatedTileOverlay *)animatedTileOverlay didChangeAnimatingState: (MATAnimatingState)animatingState
@@ -232,7 +241,12 @@
 	return nil;
 }
 
+#pragma mark - UIAlertViewDelegate
 
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+	MKCoordinateRegion region = self.mapView.region;
+}
 
 
 @end
