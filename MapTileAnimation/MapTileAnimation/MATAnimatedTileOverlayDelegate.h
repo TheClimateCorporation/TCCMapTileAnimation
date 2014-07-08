@@ -6,7 +6,7 @@
 //  Copyright (c) 2014 The Climate Corporation. All rights reserved.
 //
 
-#import "MATAnimatedTileOverlay.h"
+@class MATAnimatedTileOverlay;
 
 @protocol MATAnimatedTileOverlayDelegate <NSObject>
 

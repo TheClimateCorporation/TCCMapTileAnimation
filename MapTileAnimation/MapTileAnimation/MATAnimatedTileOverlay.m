@@ -9,12 +9,11 @@
 
 #import "MATAnimatedTileOverlay.h"
 #import "MATAnimationTile.h"
-
+#import "MATAnimatedTileOverlayDelegate.h"
 
 #define Z_INDEX "{z}"
 #define X_INDEX "{x}"
 #define Y_INDEX "{y}"
-
 
 @interface MATAnimatedTileOverlay ()
 

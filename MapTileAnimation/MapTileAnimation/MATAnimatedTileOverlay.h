@@ -7,7 +7,6 @@
 //
 
 #import <MapKit/MapKit.h>
-#import "MATAnimatedTileOverlayDelegate.h"
 
 @class MATAnimationTile;
 
@@ -16,6 +15,8 @@ typedef NS_ENUM(NSUInteger, MATAnimatingState) {
 	MATAnimatingStateLoading = 1,
 	MATAnimatingStateAnimating = 2
 };
+
+@protocol MATAnimatedTileOverlayDelegate;
 
 @interface MATAnimatedTileOverlay : NSObject <MKOverlay>
 

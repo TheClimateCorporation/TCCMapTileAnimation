@@ -150,14 +150,12 @@
     if(currentAnimationState == MATAnimatingStateLoading) {
         [self.startStopButton setTitle: @"Cancel" forState: UIControlStateNormal];
     }
-    
     else if(currentAnimationState == MATAnimatingStateStopped) {
-        [self.startStopButton setTitle: @"Stop" forState: UIControlStateNormal];
+        [self.startStopButton setTitle: @"Play" forState: UIControlStateNormal];
 
     }
-    
     else if(currentAnimationState == MATAnimatingStateAnimating) {
-        [self.startStopButton setTitle: @"Play" forState: UIControlStateNormal];
+        [self.startStopButton setTitle: @"Stop" forState: UIControlStateNormal];
     }
     
 }
