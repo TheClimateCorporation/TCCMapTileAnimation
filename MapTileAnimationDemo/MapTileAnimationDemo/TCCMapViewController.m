@@ -146,6 +146,8 @@
 
 - (void)animatedTileOverlay:(MATAnimatedTileOverlay *)animatedTileOverlay didChangeAnimationState:(MATAnimatingState)currentAnimationState {
    
+    self.startStopButton.tag = currentAnimationState;
+
     //set titles of button to appropriate string based on currentAnimationState
     if(currentAnimationState == MATAnimatingStateLoading) {
         [self.startStopButton setTitle: @"Cancel" forState: UIControlStateNormal];
