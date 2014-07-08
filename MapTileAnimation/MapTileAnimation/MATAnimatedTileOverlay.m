@@ -21,9 +21,8 @@
 @property (nonatomic, readwrite, strong) NSOperationQueue *fetchOperationQueue;
 @property (nonatomic, readwrite, strong) NSOperationQueue *downLoadOperationQueue;
 
-
-@property (nonatomic, readwrite, strong) NSCache *cache;
-@property (nonatomic, readwrite, strong) NSLock *cacheLock;
+@property (nonatomic, readwrite, strong) NSMutableDictionary *tileDict;
+//@property (nonatomic, readwrite, strong) NSLock *cacheLock;
 
 @property (nonatomic, readwrite, strong) NSArray *templateURLs;
 @property (nonatomic, readwrite) NSInteger numberOfAnimationFrames;
@@ -32,8 +31,6 @@
 @property (readwrite, assign) MATAnimatingState currentAnimatingState;
 @property (strong, nonatomic) NSSet *mapTiles;
 @property (nonatomic) NSInteger tileSize;
-
-//TODO: Add NSURLCache here
 
 - (NSString *) URLStringForX: (NSInteger)xValue Y: (NSInteger)yValue Z: (NSInteger)zValue timeIndex: (NSInteger)aTimeIndex;
 - (NSSet *) mapTilesInMapRect: (MKMapRect)aRect zoomScale: (MKZoomScale)aScale;
@@ -44,12 +41,20 @@
 @end
 
 @implementation MATAnimatedTileOverlay
+
 {
     dispatch_queue_t _lockedQueue;
 }
 
 - (id) initWithTemplateURLs: (NSArray *)templateURLs frameDuration:(NSTimeInterval)frameDuration
 {
+    
+    //Initialize network caching settings
+    NSURLCache *URLCache = [[NSURLCache alloc] initWithMemoryCapacity:4 * 1024 * 1024
+                                                         diskCapacity:20 * 1024 * 1024
+                                                             diskPath:nil];
+    [NSURLCache setSharedURLCache:URLCache];
+    
 	self = [super init];
 	if (self)
 	{
@@ -65,14 +70,15 @@
 		self.downLoadOperationQueue = [[NSOperationQueue alloc] init];
 		[self.downLoadOperationQueue setMaxConcurrentOperationCount: 25];
 		
-		self.cache = [[NSCache alloc] init];
-		self.cache.name = NSStringFromClass([MATAnimatedTileOverlay class]);
-		self.cache.countLimit = 2048;
-		[self.cache setEvictsObjectsWithDiscardedContent: YES];
-		[self.cache setTotalCostLimit: 2048];
+		self.tileDict = [[NSMutableDictionary alloc] init];
+//		self.cache.name = NSStringFromClass([MATAnimatedTileOverlay class]);
+//		self.cache.countLimit = 2048;
+//		[self.cache setEvictsObjectsWithDiscardedContent: YES];
+//		[self.cache setTotalCostLimit: 2048];
+//      self.cacheLock = [[NSLock alloc] init];
+
 		self.tileSize = 256;
 		
-		self.cacheLock = [[NSLock alloc] init];
 		self.currentAnimatingState = MATAnimatingStateStopped;
 		
 	}
@@ -81,7 +87,7 @@
 
 - (void) dealloc
 {
-	[self.cache removeAllObjects];
+	[self.tileDict removeAllObjects];
 }
 
 #pragma mark - MKOverlay protocol
@@ -189,9 +195,9 @@
 		
 		NSString *cacheKey = [tile.tileURLs objectAtIndex: animationFrameIndex];
 		// Load the image from cache.
-		[self.cacheLock lock];
+		//[self.cacheLock lock];
 		NSData *cachedData = [[self imageTileCache] objectForKey: cacheKey];
-		[self.cacheLock unlock];
+		//[self.cacheLock unlock];
 		if (cachedData) {
 			UIImage *img = [[UIImage alloc] initWithData: cachedData];
 			tile.currentImageTile = img;
@@ -254,11 +260,11 @@
 /*
  locks access to the cache so that only one thread at a time can read/write to the cache
  */
-- (NSCache *)imageTileCache
+- (NSMutableDictionary *)imageTileCache
 {
-	__block NSCache *value;
+	__block NSMutableDictionary *value;
 	dispatch_sync(_lockedQueue, ^{
-		value = _cache;
+		value = _tileDict;
 	});
 	return value;
 }
@@ -318,9 +324,9 @@
 		
 		NSString *urlString = [aUrlString copy];
 		
-		[overlay.cacheLock lock];
+		//[overlay.cacheLock lock];
 		NSData *cachedData = [[overlay imageTileCache] objectForKey: urlString];
-		[overlay.cacheLock unlock];
+		//[overlay.cacheLock unlock];
 		if (cachedData) {
 			//do we want to do anything if we already have the cached tile data?
 		} else {
@@ -342,9 +348,9 @@
 				
 				if (data) {
 					if (urlResponse.statusCode == 200) {
-						[overlay.cacheLock lock];
+						//[overlay.cacheLock lock];
 						[[overlay imageTileCache] setObject: data forKey: urlString];
-						[overlay.cacheLock unlock];
+						//[overlay.cacheLock unlock];
 					} else {
 						NSLog(@"%s response status = %ld", __PRETTY_FUNCTION__, (long)urlResponse.statusCode);
 					}
