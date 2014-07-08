@@ -27,6 +27,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *timeIndexLabel;
 @property (weak, nonatomic) IBOutlet UIProgressView *downloadProgressView;
 @property (weak, nonatomic) IBOutlet UIButton *startStopButton;
+@property (weak, nonatomic) IBOutlet UISlider *timeSlider;
 
 @property (nonatomic, readwrite, strong) TCCTimeFrameParser *timeFrameParser;
 
@@ -38,6 +39,9 @@
 @end
 
 @implementation TCCMapViewController
+{
+	CGFloat _oldTimeSliderValue;
+}
 
 - (void)viewDidLoad
 {
@@ -56,6 +60,8 @@
 	self.shouldStop = NO;
 //	[self.mapView setCenterCoordinate: startingLocation zoomLevel: 5 animated: NO];
 	self.startStopButton.tag = MATAnimatingStateStopped;
+	_oldTimeSliderValue = 0.0f;
+	
 }
 
 - (void) viewDidAppear:(BOOL)animated
@@ -73,15 +79,19 @@
 
 - (IBAction)onHandleTimeIndexChange:(id)sender
 {
-	self.timeIndexLabel.text = [NSString stringWithFormat: @"%lu", (unsigned long)self.animatedTileOverlay.currentFrameIndex];
-	[self.animatedTileOverlay updateImageTilesToFrameIndex: (unsigned long)self.animatedTileOverlay.currentFrameIndex];
-	[self.animatedTileRenderer setNeedsDisplayInMapRect: self.mapView.visibleMapRect zoomScale: self.animatedTileRenderer.zoomScale];
-
+	CGFloat sliderVal = floorf(self.timeSlider.value);
+	
+	if (_oldTimeSliderValue != sliderVal) {
+		if ([self.animatedTileOverlay updateToCurrentFrameIndex: (unsigned long)sliderVal]) {
+			self.timeIndexLabel.text = [NSString stringWithFormat: @"%lu", (unsigned long)self.animatedTileOverlay.currentFrameIndex];
+			[self.animatedTileRenderer setNeedsDisplayInMapRect: self.mapView.visibleMapRect zoomScale: self.animatedTileRenderer.zoomScale];
+		};
+		_oldTimeSliderValue = sliderVal;
+	}
 }
 
 - (IBAction) onHandleStartStopAction: (id)sender
 {
-	
 	if (self.startStopButton.tag == MATAnimatingStateStopped) {
 		[self.tileOverlayRenderer setAlpha: 1.0];
 		
@@ -95,13 +105,13 @@
 			CGFloat progressValue = (CGFloat)currentTimeIndex / (CGFloat)(self.animatedTileOverlay.numberOfAnimationFrames - 1);
 			[controller.downloadProgressView setProgress: progressValue animated: YES];
 			controller.timeIndexLabel.text = [NSString stringWithFormat: @"%lu", (unsigned long)currentTimeIndex];
-
+			controller.timeSlider.value = (CGFloat)currentTimeIndex;
+			
 			if (currentTimeIndex == 0) {
 				[controller.tileOverlayRenderer setAlpha: 0.0];
 				[controller.animatedTileRenderer setAlpha: 1.0];
 			}
 			
-			//controller.animatedTileOverlay.currentTimeIndex = currentTimeIndex;
 			[controller.animatedTileOverlay updateImageTilesToFrameIndex: currentTimeIndex];
             
 			[controller.animatedTileRenderer setNeedsDisplayInMapRect: self.mapView.visibleMapRect zoomScale: self.animatedTileRenderer.zoomScale];
@@ -140,6 +150,7 @@
 	
 	[self.mapView addOverlays: @[tileOverlay, overlay] level: MKOverlayLevelAboveRoads];
 
+	self.timeSlider.maximumValue = (CGFloat)templateURLs.count - 1;
 }
 
 #pragma mark - MATAnimatedTileOverlayDelegate Protocol
@@ -148,7 +159,10 @@
 {
 	self.timeIndexLabel.text = [NSString stringWithFormat: @"%lu", (unsigned long)animationFrameIndex];
 	[self.animatedTileRenderer setNeedsDisplayInMapRect: self.mapView.visibleMapRect zoomScale: self.animatedTileRenderer.zoomScale];
-
+	//update the slider if we are loading or animating
+	if (animatedTileOverlay.currentAnimatingState != MATAnimatingStateStopped) {
+		self.timeSlider.value = (CGFloat)animationFrameIndex;
+	}
 }
 
 - (void)animatedTileOverlay:(MATAnimatedTileOverlay *)animatedTileOverlay didHaveError:(NSError *) error

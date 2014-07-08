@@ -18,11 +18,15 @@
 @property (nonatomic) NSInteger currentFrameIndex;
 @property (readonly, nonatomic) NSInteger numberOfAnimationFrames;
 @property (readonly, nonatomic) MATAnimatingState currentAnimatingState;
+@property (readonly) NSString *currentFrameTemplateURL;
 
 - (instancetype) initWithTemplateURLs: (NSArray *)templateURLs frameDuration:(NSTimeInterval)frameDuration delegate: (id)aDelegate;
 - (void)startAnimating;
 - (void)stopAnimating;
 - (void)fetchTilesForMapRect:(MKMapRect)aMapRect zoomScale:(MKZoomScale)aScale progressBlock:(void(^)(NSUInteger currentTimeIndex, BOOL *stop))progressBlock completionBlock:(void (^)(BOOL success, NSError *error))completionBlock;
+
+- (BOOL) updateToCurrentFrameIndex: (NSUInteger)currentFrameIndex;
+
 - (void)updateImageTilesToFrameIndex: (NSUInteger)animationFrameIndex;
 - (MATAnimationTile *)tileForMapRect:(MKMapRect)aMapRect zoomScale:(MKZoomScale)aZoomScale;
 

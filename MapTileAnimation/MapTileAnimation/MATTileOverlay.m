@@ -35,19 +35,19 @@
 
 - (void) loadTileAtPath: (MKTileOverlayPath)path result:(void (^)(NSData *data, NSError *error))result
 {
+	
     if (!result) {
         return;
     }
 	
 //	__block MATTileOverlay *weakself = self;
-	
-	NSString *tilePath = [[self URLForTilePath: path] absoluteString];
-	
-	NSLog(@"url %@", tilePath);
+//	
+//	NSString *tilePath = [[self URLForTilePath: path] absoluteString];
+//	
+//	NSLog(@"url %@", tilePath);
 	
 	NSURLRequest *request = [NSURLRequest requestWithURL: [self URLForTilePath: path]];
 	[NSURLConnection sendAsynchronousRequest: request queue: self.operationQueue completionHandler: ^(NSURLResponse *response, NSData *data, NSError *connectionError) {
-
 		result(data, connectionError);
 	}];
 }

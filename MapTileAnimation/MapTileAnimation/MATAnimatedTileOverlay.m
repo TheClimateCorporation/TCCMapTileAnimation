@@ -50,6 +50,7 @@
 }
 
 @dynamic currentAnimatingState;
+@dynamic currentFrameTemplateURL;
 
 - (instancetype) initWithTemplateURLs: (NSArray *)templateURLs frameDuration:(NSTimeInterval)frameDuration delegate: (id)aDelegate
 {
@@ -185,10 +186,26 @@
 	}];
 }
 /*
+ updates the currentFrameIndex property and updates the tiles to the current index.
+ */
+- (BOOL) updateToCurrentFrameIndex: (NSUInteger)currentFrameIndex
+{
+	if (self.currentFrameIndex > self.numberOfAnimationFrames - 1) {
+		return NO;
+	}
+
+	self.currentFrameIndex = currentFrameIndex;
+	[self updateImageTilesToFrameIndex: self.currentFrameIndex];
+	
+	return YES;
+}
+
+/*
  updates the MATAnimationTile tile image property to point to the tile image for the current time index
  */
 - (void) updateImageTilesToFrameIndex:(NSUInteger)animationFrameIndex
 {
+	
 	for (MATAnimationTile *tile in self.mapTiles) {
 		
 		NSString *cacheKey = [tile.tileURLs objectAtIndex: animationFrameIndex];
@@ -203,6 +220,11 @@
 			tile.currentImageTile = nil;
 		}
 	}
+	
+	dispatch_async(dispatch_get_main_queue(), ^{
+		[self.delegate animatedTileOverlay: self didAnimateWithAnimationFrameIndex: animationFrameIndex];
+	});
+
 }
 
 - (MATTileCoordinate) tileCoordinateForMapRect: (MKMapRect)aMapRect zoomScale:(MKZoomScale)aZoomScale
@@ -237,7 +259,11 @@
 
 - (NSString *)templateURLStringForFrameIndex:(NSUInteger)animationFrameIndex
 {
-	return [self.templateURLs objectAtIndex: animationFrameIndex];
+	NSString *returnURL = nil;
+	if (self.templateURLs) {
+		returnURL = [self.templateURLs objectAtIndex: animationFrameIndex];
+	}
+	return returnURL;
 }
 
 #pragma  mark - Private
@@ -255,9 +281,9 @@
 		}
 
 		[self updateImageTilesToFrameIndex:self.currentFrameIndex];
-		dispatch_async(dispatch_get_main_queue(), ^{
-			[self.delegate animatedTileOverlay: self didAnimateWithAnimationFrameIndex: self.currentFrameIndex];
-		});
+//		dispatch_async(dispatch_get_main_queue(), ^{
+//			[self.delegate animatedTileOverlay: self didAnimateWithAnimationFrameIndex: self.currentFrameIndex];
+//		});
 	}];
 }
 /*
@@ -281,6 +307,12 @@
 	_currentAnimatingState = currentAnimatingState;
 	[self.delegate animatedTileOverlay: self didChangeAnimatingState: _currentAnimatingState];
 }
+
+- (NSString *)currentFrameTemplateURL
+{
+	return [self templateURLStringForFrameIndex: self.currentFrameIndex];
+}
+
 /*
  derives a URL string from the template URLs, needs tile coordinates and a time index
  */
