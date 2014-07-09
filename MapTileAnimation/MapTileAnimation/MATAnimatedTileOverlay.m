@@ -131,7 +131,6 @@
 	self.playBackTimer = nil;
 	self.currentAnimatingState = MATAnimatingStateStopped;
     self.currentPausedFrameIndex = self.currentFrameIndex;
-    
 }
 
 - (void) cancelAllOperations
@@ -200,6 +199,7 @@
             completionBlock(!didStopFlag, nil);
             
 		});
+        
 	}];
 }
 /*

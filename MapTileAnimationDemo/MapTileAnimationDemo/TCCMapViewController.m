@@ -25,7 +25,7 @@
 @property (weak, nonatomic) IBOutlet UIProgressView *downloadProgressView;
 @property (weak, nonatomic) IBOutlet UIButton *startStopButton;
 @property (weak, nonatomic) IBOutlet UISlider *timeSlider;
-
+@property(nonatomic) MKMapRect visibleMapRect;
 @property (nonatomic, readwrite, strong) TCCTimeFrameParser *timeFrameParser;
 
 @property (readwrite, weak) MKTileOverlayRenderer *tileOverlayRenderer;
@@ -57,6 +57,8 @@
 	self.shouldStop = NO;
 	self.startStopButton.tag = MATAnimatingStateStopped;
 	_oldTimeSliderValue = 0.0f;
+    self.downloadProgressView.hidden = NO;
+
 	
 }
 
@@ -91,10 +93,9 @@
         TCCMapViewController __weak *controller = self;
         
 		//start downloading the image tiles for the time frame indexes
-		//self.downloadProgressView.hidden = NO;
 
 		[self.animatedTileOverlay fetchTilesForMapRect: self.mapView.visibleMapRect zoomScale: self.animatedTileRenderer.zoomScale progressBlock: ^(NSUInteger currentTimeIndex, BOOL *stop) {
-			            
+			         
 			CGFloat progressValue = (CGFloat)currentTimeIndex / (CGFloat)(self.animatedTileOverlay.numberOfAnimationFrames - 1);
 			[controller.downloadProgressView setProgress: progressValue animated: YES];
             controller.timeSlider.value = (CGFloat)currentTimeIndex;
@@ -112,7 +113,14 @@
 			
 		} completionBlock: ^(BOOL success, NSError *error) {
 			
-			//controller.downloadProgressView.hidden = YES;
+            if(success == YES) {
+                NSLog(@"loaded");
+                self.downloadProgressView.hidden = YES;
+            }
+            else {
+                self.downloadProgressView.hidden = NO;
+            }
+            
 			[controller.downloadProgressView setProgress: 0.0];
 			controller.animatedTileOverlay.currentFrameIndex = 0;
 
@@ -155,7 +163,10 @@
     //set titles of button to appropriate string based on currentAnimationState
     if(currentAnimationState == MATAnimatingStateLoading) {
         [self.startStopButton setTitle: @"Cancel" forState: UIControlStateNormal];
-        self.downloadProgressView.hidden = NO;
+        if(!MKMapRectEqualToRect(self.visibleMapRect, self.mapView.visibleMapRect)) {
+            self.downloadProgressView.hidden = NO;
+        }
+        self.visibleMapRect = self.mapView.visibleMapRect;
     }
     else if(currentAnimationState == MATAnimatingStateStopped) {
         [self.startStopButton setTitle: @"Play" forState: UIControlStateNormal];
@@ -163,7 +174,6 @@
     }
     else if(currentAnimationState == MATAnimatingStateAnimating) {
         [self.startStopButton setTitle: @"Stop" forState: UIControlStateNormal];
-        self.downloadProgressView.hidden = YES;
     }
     
 }
