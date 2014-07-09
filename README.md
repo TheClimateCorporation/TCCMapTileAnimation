@@ -53,7 +53,6 @@ The following is an overlay class that defers all it's calls to the MATAnimation
 
 Animation
 =========
-The following MATAnimatedTileOverlay
 
     @protocol MATAnimatedTileOverlayDelegate
     - (void)animatedTileOverlay:(MATAnimatedTileOverlay *)animatedTileOverlay didChangeAnimationState:(MATAnimatingState)currentAnimationState;
@@ -82,18 +81,12 @@ The following MATAnimatedTileOverlay
     @interface MATAnimatedTileOverlayRenderer : MKOverlayRenderer
     @end
 
-    @interface MATAnimationTile // Is this class necessary?
-    @property (nonatomic) MATTileCoordinate coordinate;
-    // TODO: review these again
-    @property (assign, nonatomic, readonly) MKTileOverlayPath path;
-    @property (assign, nonatomic, readonly) MKMapRect mapRect; // Do we need both mapRect and path?
-    @property (strong, nonatomic, readonly) NSDictionary* animationImages; // Key is NSNumber of animationIndex
-    - (id) initWithPath:(MKTileOverlayPath) path mapRect:(MKMapRect) mapRect animationImages:(NSDictionary*) animationImages;
-    @end
+    @interface MATAnimationTile
 
-    // TODO: needs review
-    @property (nonatomic, readwrite, strong) NSString *tileCoordinate;
-    @property (nonatomic, readwrite, assign) MKMapRect mapRectFrame;
-    @property (nonatomic, readwrite, strong) UIImage *currentImageTile;
-    @property (nonatomic, readwrite, strong) NSArray *tileURLs;
-    - (id) initWithFrame:(MKMapRect)aTileFrame xCord: (NSInteger)aXCord yCord: (NSInteger)aYCord zCord: (NSInteger)aZCord;
+    @property (readonly, nonatomic) MATTileCoordinate coordinate;
+    @property (readonly, nonatomic) MKMapRect tileMapRect;
+    @property (strong, nonatomic) UIImage *currentTileImage;
+    @property (strong, nonatomic) NSArray *tileURLs;
+
+    - (instancetype)initWithMapRect:(MKMapRect)tileMapRect tileCoordinate:(MATTileCoordinate)tileCoordinate;
+    @end

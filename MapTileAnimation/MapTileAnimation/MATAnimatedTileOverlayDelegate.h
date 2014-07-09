@@ -6,6 +6,15 @@
 //  Copyright (c) 2014 The Climate Corporation. All rights reserved.
 //
 
+#import "MATAnimatedTileOverlay.h"
+
+typedef NS_ENUM(NSUInteger, MATAnimatingErrorCode) {
+	MATAnimatingErrorInvalidZoomLevel = 1001,
+	MATAnimatingErrorBadURLResponseCode = 1003,
+	MATAnimatingErrorNoImageData = 1003
+
+};
+
 @class MATAnimatedTileOverlay;
 
 @protocol MATAnimatedTileOverlayDelegate <NSObject>

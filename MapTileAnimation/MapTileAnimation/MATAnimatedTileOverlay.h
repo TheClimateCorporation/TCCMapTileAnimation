@@ -7,6 +7,7 @@
 //
 
 #import <MapKit/MapKit.h>
+#import "TCCMapViewController.h"
 
 @class MATAnimationTile;
 
@@ -23,12 +24,13 @@ typedef NS_ENUM(NSUInteger, MATAnimatingState) {
 //any object conforming to MATAnimatedTileOverlayDelegate protocol
 @property (weak, nonatomic) id<MATAnimatedTileOverlayDelegate>delegate;
 @property (nonatomic) NSInteger currentFrameIndex;
+@property (nonatomic) NSInteger currentPausedFrameIndex;
 @property (readonly, nonatomic) NSInteger numberOfAnimationFrames;
 @property (readonly, nonatomic) MATAnimatingState currentAnimatingState;
 
 - (instancetype)initWithTemplateURLs:(NSArray *)templateURLs frameDuration:(NSTimeInterval)frameDuration;
 - (void)startAnimating;
-- (void)stopAnimating;
+- (void)pauseAnimating;
 - (void)fetchTilesForMapRect:(MKMapRect)aMapRect zoomScale:(MKZoomScale)aScale progressBlock:(void(^)(NSUInteger currentTimeIndex, BOOL *stop))progressBlock completionBlock:(void (^)(BOOL success, NSError *error))completionBlock;
 - (void)updateImageTilesToFrameIndex: (NSUInteger)animationFrameIndex;
 - (MATAnimationTile *)tileForMapRect:(MKMapRect)aMapRect zoomScale:(MKZoomScale)aZoomScale;

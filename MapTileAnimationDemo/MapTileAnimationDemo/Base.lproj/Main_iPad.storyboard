@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="5056" systemVersion="13D65" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" useAutolayout="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="5056" systemVersion="13E28" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" useAutolayout="YES" initialViewController="BYZ-38-t0r">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3733"/>
     </dependencies>
@@ -44,6 +44,13 @@
                                     <action selector="onHandleStartStopAction:" destination="BYZ-38-t0r" eventType="touchUpInside" id="0Ax-Ru-HnU"/>
                                 </connections>
                             </button>
+                            <slider opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="Gnq-s2-qfm">
+                                <rect key="frame" x="283" y="990" width="211" height="31"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <connections>
+                                    <action selector="onHandleTimeIndexChange:" destination="BYZ-38-t0r" eventType="valueChanged" id="exK-p6-QpX"/>
+                                </connections>
+                            </slider>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
@@ -55,6 +62,7 @@
                         <outlet property="mapView" destination="ac8-nG-8th" id="BJX-ov-euC"/>
                         <outlet property="startStopButton" destination="nfb-E5-mle" id="WIx-lf-9Y6"/>
                         <outlet property="timeIndexLabel" destination="Znf-mz-Av0" id="svH-7d-o3K"/>
+                        <outlet property="timeSlider" destination="Gnq-s2-qfm" id="6zo-ld-YXE"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
