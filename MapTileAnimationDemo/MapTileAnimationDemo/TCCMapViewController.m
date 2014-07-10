@@ -121,6 +121,11 @@
 			[controller.animatedTileRenderer setNeedsDisplayInMapRect: self.mapView.visibleMapRect zoomScale: self.animatedTileRenderer.zoomScale];
 			*stop = controller.shouldStop;
 			
+			//if we cancelled loading, reset the sliders max value to what we currently have
+			if (controller.shouldStop == YES) {
+				controller.timeSlider.maximumValue = (CGFloat)currentTimeIndex;
+			}
+			
 		} completionBlock: ^(BOOL success, NSError *error) {
 			
             if(success == YES) {
