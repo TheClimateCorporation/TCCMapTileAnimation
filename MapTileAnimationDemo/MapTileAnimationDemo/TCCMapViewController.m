@@ -95,8 +95,7 @@
             
             if(self.initialLoad == YES) {
                 self.timeSlider.enabled = NO;
-//              self.timeSlider.value = (CGFloat)currentTimeIndex;
-//              self.timeIndexLabel.text = [NSString stringWithFormat: @"%lu", (unsigned long)currentTimeIndex];
+              self.timeIndexLabel.text = [NSString stringWithFormat: @"%lu", (unsigned long)currentTimeIndex];
 			}
             
 //			if (currentTimeIndex == 0) {
@@ -105,8 +104,8 @@
 //			}
 			
 //			[self.animatedTileOverlay updateImageTilesToFrameIndex: currentTimeIndex];
-            
 //			[self.animatedTileRenderer setNeedsDisplayInMapRect: self.mapView.visibleMapRect zoomScale: self.animatedTileRenderer.zoomScale];
+            
 			*stop = self.shouldStop;
 			
 			//if we cancelled loading, reset the sliders max value to what we currently have
