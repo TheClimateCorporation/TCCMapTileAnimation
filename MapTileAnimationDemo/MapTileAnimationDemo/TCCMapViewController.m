@@ -91,10 +91,10 @@
 			CGFloat progressValue = (CGFloat)currentTimeIndex / (CGFloat)(self.animatedTileOverlay.numberOfAnimationFrames - 1);
 			[self.downloadProgressView setProgress: progressValue animated: YES];
             
-//            if(self.initialLoad == YES) {
-//                self.timeSlider.value = (CGFloat)currentTimeIndex;
-//                self.timeIndexLabel.text = [NSString stringWithFormat: @"%lu", (unsigned long)currentTimeIndex];
-//			}
+            if(self.initialLoad == YES) {
+                self.timeSlider.enabled = NO;
+              self.timeIndexLabel.text = [NSString stringWithFormat: @"%lu", (unsigned long)currentTimeIndex];
+			}
             
 //			if (currentTimeIndex == 0) {
 //				[self.tileOverlayRenderer setAlpha: 0.0];
@@ -102,8 +102,8 @@
 //			}
 			
 //			[self.animatedTileOverlay updateImageTilesToFrameIndex: currentTimeIndex];
-            
 //			[self.animatedTileRenderer setNeedsDisplayInMapRect: self.mapView.visibleMapRect zoomScale: self.animatedTileRenderer.zoomScale];
+            
 			*stop = self.shouldStop;
 			
 			//if we cancelled loading, reset the sliders max value to what we currently have
@@ -187,6 +187,7 @@
 	//update the slider if we are loading or animating
     self.timeIndexLabel.text = [NSString stringWithFormat: @"%lu", (unsigned long)animationFrameIndex];
  	if (animatedTileOverlay.currentAnimatingState != MATAnimatingStateStopped) {
+        self.timeSlider.enabled = YES;
 		self.timeSlider.value = (CGFloat)animationFrameIndex;
 	}
 }
