@@ -79,7 +79,9 @@
 		self.tileSize = 256;
 		
 		self.currentAnimatingState = MATAnimatingStateStopped;
-		
+		self.minimumZ = 1;
+		self.maximumZ = 22;
+
 	}
 	return self;
 }
@@ -144,7 +146,22 @@
  */
 - (void) fetchTilesForMapRect: (MKMapRect)aMapRect zoomScale: (MKZoomScale)aScale progressBlock:(void(^)(NSUInteger currentTimeIndex, BOOL *stop))progressBlock completionBlock: (void (^)(BOOL success, NSError *error))completionBlock
 {
-    
+	//check to see if our zoom level is supported by our tile server
+	NSUInteger zoomLevel = [self zoomLevelForZoomScale: aScale];
+	if (zoomLevel > self.maximumZ || zoomLevel < self.minimumZ) {
+		
+		NSError *error = [[NSError alloc] initWithDomain: NSStringFromClass([self class])
+													code: MATAnimatingErrorInvalidZoomLevel
+												userInfo: @{NSLocalizedDescriptionKey: [NSString stringWithFormat: @"Current Zoom Level %lu not supported (min %ld max %ld scale %lf)", (unsigned long)zoomLevel, (long)self.minimumZ, (long)self.maximumZ, aScale]}];
+		
+		[self.delegate animatedTileOverlay: self didHaveError: error];
+		dispatch_async(dispatch_get_main_queue(), ^{
+            completionBlock(NO, error);
+		});
+		
+		return;
+	}
+
 	self.currentAnimatingState = MATAnimatingStateLoading;
     
 	[self.fetchOperationQueue addOperationWithBlock:^{
@@ -393,10 +410,16 @@
 						[[overlay imageTileCache] setObject: data forKey: urlString];
 						//[overlay.cacheLock unlock];
 					} else {
-						NSLog(@"%s response status = %ld", __PRETTY_FUNCTION__, (long)urlResponse.statusCode);
+						NSError *error = [[NSError alloc] initWithDomain: NSStringFromClass([self class])
+																	code: MATAnimatingErrorBadURLResponseCode
+																userInfo: @{NSLocalizedDescriptionKey: [NSString stringWithFormat: @"Image Tile HTTP respsonse code %ld, URL %@", (long)urlResponse.statusCode, urlResponse.URL]}];
+						[overlay.delegate animatedTileOverlay: self didHaveError: error];
 					}
 				} else {
-					NSLog(@"error = %@", error);
+					NSError *error = [[NSError alloc] initWithDomain: NSStringFromClass([self class])
+																code: MATAnimatingErrorNoImageData
+															userInfo: @{NSLocalizedDescriptionKey: [NSString stringWithFormat: @"No Image Data HTTP respsonse code %ld, URL %@", (long)urlResponse.statusCode, urlResponse.URL]}];
+					[overlay.delegate animatedTileOverlay: self didHaveError: error];
 				}
 				dispatch_semaphore_signal(semaphore);
 			}];

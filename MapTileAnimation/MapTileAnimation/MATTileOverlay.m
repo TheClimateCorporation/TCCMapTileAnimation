@@ -28,6 +28,8 @@
 		self.minimumZ = 3;
 		self.maximumZ = 9;
 		self.animatedTileOverlay = animatedTileOverlay;
+		self.animatedTileOverlay.minimumZ = self.minimumZ;
+		self.animatedTileOverlay.maximumZ = self.maximumZ;
 	}
 
 	return self;

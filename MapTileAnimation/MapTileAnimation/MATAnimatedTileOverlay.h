@@ -27,6 +27,8 @@ typedef NS_ENUM(NSUInteger, MATAnimatingState) {
 @property (nonatomic) NSInteger currentPausedFrameIndex;
 @property (readonly, nonatomic) NSInteger numberOfAnimationFrames;
 @property (readonly, nonatomic) MATAnimatingState currentAnimatingState;
+@property (nonatomic, readwrite, assign) NSInteger minimumZ;
+@property (nonatomic, readwrite, assign) NSInteger maximumZ;
 
 - (instancetype)initWithTemplateURLs:(NSArray *)templateURLs frameDuration:(NSTimeInterval)frameDuration;
 - (void)startAnimating;
