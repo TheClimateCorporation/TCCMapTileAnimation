@@ -219,25 +219,14 @@
         
 	}];
 }
-/*
- updates the currentFrameIndex property and updates the tiles to the current index.
-*/
-- (BOOL) updateToCurrentFrameIndex: (NSUInteger)currentFrameIndex
-{
-	if (self.currentFrameIndex > self.numberOfAnimationFrames - 1) {
-		return NO;
-	}
-
-	self.currentFrameIndex = currentFrameIndex;
-	[self updateImageTilesToFrameIndex: self.currentFrameIndex];
-	return YES;
-}
 
 /*
  updates the MATAnimationTile tile image property to point to the tile image for the current time index
  */
 - (void) updateImageTilesToFrameIndex:(NSUInteger)animationFrameIndex
 {
+	self.currentFrameIndex = animationFrameIndex;
+
 	for (MATAnimationTile *tile in self.mapTiles) {
    		NSString *cacheKey = [tile.tileURLs objectAtIndex: animationFrameIndex];
 		// Load the image from cache.

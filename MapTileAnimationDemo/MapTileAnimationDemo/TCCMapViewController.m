@@ -38,9 +38,6 @@
 @end
 
 @implementation TCCMapViewController
-{
-	CGFloat _oldTimeSliderValue;
-}
 
 - (void)viewDidLoad
 {
@@ -58,7 +55,6 @@
 	
 	self.shouldStop = NO;
 	self.startStopButton.tag = MATAnimatingStateStopped;
-	_oldTimeSliderValue = 0.0f;
     self.downloadProgressView.hidden = NO;
     self.initialLoad = YES;
 	
@@ -71,23 +67,16 @@
 
 }
 
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
-
 - (IBAction)onHandleTimeIndexChange:(id)sender
 {
-	CGFloat sliderVal = floorf(self.timeSlider.value);
-
-	if (_oldTimeSliderValue != sliderVal) {
-		if ([self.animatedTileOverlay updateToCurrentFrameIndex: (unsigned long)sliderVal]) {
-			self.timeIndexLabel.text = [NSString stringWithFormat: @"%lu", (unsigned long)self.animatedTileOverlay.currentFrameIndex];
-			[self.animatedTileRenderer setNeedsDisplayInMapRect: self.mapView.visibleMapRect zoomScale: self.animatedTileRenderer.zoomScale];
-		};
-		_oldTimeSliderValue = sliderVal;
+    [self.animatedTileOverlay pauseAnimating];
+    
+	NSInteger sliderVal = floor(self.timeSlider.value);
+    
+    if (sliderVal != self.animatedTileOverlay.currentFrameIndex) {
+        [self.animatedTileOverlay updateImageTilesToFrameIndex:(NSInteger)sliderVal];
+        self.timeIndexLabel.text = [NSString stringWithFormat:@"%d", (NSInteger)self.animatedTileOverlay.currentFrameIndex];
+        [self.animatedTileRenderer setNeedsDisplayInMapRect:self.mapView.visibleMapRect zoomScale:self.animatedTileRenderer.zoomScale];
 	}
 }
 
@@ -96,34 +85,32 @@
 	if (self.startStopButton.tag == MATAnimatingStateStopped) {
 		
 		[self.tileOverlayRenderer setAlpha: 1.0];
-		
-        TCCMapViewController __weak *controller = self;
-        
+		      
 		//start downloading the image tiles for the time frame indexes
 
 		[self.animatedTileOverlay fetchTilesForMapRect: self.mapView.visibleMapRect zoomScale: self.animatedTileRenderer.zoomScale progressBlock: ^(NSUInteger currentTimeIndex, BOOL *stop) {
 			         
 			CGFloat progressValue = (CGFloat)currentTimeIndex / (CGFloat)(self.animatedTileOverlay.numberOfAnimationFrames - 1);
-			[controller.downloadProgressView setProgress: progressValue animated: YES];
+			[self.downloadProgressView setProgress: progressValue animated: YES];
             
-            if(self.initialLoad == YES) {
-                controller.timeSlider.value = (CGFloat)currentTimeIndex;
-                controller.timeIndexLabel.text = [NSString stringWithFormat: @"%lu", (unsigned long)currentTimeIndex];
-			}
+//            if(self.initialLoad == YES) {
+//                self.timeSlider.value = (CGFloat)currentTimeIndex;
+//                self.timeIndexLabel.text = [NSString stringWithFormat: @"%lu", (unsigned long)currentTimeIndex];
+//			}
             
-			if (currentTimeIndex == 0) {
-				[controller.tileOverlayRenderer setAlpha: 0.0];
-				[controller.animatedTileRenderer setAlpha: 1.0];
-			}
+//			if (currentTimeIndex == 0) {
+//				[self.tileOverlayRenderer setAlpha: 0.0];
+//				[self.animatedTileRenderer setAlpha: 1.0];
+//			}
 			
-			[controller.animatedTileOverlay updateImageTilesToFrameIndex: currentTimeIndex];
+//			[self.animatedTileOverlay updateImageTilesToFrameIndex: currentTimeIndex];
             
-			[controller.animatedTileRenderer setNeedsDisplayInMapRect: self.mapView.visibleMapRect zoomScale: self.animatedTileRenderer.zoomScale];
-			*stop = controller.shouldStop;
+//			[self.animatedTileRenderer setNeedsDisplayInMapRect: self.mapView.visibleMapRect zoomScale: self.animatedTileRenderer.zoomScale];
+			*stop = self.shouldStop;
 			
 			//if we cancelled loading, reset the sliders max value to what we currently have
-			if (controller.shouldStop == YES) {
-				controller.timeSlider.maximumValue = (CGFloat)currentTimeIndex;
+			if (self.shouldStop == YES) {
+				self.timeSlider.maximumValue = (CGFloat)currentTimeIndex;
 			}
 			
 		} completionBlock: ^(BOOL success, NSError *error) {
@@ -131,21 +118,22 @@
             if(success == YES) {
                 self.initialLoad = NO;
                 self.downloadProgressView.hidden = YES;
+				[self.tileOverlayRenderer setAlpha: 0.0];
+				[self.animatedTileRenderer setAlpha: 1.0];
             } else {
                 self.downloadProgressView.hidden = NO;
             }
             
-			[controller.downloadProgressView setProgress: 0.0];
-			controller.animatedTileOverlay.currentFrameIndex = 0;
+			[self.downloadProgressView setProgress: 0.0];
+			self.animatedTileOverlay.currentFrameIndex = 0;
 
 			if (success) {
-				[controller.animatedTileOverlay updateImageTilesToFrameIndex: controller.animatedTileOverlay.currentFrameIndex];
+				[self.animatedTileOverlay updateImageTilesToFrameIndex:self.animatedTileOverlay.currentFrameIndex];
 				
-				[controller.animatedTileRenderer setNeedsDisplayInMapRect: self.mapView.visibleMapRect zoomScale: self.animatedTileRenderer.zoomScale];
-				[controller.animatedTileOverlay startAnimating];
+				[self.animatedTileRenderer setNeedsDisplayInMapRect: self.mapView.visibleMapRect zoomScale: self.animatedTileRenderer.zoomScale];
+				[self.animatedTileOverlay startAnimating];
 			} else {
-				
-				controller.shouldStop = NO;
+				self.shouldStop = NO;
 			}
 		}];
 	} else if (self.startStopButton.tag == MATAnimatingStateLoading) {

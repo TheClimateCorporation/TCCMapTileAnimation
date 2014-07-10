@@ -31,11 +31,15 @@ typedef NS_ENUM(NSUInteger, MATAnimatingState) {
 @property (nonatomic, readwrite, assign) NSInteger maximumZ;
 
 - (instancetype)initWithTemplateURLs:(NSArray *)templateURLs frameDuration:(NSTimeInterval)frameDuration;
+
 - (void)startAnimating;
+
 - (void)pauseAnimating;
+
 - (void)fetchTilesForMapRect:(MKMapRect)aMapRect zoomScale:(MKZoomScale)aScale progressBlock:(void(^)(NSUInteger currentTimeIndex, BOOL *stop))progressBlock completionBlock:(void (^)(BOOL success, NSError *error))completionBlock;
-- (BOOL) updateToCurrentFrameIndex: (NSUInteger)currentFrameIndex;
+
 - (void)updateImageTilesToFrameIndex: (NSUInteger)animationFrameIndex;
+
 - (MATAnimationTile *)tileForMapRect:(MKMapRect)aMapRect zoomScale:(MKZoomScale)aZoomScale;
 
 - (NSString *)templateURLStringForFrameIndex: (NSUInteger)animationFrameIndex;
