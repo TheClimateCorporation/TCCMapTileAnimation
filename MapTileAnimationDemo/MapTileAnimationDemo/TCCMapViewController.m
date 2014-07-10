@@ -123,7 +123,6 @@
             }
             
 			[self.downloadProgressView setProgress: 0.0];
-			self.animatedTileOverlay.currentFrameIndex = 0;
 
 			if (success) {
 				[self.animatedTileOverlay moveToFrameIndex:self.animatedTileOverlay.currentFrameIndex];

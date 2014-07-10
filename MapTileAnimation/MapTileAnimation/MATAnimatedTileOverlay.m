@@ -114,7 +114,6 @@
 {
 	self.playBackTimer = [NSTimer scheduledTimerWithTimeInterval: self.frameDuration target: self selector: @selector(updateImageTileAnimation:) userInfo: nil repeats: YES];
 	[self.playBackTimer fire];
-    self.currentFrameIndex = self.currentPausedFrameIndex;
 	self.currentAnimatingState = MATAnimatingStateAnimating;
     
 }
@@ -125,7 +124,6 @@
 	[self cancelAllOperations];
 	self.playBackTimer = nil;
 	self.currentAnimatingState = MATAnimatingStateStopped;
-    self.currentPausedFrameIndex = self.currentFrameIndex;
 }
 
 - (void) cancelAllOperations
