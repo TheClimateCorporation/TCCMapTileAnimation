@@ -27,7 +27,7 @@
 @property (weak, nonatomic) IBOutlet UISlider *timeSlider;
 @property(nonatomic) MKMapRect visibleMapRect;
 @property (nonatomic, readwrite, strong) TCCTimeFrameParser *timeFrameParser;
-
+@property (nonatomic) BOOL initialLoad;
 @property (readwrite, weak) MKTileOverlayRenderer *tileOverlayRenderer;
 @property (readwrite, weak) MATAnimatedTileOverlay *animatedTileOverlay;
 @property (readwrite, weak) MATAnimatedTileOverlayRenderer *animatedTileRenderer;
@@ -58,7 +58,7 @@
 	self.startStopButton.tag = MATAnimatingStateStopped;
 	_oldTimeSliderValue = 0.0f;
     self.downloadProgressView.hidden = NO;
-
+    self.initialLoad = YES;
 	
 }
 
@@ -98,9 +98,12 @@
 			         
 			CGFloat progressValue = (CGFloat)currentTimeIndex / (CGFloat)(self.animatedTileOverlay.numberOfAnimationFrames - 1);
 			[controller.downloadProgressView setProgress: progressValue animated: YES];
-            controller.timeSlider.value = (CGFloat)currentTimeIndex;
-			controller.timeIndexLabel.text = [NSString stringWithFormat: @"%lu", (unsigned long)currentTimeIndex];
-			
+            
+            if(self.initialLoad == YES) {
+                controller.timeSlider.value = (CGFloat)currentTimeIndex;
+                controller.timeIndexLabel.text = [NSString stringWithFormat: @"%lu", (unsigned long)currentTimeIndex];
+			}
+            
 			if (currentTimeIndex == 0) {
 				[controller.tileOverlayRenderer setAlpha: 0.0];
 				[controller.animatedTileRenderer setAlpha: 1.0];
@@ -114,7 +117,7 @@
 		} completionBlock: ^(BOOL success, NSError *error) {
 			
             if(success == YES) {
-                NSLog(@"loaded");
+                self.initialLoad = NO;
                 self.downloadProgressView.hidden = YES;
             }
             else {
@@ -163,8 +166,10 @@
     //set titles of button to appropriate string based on currentAnimationState
     if(currentAnimationState == MATAnimatingStateLoading) {
         [self.startStopButton setTitle: @"Cancel" forState: UIControlStateNormal];
+        //check if user has panned (visibleRects different)
         if(!MKMapRectEqualToRect(self.visibleMapRect, self.mapView.visibleMapRect)) {
             self.downloadProgressView.hidden = NO;
+            self.initialLoad = YES;
         }
         self.visibleMapRect = self.mapView.visibleMapRect;
     }

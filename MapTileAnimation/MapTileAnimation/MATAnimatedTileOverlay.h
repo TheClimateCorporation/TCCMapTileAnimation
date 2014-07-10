@@ -25,7 +25,6 @@ typedef NS_ENUM(NSUInteger, MATAnimatingState) {
 @property (weak, nonatomic) id<MATAnimatedTileOverlayDelegate>delegate;
 @property (nonatomic) NSInteger currentFrameIndex;
 @property (nonatomic) NSInteger currentPausedFrameIndex;
-@property (nonatomic) BOOL showProgressBar;
 @property (readonly, nonatomic) NSInteger numberOfAnimationFrames;
 @property (readonly, nonatomic) MATAnimatingState currentAnimatingState;
 
