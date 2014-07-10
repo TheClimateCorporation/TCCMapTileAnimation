@@ -146,13 +146,19 @@
 - (void) didLoadTimeStampData;
 {
 	NSArray *templateURLs = self.timeFrameParser.templateFrameTimeURLs;
-	MATAnimatedTileOverlay *overlay = [[MATAnimatedTileOverlay alloc] initWithTemplateURLs: templateURLs frameDuration: 0.10];
+    NSMutableArray *pluckedArray = [[NSMutableArray alloc] init];
+    for(int i = 0; i < 24; i+=2) {
+        NSString *url = [templateURLs objectAtIndex:i];
+        [pluckedArray addObject:url];
+    }
+    
+	MATAnimatedTileOverlay *overlay = [[MATAnimatedTileOverlay alloc] initWithTemplateURLs: pluckedArray frameDuration: 0.10];
 	overlay.delegate = self;
 	
 	MATTileOverlay *tileOverlay = [[MATTileOverlay alloc] initWithAnimationTileOverlay: overlay];
 	
 	[self.mapView addOverlays: @[tileOverlay, overlay] level: MKOverlayLevelAboveRoads];
-	self.timeSlider.maximumValue = (CGFloat)templateURLs.count - 1;
+	self.timeSlider.maximumValue = (CGFloat)pluckedArray.count - 1;
 }
 
 #pragma mark - MATAnimatedTileOverlayDelegate Protocol
