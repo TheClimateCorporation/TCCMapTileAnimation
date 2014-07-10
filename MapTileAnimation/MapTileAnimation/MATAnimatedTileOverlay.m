@@ -203,6 +203,20 @@
 	}];
 }
 /*
+ updates the currentFrameIndex property and updates the tiles to the current index.
+*/
+- (BOOL) updateToCurrentFrameIndex: (NSUInteger)currentFrameIndex
+{
+	if (self.currentFrameIndex > self.numberOfAnimationFrames - 1) {
+		return NO;
+	}
+
+	self.currentFrameIndex = currentFrameIndex;
+	[self updateImageTilesToFrameIndex: self.currentFrameIndex];
+	return YES;
+}
+
+/*
  updates the MATAnimationTile tile image property to point to the tile image for the current time index
  */
 - (void) updateImageTilesToFrameIndex:(NSUInteger)animationFrameIndex
@@ -220,6 +234,11 @@
 			tile.currentImageTile = nil;
 		}
 	}
+	
+	dispatch_async(dispatch_get_main_queue(), ^{
+		[self.delegate animatedTileOverlay: self didAnimateWithAnimationFrameIndex: self.currentFrameIndex];
+	});
+
 }
 
 - (MATTileCoordinate) tileCoordinateForMapRect: (MKMapRect)aMapRect zoomScale:(MKZoomScale)aZoomScale
@@ -252,6 +271,15 @@
 	return nil;
 }
 
+- (NSString *)templateURLStringForFrameIndex: (NSUInteger)animationFrameIndex
+{
+	NSString *returnURL = nil;
+	if (self.templateURLs) {
+		returnURL = [self.templateURLs objectAtIndex: animationFrameIndex];
+	}
+	return returnURL;
+}
+
 #pragma  mark - Private
 /*
  called from the animation timer on a periodic basis
@@ -261,16 +289,13 @@
 	[self.fetchOperationQueue addOperationWithBlock:^{
 		
 		self.currentFrameIndex++;
-        NSLog(@"frame: %@", @(self.currentFrameIndex).stringValue);
+//        NSLog(@"frame: %@", @(self.currentFrameIndex).stringValue);
 		//reset the index counter if we have rolled over
 		if (self.currentFrameIndex > self.numberOfAnimationFrames - 1) {
 			self.currentFrameIndex = 0;
 		}
         
 		[self updateImageTilesToFrameIndex:self.currentFrameIndex];
-		dispatch_async(dispatch_get_main_queue(), ^{
-			[self.delegate animatedTileOverlay: self didAnimateWithAnimationFrameIndex: self.currentFrameIndex];
-		});
 	}];
 }
 /*

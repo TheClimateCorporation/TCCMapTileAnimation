@@ -12,6 +12,8 @@
 #import "MATAnimatedTileOverlay.h"
 #import "MATAnimatedTileOverlayDelegate.h"
 
+#import "MATTileOverlay.h"
+
 #import "MKMapView+Extras.h"
 
 
@@ -45,7 +47,7 @@
     [super viewDidLoad];
 
     // Set the starting  location.
-    CLLocationCoordinate2D startingLocation = {41.5908, -93.6208};
+    CLLocationCoordinate2D startingLocation = {40.2444, -111.6608};
 //	MKCoordinateSpan span = {8.403266, 7.031250};
 	MKCoordinateSpan span = {7.0, 7.0};
 	//calling regionThatFits: is very important, this will line up the visible map rect with the screen aspect ratio
@@ -78,10 +80,15 @@
 
 - (IBAction)onHandleTimeIndexChange:(id)sender
 {
-	self.timeIndexLabel.text = [NSString stringWithFormat: @"%lu", (unsigned long)self.animatedTileOverlay.currentFrameIndex];
-	[self.animatedTileOverlay updateImageTilesToFrameIndex: (unsigned long)self.animatedTileOverlay.currentFrameIndex];
-	[self.animatedTileRenderer setNeedsDisplayInMapRect: self.mapView.visibleMapRect zoomScale: self.animatedTileRenderer.zoomScale];
-    
+	CGFloat sliderVal = floorf(self.timeSlider.value);
+
+	if (_oldTimeSliderValue != sliderVal) {
+		if ([self.animatedTileOverlay updateToCurrentFrameIndex: (unsigned long)sliderVal]) {
+			self.timeIndexLabel.text = [NSString stringWithFormat: @"%lu", (unsigned long)self.animatedTileOverlay.currentFrameIndex];
+			[self.animatedTileRenderer setNeedsDisplayInMapRect: self.mapView.visibleMapRect zoomScale: self.animatedTileRenderer.zoomScale];
+		};
+		_oldTimeSliderValue = sliderVal;
+	}
 }
 
 - (IBAction) onHandleStartStopAction: (id)sender
@@ -119,8 +126,7 @@
             if(success == YES) {
                 self.initialLoad = NO;
                 self.downloadProgressView.hidden = YES;
-            }
-            else {
+            } else {
                 self.downloadProgressView.hidden = NO;
             }
             
@@ -151,9 +157,10 @@
 	NSArray *templateURLs = self.timeFrameParser.templateFrameTimeURLs;
 	MATAnimatedTileOverlay *overlay = [[MATAnimatedTileOverlay alloc] initWithTemplateURLs: templateURLs frameDuration: 0.10];
 	overlay.delegate = self;
-		
-	[self.mapView addOverlay: overlay level: MKOverlayLevelAboveRoads];
-
+	
+	MATTileOverlay *tileOverlay = [[MATTileOverlay alloc] initWithAnimationTileOverlay: overlay];
+	
+	[self.mapView addOverlays: @[tileOverlay, overlay] level: MKOverlayLevelAboveRoads];
 	self.timeSlider.maximumValue = (CGFloat)templateURLs.count - 1;
 }
 
@@ -238,7 +245,7 @@
 
 - (MKOverlayRenderer *)mapView:(MKMapView *)mapView rendererForOverlay:(id<MKOverlay>)overlay
 {
-	if ([overlay isKindOfClass: [MKTileOverlay class]]) {
+	if ([overlay isKindOfClass: [MATTileOverlay class]]) {
 		MKTileOverlayRenderer *renderer = [[MKTileOverlayRenderer alloc] initWithTileOverlay: (MKTileOverlay *)overlay];
 		self.tileOverlayRenderer = renderer;
 		return self.tileOverlayRenderer;
