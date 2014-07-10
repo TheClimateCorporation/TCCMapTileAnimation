@@ -27,21 +27,36 @@ typedef NS_ENUM(NSUInteger, MATAnimatingState) {
 @property (nonatomic) NSInteger currentPausedFrameIndex;
 @property (readonly, nonatomic) NSInteger numberOfAnimationFrames;
 @property (readonly, nonatomic) MATAnimatingState currentAnimatingState;
-@property (nonatomic, readwrite, assign) NSInteger minimumZ;
-@property (nonatomic, readwrite, assign) NSInteger maximumZ;
+@property (nonatomic) NSInteger minimumZ;
+@property (nonatomic) NSInteger maximumZ;
 
 - (instancetype)initWithTemplateURLs:(NSArray *)templateURLs frameDuration:(NSTimeInterval)frameDuration;
 
+/**
+ Begins animating the tile overlay, starting from the current frame index.
+ */
 - (void)startAnimating;
 
+/**
+ Pauses animation at the current frame index
+ */
 - (void)pauseAnimating;
 
-- (void)fetchTilesForMapRect:(MKMapRect)aMapRect zoomScale:(MKZoomScale)aScale progressBlock:(void(^)(NSUInteger currentTimeIndex, BOOL *stop))progressBlock completionBlock:(void (^)(BOOL success, NSError *error))completionBlock;
+/**
+ Updates the overlay's underlying tile data to the given frame index. Throws exception if out of bounds.
+ If the tile overlay is currently animating, it pauses animation.
+ */
+- (void)moveToFrameIndex:(NSInteger)frameIndex;
 
-- (void)updateImageTilesToFrameIndex: (NSUInteger)animationFrameIndex;
+- (void)fetchTilesForMapRect:(MKMapRect)aMapRect
+                   zoomScale:(MKZoomScale)aScale
+               progressBlock:(void(^)(NSUInteger currentTimeIndex, BOOL *stop))progressBlock
+             completionBlock:(void (^)(BOOL success, NSError *error))completionBlock;
 
 - (MATAnimationTile *)tileForMapRect:(MKMapRect)aMapRect zoomScale:(MKZoomScale)aZoomScale;
 
-- (NSString *)templateURLStringForFrameIndex: (NSUInteger)animationFrameIndex;
+// TODO: After refactoring the tile overlay to be inside this class, this method can be removed
+// from the public interface.
+- (NSString *)templateURLStringForFrameIndex:(NSUInteger)frameIndex;
 
 @end

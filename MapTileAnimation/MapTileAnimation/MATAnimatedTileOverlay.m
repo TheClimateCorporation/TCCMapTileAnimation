@@ -21,7 +21,6 @@
 @property (nonatomic, readwrite, strong) NSOperationQueue *downLoadOperationQueue;
 
 @property (nonatomic, readwrite, strong) NSMutableDictionary *tileDict;
-//@property (nonatomic, readwrite, strong) NSLock *cacheLock;
 
 @property (nonatomic, readwrite, strong) NSArray *templateURLs;
 @property (nonatomic, readwrite) NSInteger numberOfAnimationFrames;
@@ -30,12 +29,6 @@
 @property (readwrite, assign) MATAnimatingState currentAnimatingState;
 @property (strong, nonatomic) NSSet *mapTiles;
 @property (nonatomic) NSInteger tileSize;
-
-- (NSString *) URLStringForX: (NSInteger)xValue Y: (NSInteger)yValue Z: (NSInteger)zValue timeIndex: (NSInteger)aTimeIndex;
-- (NSSet *) mapTilesInMapRect: (MKMapRect)aRect zoomScale: (MKZoomScale)aScale;
-- (void) fetchAndCacheImageTileAtURL: (NSString *)aUrlString;
-- (MATTileCoordinate)tileCoordinateForMapRect:(MKMapRect)aMapRect zoomScale:(MKZoomScale)aZoomScale;
-- (void)cancelAllOperations;
 
 @end
 
@@ -209,7 +202,7 @@
 		[self.downLoadOperationQueue waitUntilAllOperationsAreFinished];
         
 		//set the current image to the first time index
-		[self updateImageTilesToFrameIndex:self.currentFrameIndex];
+		[self moveToFrameIndex:self.currentFrameIndex];
 		
 		dispatch_async(dispatch_get_main_queue(), ^{
             
@@ -223,12 +216,18 @@
 /*
  updates the MATAnimationTile tile image property to point to the tile image for the current time index
  */
-- (void) updateImageTilesToFrameIndex:(NSUInteger)animationFrameIndex
+- (void)moveToFrameIndex:(NSInteger)frameIndex
 {
-	self.currentFrameIndex = animationFrameIndex;
+    if (self.currentAnimatingState == MATAnimatingStateAnimating) {
+        [self pauseAnimating];
+    }
+    [self updateTilesToFrameIndex:frameIndex];
+}
 
+- (void)updateTilesToFrameIndex:(NSInteger)frameIndex
+{
 	for (MATAnimationTile *tile in self.mapTiles) {
-   		NSString *cacheKey = [tile.tileURLs objectAtIndex: animationFrameIndex];
+   		NSString *cacheKey = tile.tileURLs[frameIndex];
 		// Load the image from cache.
 		//[self.cacheLock lock];
 		NSData *cachedData = [[self imageTileCache] objectForKey: cacheKey];
@@ -241,10 +240,10 @@
 		}
 	}
 	
+    self.currentFrameIndex = frameIndex;
 	dispatch_async(dispatch_get_main_queue(), ^{
 		[self.delegate animatedTileOverlay: self didAnimateWithAnimationFrameIndex: self.currentFrameIndex];
 	});
-
 }
 
 - (MATTileCoordinate) tileCoordinateForMapRect: (MKMapRect)aMapRect zoomScale:(MKZoomScale)aZoomScale
@@ -277,23 +276,17 @@
 	return nil;
 }
 
-- (NSString *)templateURLStringForFrameIndex: (NSUInteger)animationFrameIndex
-{
-	NSString *returnURL = nil;
-	if (self.templateURLs) {
-		returnURL = [self.templateURLs objectAtIndex: animationFrameIndex];
-	}
-	return returnURL;
+- (NSString *)templateURLStringForFrameIndex: (NSUInteger)frameIndex {
+	return self.templateURLs[frameIndex];
 }
 
 #pragma  mark - Private
 /*
  called from the animation timer on a periodic basis
  */
-- (void) updateImageTileAnimation: (NSTimer *)aTimer
+- (void)updateImageTileAnimation: (NSTimer *)aTimer
 {
 	[self.fetchOperationQueue addOperationWithBlock:^{
-		
 		self.currentFrameIndex++;
 //        NSLog(@"frame: %@", @(self.currentFrameIndex).stringValue);
 		//reset the index counter if we have rolled over
@@ -301,7 +294,7 @@
 			self.currentFrameIndex = 0;
 		}
         
-		[self updateImageTilesToFrameIndex:self.currentFrameIndex];
+        [self updateTilesToFrameIndex:self.currentFrameIndex];
 	}];
 }
 /*

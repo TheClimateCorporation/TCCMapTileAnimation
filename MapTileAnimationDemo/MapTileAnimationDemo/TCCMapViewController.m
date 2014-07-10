@@ -69,12 +69,10 @@
 
 - (IBAction)onHandleTimeIndexChange:(id)sender
 {
-    [self.animatedTileOverlay pauseAnimating];
-    
 	NSInteger sliderVal = floor(self.timeSlider.value);
     
     if (sliderVal != self.animatedTileOverlay.currentFrameIndex) {
-        [self.animatedTileOverlay updateImageTilesToFrameIndex:(NSInteger)sliderVal];
+        [self.animatedTileOverlay moveToFrameIndex:(NSInteger)sliderVal];
         self.timeIndexLabel.text = [NSString stringWithFormat:@"%d", (NSInteger)self.animatedTileOverlay.currentFrameIndex];
         [self.animatedTileRenderer setNeedsDisplayInMapRect:self.mapView.visibleMapRect zoomScale:self.animatedTileRenderer.zoomScale];
 	}
@@ -128,7 +126,7 @@
 			self.animatedTileOverlay.currentFrameIndex = 0;
 
 			if (success) {
-				[self.animatedTileOverlay updateImageTilesToFrameIndex:self.animatedTileOverlay.currentFrameIndex];
+				[self.animatedTileOverlay moveToFrameIndex:self.animatedTileOverlay.currentFrameIndex];
 				
 				[self.animatedTileRenderer setNeedsDisplayInMapRect: self.mapView.visibleMapRect zoomScale: self.animatedTileRenderer.zoomScale];
 				[self.animatedTileOverlay startAnimating];

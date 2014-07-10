@@ -20,7 +20,7 @@
 
 - (id)initWithAnimationTileOverlay:(MATAnimatedTileOverlay *)animatedTileOverlay
 {
-	NSString *templateURL = [animatedTileOverlay templateURLStringForFrameIndex: 0];
+	NSString *templateURL = [animatedTileOverlay templateURLStringForFrameIndex:0];
 	
 	self = [super initWithURLTemplate: templateURL];
 	if (self) {
