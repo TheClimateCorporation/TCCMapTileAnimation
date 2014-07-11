@@ -20,8 +20,6 @@
 @property (nonatomic, readwrite, strong) NSOperationQueue *fetchOperationQueue;
 @property (nonatomic, readwrite, strong) NSOperationQueue *downLoadOperationQueue;
 
-@property (nonatomic, readwrite, strong) NSMutableDictionary *tileDict;
-
 @property (nonatomic, readwrite, strong) NSArray *templateURLs;
 @property (nonatomic, readwrite) NSInteger numberOfAnimationFrames;
 @property (nonatomic, assign) NSTimeInterval frameDuration;
@@ -32,26 +30,20 @@
 
 @end
 
-@implementation MATAnimatedTileOverlay
+// TODO: Purge NSURLCache on memory warnings
 
-{
-    dispatch_queue_t _lockedQueue;
-}
+@implementation MATAnimatedTileOverlay
 
 - (id) initWithTemplateURLs: (NSArray *)templateURLs frameDuration:(NSTimeInterval)frameDuration
 {
-    
-    //Initialize network caching settings
-    NSURLCache *URLCache = [[NSURLCache alloc] initWithMemoryCapacity:4 * 1024 * 1024
-                                                         diskCapacity:20 * 1024 * 1024
-                                                             diskPath:nil];
-    [NSURLCache setSharedURLCache:URLCache];
-    
 	self = [super init];
 	if (self)
 	{
-		NSString *queueName = [NSString stringWithFormat: @"com.%@.lockqueue", NSStringFromClass([self class])];
-		_lockedQueue = dispatch_queue_create([queueName UTF8String], DISPATCH_QUEUE_CONCURRENT);
+        //Initialize network caching settings
+        NSURLCache *URLCache = [[NSURLCache alloc] initWithMemoryCapacity:4 * 1024 * 1024
+                                                             diskCapacity:32 * 1024 * 1024
+                                                                 diskPath:nil];
+        [NSURLCache setSharedURLCache:URLCache];
         
 		self.templateURLs = templateURLs;
 		self.numberOfAnimationFrames = [templateURLs count];
@@ -62,13 +54,6 @@
 		self.downLoadOperationQueue = [[NSOperationQueue alloc] init];
 		[self.downLoadOperationQueue setMaxConcurrentOperationCount: 25];
 		
-		self.tileDict = [[NSMutableDictionary alloc] init];
-        //		self.cache.name = NSStringFromClass([MATAnimatedTileOverlay class]);
-        //		self.cache.countLimit = 2048;
-        //		[self.cache setEvictsObjectsWithDiscardedContent: YES];
-        //		[self.cache setTotalCostLimit: 2048];
-        //      self.cacheLock = [[NSLock alloc] init];
-        
 		self.tileSize = 256;
 		
 		self.currentAnimatingState = MATAnimatingStateStopped;
@@ -77,11 +62,6 @@
 
 	}
 	return self;
-}
-
-- (void) dealloc
-{
-	[self.tileDict removeAllObjects];
 }
 
 //setter for currentAnimatingState
@@ -135,7 +115,10 @@
 /*
  will fetch all the tiles for a mapview's map rect and zoom scale.  Provides a download progres block and download completetion block
  */
-- (void) fetchTilesForMapRect: (MKMapRect)aMapRect zoomScale: (MKZoomScale)aScale progressBlock:(void(^)(NSUInteger currentTimeIndex, BOOL *stop))progressBlock completionBlock: (void (^)(BOOL success, NSError *error))completionBlock
+- (void)fetchTilesForMapRect:(MKMapRect)aMapRect
+                   zoomScale:(MKZoomScale)aScale
+               progressBlock:(void(^)(NSUInteger currentTimeIndex, BOOL *stop))progressBlock
+             completionBlock:(void (^)(BOOL success, NSError *error))completionBlock
 {
 	//check to see if our zoom level is supported by our tile server
 	NSUInteger zoomLevel = [self zoomLevelForZoomScale: aScale];
@@ -161,14 +144,12 @@
 		
 		//at this point we have a set of MATAnimationTiles we need to derive the urls for each tile, for each time index
 		for (MATAnimationTile *tile in mapTiles) {
-			
 			NSMutableArray *array = [NSMutableArray arrayWithCapacity: self.numberOfAnimationFrames];
-			
 			for (NSUInteger timeIndex = 0; timeIndex < self.numberOfAnimationFrames; timeIndex++) {
-				NSString *tileURL = [self URLStringForX: tile.xCoordinate Y: tile.yCoordinate Z: tile.zCoordinate timeIndex: timeIndex];
+				NSString *tileURL = [self URLStringForX:tile.xCoordinate Y:tile.yCoordinate Z:tile.zCoordinate timeIndex: timeIndex];
 				[array addObject: tileURL];
 			}
-			tile.tileURLs = [NSArray arrayWithArray: array];
+			tile.tileURLs = [array copy];
 		}
 		
 		//update the tile array with new tile objects
@@ -203,11 +184,8 @@
 		[self moveToFrameIndex:self.currentFrameIndex];
 		
 		dispatch_async(dispatch_get_main_queue(), ^{
-            
             completionBlock(!didStopFlag, nil);
-            
 		});
-        
 	}];
 }
 
@@ -225,18 +203,12 @@
 - (void)updateTilesToFrameIndex:(NSInteger)frameIndex
 {
 	for (MATAnimationTile *tile in self.mapTiles) {
-   		NSString *cacheKey = tile.tileURLs[frameIndex];
-		// Load the image from cache.
-		//[self.cacheLock lock];
-		NSData *cachedData = [[self imageTileCache] objectForKey: cacheKey];
-		//[self.cacheLock unlock];
-		if (cachedData) {
-			UIImage *img = [[UIImage alloc] initWithData: cachedData];
-			tile.currentImageTile = img;
-		} else {
-			tile.currentImageTile = nil;
-		}
-	}
+        NSURL *url = [[NSURL alloc] initWithString:tile.tileURLs[frameIndex]];
+        NSURLRequest *request = [[NSURLRequest alloc] initWithURL:url cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:5];
+        // TODO: Error handling for error cases
+        NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:NULL error:NULL];
+        tile.currentImageTile = [UIImage imageWithData:data];
+    }
 	
     self.currentFrameIndex = frameIndex;
 	dispatch_async(dispatch_get_main_queue(), ^{
@@ -279,6 +251,45 @@
 }
 
 #pragma  mark - Private
+
+/*
+ will fetch a tile image and cache it to the network cache (i.e. do nothing with it)
+ */
+- (void)fetchAndCacheImageTileAtURL:(NSString *)aUrlString
+{
+	MATAnimatedTileOverlay *overlay = self;
+    
+	[self.downLoadOperationQueue addOperationWithBlock: ^{
+		NSString *urlString = [aUrlString copy];
+		
+        dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+        
+        NSURLSession *session = [NSURLSession sharedSession];
+        NSURLRequest *request = [[NSURLRequest alloc] initWithURL:[NSURL URLWithString:urlString] cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:5];
+        NSURLSessionTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+            NSHTTPURLResponse *urlResponse = (NSHTTPURLResponse *)response;
+            
+            if (data) {
+                if (urlResponse.statusCode != 200) {
+                    NSError *error = [[NSError alloc] initWithDomain: NSStringFromClass([self class])
+                                                                code: MATAnimatingErrorBadURLResponseCode
+                                                            userInfo: @{NSLocalizedDescriptionKey: [NSString stringWithFormat: @"Image Tile HTTP respsonse code %ld, URL %@", (long)urlResponse.statusCode, urlResponse.URL]}];
+                    [overlay.delegate animatedTileOverlay: self didHaveError: error];
+                }
+            } else {
+                NSError *error = [[NSError alloc] initWithDomain: NSStringFromClass([self class])
+                                                            code: MATAnimatingErrorNoImageData
+                                                        userInfo: @{NSLocalizedDescriptionKey: [NSString stringWithFormat: @"No Image Data HTTP respsonse code %ld, URL %@", (long)urlResponse.statusCode, urlResponse.URL]}];
+                [overlay.delegate animatedTileOverlay: self didHaveError: error];
+            }
+            dispatch_semaphore_signal(semaphore);
+        }];
+        [task resume];
+        // have the thread wait until the download task is done
+        dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * 60)); //timeout is 10 secs.
+	}];
+}
+
 /*
  called from the animation timer on a periodic basis
  */
@@ -295,21 +306,11 @@
         [self updateTilesToFrameIndex:self.currentFrameIndex];
 	}];
 }
-/*
- locks access to the cache so that only one thread at a time can read/write to the cache
- */
-- (NSMutableDictionary *)imageTileCache
-{
-	__block NSMutableDictionary *value;
-	dispatch_sync(_lockedQueue, ^{
-		value = _tileDict;
-	});
-	return value;
-}
+
 /*
  derives a URL string from the template URLs, needs tile coordinates and a time index
  */
-- (NSString *) URLStringForX: (NSInteger)xValue Y: (NSInteger)yValue Z: (NSInteger)zValue timeIndex: (NSInteger)aTimeIndex
+- (NSString *)URLStringForX:(NSInteger)xValue Y:(NSInteger)yValue Z:(NSInteger)zValue timeIndex:(NSInteger)aTimeIndex
 {
 	NSString *currentTemplateURL = [self.templateURLs objectAtIndex: aTimeIndex];
 	NSString *returnString = nil;
@@ -324,6 +325,7 @@
 	returnString = replaceZ;
 	return returnString;
 }
+
 /*
  calculates the number of tiles, the tile coordinates and tile MapRect frame given a MapView's MapRect and zoom scale
  returns an array MATAnimationTile objects
@@ -351,64 +353,7 @@
     }
     return [NSSet setWithSet: tiles];
 }
-/*
- will fetch a tile image and cache it to NSCache.  The cache key is the url string itself
- */
-- (void) fetchAndCacheImageTileAtURL: (NSString *)aUrlString
-{
-	MATAnimatedTileOverlay *overlay = self;
-    
-	[self.downLoadOperationQueue addOperationWithBlock: ^{
-		
-		NSString *urlString = [aUrlString copy];
-		
-		//[overlay.cacheLock lock];
-		NSData *cachedData = [[overlay imageTileCache] objectForKey: urlString];
-		//[overlay.cacheLock unlock];
-		if (cachedData) {
-			//do we want to do anything if we already have the cached tile data?
-		} else {
-			dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
-            
-            // Exploring caching in NSURLSession
-            // Open questions:
-            //   1. How do you configure the caching options for NSURLSession? (max size?)
-            //   2. Can you tell before performing the request with the NSURLSession whether
-            //      a cached copy exists?
-            //   3. Is the eviction policy for this cache "deterministic"? We want newer tiles
-            //      to stay in the cache longer than older tiles.
-            //   4. What's the best compromise between cache size vs. performance? How many
-            //      tiles do we really need?
-			NSURLSession *session = [NSURLSession sharedSession];
-			NSURLSessionTask *task = [session dataTaskWithURL: [NSURL URLWithString: urlString] completionHandler: ^(NSData *data, NSURLResponse *response, NSError *error) {
-				
-				NSHTTPURLResponse *urlResponse = (NSHTTPURLResponse *)response;
-				
-				if (data) {
-					if (urlResponse.statusCode == 200) {
-						//[overlay.cacheLock lock];
-						[[overlay imageTileCache] setObject: data forKey: urlString];
-						//[overlay.cacheLock unlock];
-					} else {
-						NSError *error = [[NSError alloc] initWithDomain: NSStringFromClass([self class])
-																	code: MATAnimatingErrorBadURLResponseCode
-																userInfo: @{NSLocalizedDescriptionKey: [NSString stringWithFormat: @"Image Tile HTTP respsonse code %ld, URL %@", (long)urlResponse.statusCode, urlResponse.URL]}];
-						[overlay.delegate animatedTileOverlay: self didHaveError: error];
-					}
-				} else {
-					NSError *error = [[NSError alloc] initWithDomain: NSStringFromClass([self class])
-																code: MATAnimatingErrorNoImageData
-															userInfo: @{NSLocalizedDescriptionKey: [NSString stringWithFormat: @"No Image Data HTTP respsonse code %ld, URL %@", (long)urlResponse.statusCode, urlResponse.URL]}];
-					[overlay.delegate animatedTileOverlay: self didHaveError: error];
-				}
-				dispatch_semaphore_signal(semaphore);
-			}];
-			[task resume];
-			// have the thread wait until the download task is done
-			dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * 60)); //timeout is 10 secs.
-		}
-	}];
-}
+
 /*
  Determine the number of tiles wide *or tall* the world is, at the given zoomLevel.
  (In the Spherical Mercator projection, the poles are cut off so that the resulting 2D map is "square".)
