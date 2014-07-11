@@ -57,7 +57,8 @@
 	self.startStopButton.tag = MATAnimatingStateStopped;
     self.downloadProgressView.hidden = NO;
     self.initialLoad = YES;
-	
+    self.visibleMapRect = self.mapView.visibleMapRect;
+
 }
 
 - (void) viewDidAppear:(BOOL)animated
@@ -70,7 +71,6 @@
 - (IBAction)onHandleTimeIndexChange:(id)sender
 {
 	NSInteger sliderVal = floor(self.timeSlider.value);
-    
     if (sliderVal != self.animatedTileOverlay.currentFrameIndex) {
         [self.animatedTileOverlay moveToFrameIndex:(NSInteger)sliderVal];
         self.timeIndexLabel.text = [NSString stringWithFormat:@"%d", (NSInteger)self.animatedTileOverlay.currentFrameIndex];
@@ -151,12 +151,12 @@
         [pluckedArray addObject:url];
     }
     
-	MATAnimatedTileOverlay *overlay = [[MATAnimatedTileOverlay alloc] initWithTemplateURLs: pluckedArray frameDuration: 0.10];
+    NSLog(@"test");
+    
+	MATAnimatedTileOverlay *overlay = [[MATAnimatedTileOverlay alloc] initWithTemplateURLs: pluckedArray frameDuration: 0.20];
 	overlay.delegate = self;
-	
-	MATTileOverlay *tileOverlay = [[MATTileOverlay alloc] initWithAnimationTileOverlay: overlay];
-	
-	[self.mapView addOverlays: @[tileOverlay, overlay] level: MKOverlayLevelAboveRoads];
+		
+	[self.mapView addOverlays: @[overlay] level: MKOverlayLevelAboveRoads];
 	self.timeSlider.maximumValue = (CGFloat)pluckedArray.count - 1;
 }
 
@@ -173,6 +173,7 @@
         if(!MKMapRectEqualToRect(self.visibleMapRect, self.mapView.visibleMapRect)) {
             self.downloadProgressView.hidden = NO;
             self.initialLoad = YES;
+            NSLog(@"test");
         }
         self.visibleMapRect = self.mapView.visibleMapRect;
     }

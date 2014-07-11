@@ -337,16 +337,18 @@
     NSInteger maxX = ceil((MKMapRectGetMaxX(aRect) * aScale) / self.tileSize);
     NSInteger minY = floor((MKMapRectGetMinY(aRect) * aScale) / self.tileSize);
     NSInteger maxY = ceil((MKMapRectGetMaxY(aRect) * aScale) / self.tileSize);
-	
+    
+    if (!tiles) {
+        tiles = [NSMutableSet set];
+    }
+    
 	for(NSInteger x = minX; x <= maxX; x++) {
         for(NSInteger y = minY; y <=maxY; y++) {
-			
-			if (!tiles) {
-				tiles = [NSMutableSet set];
-			}
+					
 			MKMapRect frame = MKMapRectMake((double)(x * self.tileSize) / aScale, (double)(y * self.tileSize) / aScale, self.tileSize / aScale, self.tileSize / aScale);
 			MATAnimationTile *tile = [[MATAnimationTile alloc] initWithFrame: frame xCord: x yCord: y zCord: z];
 			[tiles addObject:tile];
+            
         }
     }
     return [NSSet setWithSet: tiles];
