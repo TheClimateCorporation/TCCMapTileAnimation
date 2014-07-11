@@ -17,6 +17,15 @@ typedef NS_ENUM(NSUInteger, MATAnimatingState) {
 	MATAnimatingStateAnimating = 2
 };
 
+typedef NS_ENUM(NSUInteger, MATAnimatingErrorCode) {
+	MATAnimatingErrorInvalidZoomLevel = 1001,
+	MATAnimatingErrorBadURLResponseCode,
+	MATAnimatingErrorNoImageData
+    
+};
+
+extern NSString *const MATAnimatedTileOverlayErrorDomain;
+
 @protocol MATAnimatedTileOverlayDelegate;
 
 @interface MATAnimatedTileOverlay : NSObject <MKOverlay>
