@@ -61,8 +61,8 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
 		self.tileSize = 256;
 		
 		self.currentAnimatingState = MATAnimatingStateStopped;
-		self.minimumZ = 1;
-		self.maximumZ = 22;
+		self.minimumZ = 4;
+		self.maximumZ = 11;
 
 	}
 	return self;
@@ -141,13 +141,41 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
              completionBlock:(void (^)(BOOL success, NSError *error))completionBlock
 {
 	//check to see if our zoom level is supported by our tile server
-	NSUInteger zoomLevel = [self zoomLevelForZoomScale: aScale];
-	if (zoomLevel > self.maximumZ || zoomLevel < self.minimumZ)
-    {
-        NSString *localizedDescription = [NSString stringWithFormat: @"Current Zoom Level %lu not supported (min %ld max %ld scale %lf)", (unsigned long)zoomLevel, (long)self.minimumZ, (long)self.maximumZ, aScale];
-        NSError *error = [NSError errorWithDomain:MATAnimatedTileOverlayErrorDomain code:MATAnimatingErrorInvalidZoomLevel userInfo:@{ NSLocalizedDescriptionKey :  localizedDescription }];
-        [self sendErrorToDelegate:error];
+    
+    //super zoomed in (cap zoom scale)
+    if(aScale > 0.000500000) {
+        aScale = 0.000500000;
+        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Zoom Scale Alert"
+                                                          message:@"You've zoomed in past tile data we have"
+                                                         delegate:nil
+                                                cancelButtonTitle:@"CLOSE"
+                                                otherButtonTitles:nil];
         
+        [message show];
+    }
+    
+    //super zoomed out (cap zoom scale)
+    if(aScale < 0.000020000) {
+        aScale = 0.000020000;
+        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Zoom Scale Alert"
+                                                          message:@"You've zoomed out past tile data we have"
+                                                         delegate:nil
+                                                cancelButtonTitle:@"CLOSE"
+                                                otherButtonTitles:nil];
+        
+        [message show];
+    }
+    
+    NSLog(@"zoom scale: %lf", aScale);
+	NSUInteger zoomLevel = [self zoomLevelForZoomScale: aScale];
+	if (zoomLevel > self.maximumZ || zoomLevel < self.minimumZ) {
+		
+		NSError *error = [[NSError alloc] initWithDomain: NSStringFromClass([self class])
+													code: MATAnimatingErrorInvalidZoomLevel
+												userInfo: @{NSLocalizedDescriptionKey: [NSString stringWithFormat: @"Current Zoom Level %lu not supported (min %ld max %ld scale %lf)", (unsigned long)zoomLevel, (long)self.minimumZ, (long)self.maximumZ, aScale]}];
+		
+		[self.delegate animatedTileOverlay: self didHaveError: error];
+
 		dispatch_async(dispatch_get_main_queue(), ^{
             completionBlock(NO, error);
 		});
@@ -158,6 +186,7 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
 	self.currentAnimatingState = MATAnimatingStateLoading;
     
 	[self.fetchQueue addOperationWithBlock:^{
+        
 		//calculate the tiles rects needed for a given mapRect and create the MATAnimationTile objects
 		NSSet *mapTiles = [self mapTilesInMapRect:aMapRect zoomScale:aScale];
 		
@@ -255,7 +284,27 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
         NSURLSession *session = [NSURLSession sharedSession];
         NSURLRequest *request = [[NSURLRequest alloc] initWithURL:[NSURL URLWithString:urlString] cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:5];
         NSURLSessionTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+<<<<<<< Updated upstream
             [self checkResponseForError:(NSHTTPURLResponse *)response data:data];
+=======
+            NSHTTPURLResponse *urlResponse = (NSHTTPURLResponse *)response;
+            
+            NSLog(@"URL: %@", urlResponse.URL);
+            
+            if (data) {
+                if (urlResponse.statusCode != 200) {
+                    NSError *error = [[NSError alloc] initWithDomain: NSStringFromClass([self class])
+                                                                code: MATAnimatingErrorBadURLResponseCode
+                                                            userInfo: @{NSLocalizedDescriptionKey: [NSString stringWithFormat: @"Image Tile HTTP respsonse code %ld, URL %@", (long)urlResponse.statusCode, urlResponse.URL]}];
+                    [overlay.delegate animatedTileOverlay: self didHaveError: error];
+                }
+            } else {
+                NSError *error = [[NSError alloc] initWithDomain: NSStringFromClass([self class])
+                                                            code: MATAnimatingErrorNoImageData
+                                                        userInfo: @{NSLocalizedDescriptionKey: [NSString stringWithFormat: @"No Image Data HTTP respsonse code %ld, URL %@", (long)urlResponse.statusCode, urlResponse.URL]}];
+                [overlay.delegate animatedTileOverlay: self didHaveError: error];
+            }
+>>>>>>> Stashed changes
             dispatch_semaphore_signal(semaphore);
         }];
         [task resume];
