@@ -15,15 +15,17 @@
 #define X_INDEX "{x}"
 #define Y_INDEX "{y}"
 
+NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayError";
+
 @interface MATAnimatedTileOverlay ()
 
-@property (nonatomic, readwrite, strong) NSOperationQueue *fetchOperationQueue;
-@property (nonatomic, readwrite, strong) NSOperationQueue *downLoadOperationQueue;
+@property (nonatomic, readwrite, strong) NSOperationQueue *fetchQueue;
+@property (nonatomic, readwrite, strong) NSOperationQueue *downloadQueue;
 
 @property (nonatomic, readwrite, strong) NSArray *templateURLs;
 @property (nonatomic, readwrite) NSInteger numberOfAnimationFrames;
 @property (nonatomic, assign) NSTimeInterval frameDuration;
-@property (nonatomic, readwrite, strong) NSTimer *playBackTimer;
+@property (nonatomic, readwrite, strong) NSTimer *timer;
 @property (readwrite, assign) MATAnimatingState currentAnimatingState;
 @property (strong, nonatomic) NSSet *mapTiles;
 @property (nonatomic) NSInteger tileSize;
@@ -33,6 +35,8 @@
 // TODO: Purge NSURLCache on memory warnings
 
 @implementation MATAnimatedTileOverlay
+
+#pragma mark - Lifecycle
 
 - (id) initWithTemplateURLs: (NSArray *)templateURLs frameDuration:(NSTimeInterval)frameDuration
 {
@@ -49,10 +53,10 @@
 		self.numberOfAnimationFrames = [templateURLs count];
 		self.frameDuration = frameDuration;
 		self.currentFrameIndex = 0;
-		self.fetchOperationQueue = [[NSOperationQueue alloc] init];
-		[self.fetchOperationQueue setMaxConcurrentOperationCount: 1];  //essentially a serial queue
-		self.downLoadOperationQueue = [[NSOperationQueue alloc] init];
-		[self.downLoadOperationQueue setMaxConcurrentOperationCount: 25];
+		self.fetchQueue = [[NSOperationQueue alloc] init];
+		[self.fetchQueue setMaxConcurrentOperationCount: 1];  //essentially a serial queue
+		self.downloadQueue = [[NSOperationQueue alloc] init];
+		[self.downloadQueue setMaxConcurrentOperationCount: 25];
 		
 		self.tileSize = 256;
 		
@@ -63,6 +67,8 @@
 	}
 	return self;
 }
+
+#pragma mark - Custom accessors
 
 //setter for currentAnimatingState
 - (void) setCurrentAnimatingState:(MATAnimatingState)currentAnimatingState {
@@ -76,7 +82,7 @@
     }
 }
 
-#pragma mark - MKOverlay protocol
+#pragma mark MKOverlay
 
 - (CLLocationCoordinate2D)coordinate
 {
@@ -88,28 +94,42 @@
     return MKMapRectWorld;
 }
 
+#pragma mark - IBActions
+
+/*
+ called from the animation timer on a periodic basis
+ */
+- (IBAction)updateImageTileAnimation:(NSTimer *)aTimer
+{
+	[self.fetchQueue addOperationWithBlock:^{
+		self.currentFrameIndex++;
+        //        NSLog(@"frame: %@", @(self.currentFrameIndex).stringValue);
+		//reset the index counter if we have rolled over
+		if (self.currentFrameIndex > self.numberOfAnimationFrames - 1) {
+			self.currentFrameIndex = 0;
+		}
+        
+        [self updateTilesToFrameIndex:self.currentFrameIndex];
+	}];
+}
+
 #pragma mark - Public
 
-- (void) startAnimating;
+- (void)startAnimating;
 {
-	self.playBackTimer = [NSTimer scheduledTimerWithTimeInterval: self.frameDuration target: self selector: @selector(updateImageTileAnimation:) userInfo: nil repeats: YES];
-	[self.playBackTimer fire];
+	self.timer = [NSTimer scheduledTimerWithTimeInterval:self.frameDuration target:self selector:@selector(updateImageTileAnimation:) userInfo:nil repeats:YES];
+	[self.timer fire];
 	self.currentAnimatingState = MATAnimatingStateAnimating;
     
 }
 
-- (void) pauseAnimating
+- (void)pauseAnimating
 {
-	[self.playBackTimer invalidate];
-	[self cancelAllOperations];
-	self.playBackTimer = nil;
+	[self.timer invalidate];
+    [self.downloadQueue cancelAllOperations];
+	[self.fetchQueue cancelAllOperations];
+	self.timer = nil;
 	self.currentAnimatingState = MATAnimatingStateStopped;
-}
-
-- (void) cancelAllOperations
-{
-	[self.downLoadOperationQueue cancelAllOperations];
-	[self.fetchOperationQueue cancelAllOperations];
 }
 
 /*
@@ -122,13 +142,12 @@
 {
 	//check to see if our zoom level is supported by our tile server
 	NSUInteger zoomLevel = [self zoomLevelForZoomScale: aScale];
-	if (zoomLevel > self.maximumZ || zoomLevel < self.minimumZ) {
-		
-		NSError *error = [[NSError alloc] initWithDomain: NSStringFromClass([self class])
-													code: MATAnimatingErrorInvalidZoomLevel
-												userInfo: @{NSLocalizedDescriptionKey: [NSString stringWithFormat: @"Current Zoom Level %lu not supported (min %ld max %ld scale %lf)", (unsigned long)zoomLevel, (long)self.minimumZ, (long)self.maximumZ, aScale]}];
-		
-		[self.delegate animatedTileOverlay: self didHaveError: error];
+	if (zoomLevel > self.maximumZ || zoomLevel < self.minimumZ)
+    {
+        NSString *localizedDescription = [NSString stringWithFormat: @"Current Zoom Level %lu not supported (min %ld max %ld scale %lf)", (unsigned long)zoomLevel, (long)self.minimumZ, (long)self.maximumZ, aScale];
+        NSError *error = [NSError errorWithDomain:MATAnimatedTileOverlayErrorDomain code:MATAnimatingErrorInvalidZoomLevel userInfo:@{ NSLocalizedDescriptionKey :  localizedDescription }];
+        [self sendErrorToDelegate:error];
+        
 		dispatch_async(dispatch_get_main_queue(), ^{
             completionBlock(NO, error);
 		});
@@ -138,16 +157,16 @@
 
 	self.currentAnimatingState = MATAnimatingStateLoading;
     
-	[self.fetchOperationQueue addOperationWithBlock:^{
+	[self.fetchQueue addOperationWithBlock:^{
 		//calculate the tiles rects needed for a given mapRect and create the MATAnimationTile objects
-		NSSet *mapTiles = [self mapTilesInMapRect: aMapRect zoomScale: aScale];
+		NSSet *mapTiles = [self mapTilesInMapRect:aMapRect zoomScale:aScale];
 		
 		//at this point we have a set of MATAnimationTiles we need to derive the urls for each tile, for each time index
 		for (MATAnimationTile *tile in mapTiles) {
 			NSMutableArray *array = [NSMutableArray arrayWithCapacity: self.numberOfAnimationFrames];
 			for (NSUInteger timeIndex = 0; timeIndex < self.numberOfAnimationFrames; timeIndex++) {
-				NSString *tileURL = [self URLStringForX:tile.xCoordinate Y:tile.yCoordinate Z:tile.zCoordinate timeIndex: timeIndex];
-				[array addObject: tileURL];
+				NSString *tileURL = [self URLStringForX:tile.xCoordinate Y:tile.yCoordinate Z:tile.zCoordinate timeIndex:timeIndex];
+				[array addObject:tileURL];
 			}
 			tile.tileURLs = [array copy];
 		}
@@ -159,26 +178,27 @@
 		//start downloading the tiles for a given time index, we want to download all the tiles for a time index
 		//before we move onto the next time index
 		for (NSUInteger timeIndex = 0; timeIndex < self.numberOfAnimationFrames; timeIndex++) {
-			if (didStopFlag == YES) {
+			if (didStopFlag) {
 				NSLog(@"User Stopped");
-				[self.downLoadOperationQueue cancelAllOperations];
+				[self.downloadQueue cancelAllOperations];
 				self.currentAnimatingState = MATAnimatingStateStopped;
 				break;
 			}
+            
 			//loop over all the tiles for this time index
 			for (MATAnimationTile *tile in self.mapTiles) {
-				NSString *tileURL = [tile.tileURLs objectAtIndex: timeIndex];
+				NSString *tileURL = tile.tileURLs[timeIndex];
 				//this will return right away
-				[self fetchAndCacheImageTileAtURL: tileURL];
+				[self fetchAndCacheImageTileAtURL:tileURL];
 			}
 			//wait for all the tiles in this time index to download before proceeding the next time index
-			[self.downLoadOperationQueue waitUntilAllOperationsAreFinished];
+			[self.downloadQueue waitUntilAllOperationsAreFinished];
             
 			dispatch_async(dispatch_get_main_queue(), ^{
 				progressBlock(timeIndex, &didStopFlag);
 			});
 		}
-		[self.downLoadOperationQueue waitUntilAllOperationsAreFinished];
+		[self.downloadQueue waitUntilAllOperationsAreFinished];
         
 		//set the current image to the first time index
 		[self moveToFrameIndex:self.currentFrameIndex];
@@ -200,49 +220,19 @@
     [self updateTilesToFrameIndex:frameIndex];
 }
 
-- (void)updateTilesToFrameIndex:(NSInteger)frameIndex
-{
-	for (MATAnimationTile *tile in self.mapTiles) {
-        NSURL *url = [[NSURL alloc] initWithString:tile.tileURLs[frameIndex]];
-        NSURLRequest *request = [[NSURLRequest alloc] initWithURL:url cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:5];
-        // TODO: Error handling for error cases
-        NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:NULL error:NULL];
-        tile.currentImageTile = [UIImage imageWithData:data];
-    }
-	
-    self.currentFrameIndex = frameIndex;
-	dispatch_async(dispatch_get_main_queue(), ^{
-		[self.delegate animatedTileOverlay: self didAnimateWithAnimationFrameIndex: self.currentFrameIndex];
-	});
-}
-
-- (MATTileCoordinate) tileCoordinateForMapRect: (MKMapRect)aMapRect zoomScale:(MKZoomScale)aZoomScale
-{
-	MATTileCoordinate coord = {0 , 0, 0};
-	
-	NSUInteger zoomLevel = [self zoomLevelForZoomScale: aZoomScale];
-    CGPoint mercatorPoint = [self mercatorTileOriginForMapRect: aMapRect];
-    NSUInteger tilex = floor(mercatorPoint.x * [self worldTileWidthForZoomLevel:zoomLevel]);
-    NSUInteger tiley = floor(mercatorPoint.y * [self worldTileWidthForZoomLevel:zoomLevel]);
-    
-	coord.xCoordinate = tilex;
-	coord.yCoordinate = tiley;
-	coord.zCoordiante = zoomLevel;
-	
-	return coord;
-}
-
-- (MATAnimationTile *) tileForMapRect: (MKMapRect)aMapRect zoomScale:(MKZoomScale)aZoomScale;
+- (MATAnimationTile *)tileForMapRect:(MKMapRect)aMapRect zoomScale:(MKZoomScale)aZoomScale;
 {
 	if (self.mapTiles) {
 		MATTileCoordinate coord = [self tileCoordinateForMapRect: aMapRect zoomScale: aZoomScale];
 		for (MATAnimationTile *tile in self.mapTiles) {
-			if (coord.xCoordinate == tile.xCoordinate && coord.yCoordinate == tile.yCoordinate && coord.zCoordiante == tile.zCoordinate) {
+			if (coord.xCoordinate == tile.xCoordinate &&
+                coord.yCoordinate == tile.yCoordinate &&
+                coord.zCoordiante == tile.zCoordinate)
+            {
 				return tile;
 			}
 		}
 	}
-	
 	return nil;
 }
 
@@ -257,9 +247,7 @@
  */
 - (void)fetchAndCacheImageTileAtURL:(NSString *)aUrlString
 {
-	MATAnimatedTileOverlay *overlay = self;
-    
-	[self.downLoadOperationQueue addOperationWithBlock: ^{
+	[self.downloadQueue addOperationWithBlock: ^{
 		NSString *urlString = [aUrlString copy];
 		
         dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
@@ -267,21 +255,7 @@
         NSURLSession *session = [NSURLSession sharedSession];
         NSURLRequest *request = [[NSURLRequest alloc] initWithURL:[NSURL URLWithString:urlString] cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:5];
         NSURLSessionTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-            NSHTTPURLResponse *urlResponse = (NSHTTPURLResponse *)response;
-            
-            if (data) {
-                if (urlResponse.statusCode != 200) {
-                    NSError *error = [[NSError alloc] initWithDomain: NSStringFromClass([self class])
-                                                                code: MATAnimatingErrorBadURLResponseCode
-                                                            userInfo: @{NSLocalizedDescriptionKey: [NSString stringWithFormat: @"Image Tile HTTP respsonse code %ld, URL %@", (long)urlResponse.statusCode, urlResponse.URL]}];
-                    [overlay.delegate animatedTileOverlay: self didHaveError: error];
-                }
-            } else {
-                NSError *error = [[NSError alloc] initWithDomain: NSStringFromClass([self class])
-                                                            code: MATAnimatingErrorNoImageData
-                                                        userInfo: @{NSLocalizedDescriptionKey: [NSString stringWithFormat: @"No Image Data HTTP respsonse code %ld, URL %@", (long)urlResponse.statusCode, urlResponse.URL]}];
-                [overlay.delegate animatedTileOverlay: self didHaveError: error];
-            }
+            [self checkResponseForError:(NSHTTPURLResponse *)response data:data];
             dispatch_semaphore_signal(semaphore);
         }];
         [task resume];
@@ -290,21 +264,35 @@
 	}];
 }
 
-/*
- called from the animation timer on a periodic basis
- */
-- (void)updateImageTileAnimation: (NSTimer *)aTimer
+- (void)updateTilesToFrameIndex:(NSInteger)frameIndex
 {
-	[self.fetchOperationQueue addOperationWithBlock:^{
-		self.currentFrameIndex++;
-//        NSLog(@"frame: %@", @(self.currentFrameIndex).stringValue);
-		//reset the index counter if we have rolled over
-		if (self.currentFrameIndex > self.numberOfAnimationFrames - 1) {
-			self.currentFrameIndex = 0;
-		}
+    // RSS: Tried to have this data updating occur on a background thread, but it causes threading issues.
+    // I wanted this in the background so that it doesn't block the main thread when it's loading cached
+    // data. However, scrubbing quickly causes multiple calls to occur concurrently, which causes the
+    // currentFrameIndex to enter a race condition. If we want to do this in the background, I think we'll
+    // need to create a serial background queue.
+//    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        for (MATAnimationTile *tile in self.mapTiles) {
+            NSURL *url = [[NSURL alloc] initWithString:tile.tileURLs[frameIndex]];
+            NSURLRequest *request = [[NSURLRequest alloc] initWithURL:url cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:1];
+            NSURLResponse *response;
+            NSError *error;
+            NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+            
+            BOOL errorOccurred = [self checkResponseForError:(NSHTTPURLResponse *)response data:data];
+            
+            if (!errorOccurred) {
+//                dispatch_async(dispatch_get_main_queue(), ^{
+                    tile.currentImageTile = [UIImage imageWithData:data];
+//                });
+            }
+        }
         
-        [self updateTilesToFrameIndex:self.currentFrameIndex];
-	}];
+        self.currentFrameIndex = frameIndex;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.delegate animatedTileOverlay:self didAnimateWithAnimationFrameIndex:self.currentFrameIndex];
+        });
+//    });
 }
 
 /*
@@ -324,6 +312,22 @@
 	
 	returnString = replaceZ;
 	return returnString;
+}
+
+- (MATTileCoordinate) tileCoordinateForMapRect: (MKMapRect)aMapRect zoomScale:(MKZoomScale)aZoomScale
+{
+	MATTileCoordinate coord = {0 , 0, 0};
+	
+	NSUInteger zoomLevel = [self zoomLevelForZoomScale: aZoomScale];
+    CGPoint mercatorPoint = [self mercatorTileOriginForMapRect: aMapRect];
+    NSUInteger tilex = floor(mercatorPoint.x * [self worldTileWidthForZoomLevel:zoomLevel]);
+    NSUInteger tiley = floor(mercatorPoint.y * [self worldTileWidthForZoomLevel:zoomLevel]);
+    
+	coord.xCoordinate = tilex;
+	coord.yCoordinate = tiley;
+	coord.zCoordiante = zoomLevel;
+	
+	return coord;
 }
 
 /*
@@ -402,5 +406,32 @@
 	
     return CGPointMake(x, y);
 }
+
+- (BOOL)checkResponseForError:(NSHTTPURLResponse *)response data:(NSData *)data
+{
+    if (data) {
+        if (response.statusCode != 200) {
+            NSString *localizedDescription = [NSString stringWithFormat:@"Error during fetch. Image tile HTTP respsonse code %ld, URL %@", (long)response.statusCode, response.URL];
+            NSError *error = [NSError errorWithDomain:MATAnimatedTileOverlayErrorDomain code:MATAnimatingErrorBadURLResponseCode userInfo:@{ NSLocalizedDescriptionKey : localizedDescription }];
+            [self sendErrorToDelegate:error];
+            return YES;
+        }
+    } else {
+        NSString *localizedDescription = [NSString stringWithFormat:@"No image data. HTTP respsonse code %ld, URL %@", (long)response.statusCode, response.URL];
+        NSError *error = [NSError errorWithDomain:MATAnimatedTileOverlayErrorDomain code:MATAnimatingErrorNoImageData userInfo:@{ NSLocalizedDescriptionKey : localizedDescription }];
+        [self sendErrorToDelegate:error];
+        return YES;
+    }
+    return NO;
+}
+
+- (void)sendErrorToDelegate:(NSError *)error
+{
+    if ([self.delegate respondsToSelector:@selector(animatedTileOverlay:didHaveError:)]) {
+        [self.delegate animatedTileOverlay:self didHaveError:error];
+    }
+}
+
+#pragma mark - Protocol conformance
 
 @end

@@ -73,7 +73,7 @@
 	NSInteger sliderVal = floor(self.timeSlider.value);
     if (sliderVal != self.animatedTileOverlay.currentFrameIndex) {
         [self.animatedTileOverlay moveToFrameIndex:(NSInteger)sliderVal];
-        self.timeIndexLabel.text = [NSString stringWithFormat:@"%d", (NSInteger)self.animatedTileOverlay.currentFrameIndex];
+        self.timeIndexLabel.text = [NSString stringWithFormat:@"%ld", (long)self.animatedTileOverlay.currentFrameIndex];
         [self.animatedTileRenderer setNeedsDisplayInMapRect:self.mapView.visibleMapRect zoomScale:self.animatedTileRenderer.zoomScale];
 	}
 }
