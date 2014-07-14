@@ -284,27 +284,7 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
         NSURLSession *session = [NSURLSession sharedSession];
         NSURLRequest *request = [[NSURLRequest alloc] initWithURL:[NSURL URLWithString:urlString] cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:5];
         NSURLSessionTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-<<<<<<< Updated upstream
             [self checkResponseForError:(NSHTTPURLResponse *)response data:data];
-=======
-            NSHTTPURLResponse *urlResponse = (NSHTTPURLResponse *)response;
-            
-            NSLog(@"URL: %@", urlResponse.URL);
-            
-            if (data) {
-                if (urlResponse.statusCode != 200) {
-                    NSError *error = [[NSError alloc] initWithDomain: NSStringFromClass([self class])
-                                                                code: MATAnimatingErrorBadURLResponseCode
-                                                            userInfo: @{NSLocalizedDescriptionKey: [NSString stringWithFormat: @"Image Tile HTTP respsonse code %ld, URL %@", (long)urlResponse.statusCode, urlResponse.URL]}];
-                    [overlay.delegate animatedTileOverlay: self didHaveError: error];
-                }
-            } else {
-                NSError *error = [[NSError alloc] initWithDomain: NSStringFromClass([self class])
-                                                            code: MATAnimatingErrorNoImageData
-                                                        userInfo: @{NSLocalizedDescriptionKey: [NSString stringWithFormat: @"No Image Data HTTP respsonse code %ld, URL %@", (long)urlResponse.statusCode, urlResponse.URL]}];
-                [overlay.delegate animatedTileOverlay: self didHaveError: error];
-            }
->>>>>>> Stashed changes
             dispatch_semaphore_signal(semaphore);
         }];
         [task resume];
