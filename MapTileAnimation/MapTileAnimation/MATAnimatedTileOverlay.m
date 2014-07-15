@@ -29,6 +29,8 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
 @property (readwrite, assign) MATAnimatingState currentAnimatingState;
 @property (strong, nonatomic) NSSet *mapTiles;
 @property (nonatomic) NSInteger tileSize;
+@property (strong, nonatomic) MKTileOverlay *tileOverlay;
+@property (strong, nonatomic) MKMapView *mapView;
 
 @end
 
@@ -38,7 +40,7 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
 
 #pragma mark - Lifecycle
 
-- (id) initWithTemplateURLs: (NSArray *)templateURLs frameDuration:(NSTimeInterval)frameDuration
+- (id) initWithTemplateURLs: (NSArray *)templateURLs frameDuration:(NSTimeInterval)frameDuration mapView:(MKMapView *)mapView
 {
 	self = [super init];
 	if (self)
@@ -64,6 +66,9 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
 		self.minimumZ = 4;
 		self.maximumZ = 11;
 
+        _mapView = mapView;
+        _tileOverlay = [[MKTileOverlay alloc] initWithURLTemplate:_templateURLs[0]];
+        [_mapView addOverlay:_tileOverlay];
 	}
 	return self;
 }
@@ -117,6 +122,7 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
 
 - (void)startAnimating;
 {
+    [self.mapView removeOverlay:self.tileOverlay];
 	self.timer = [NSTimer scheduledTimerWithTimeInterval:self.frameDuration target:self selector:@selector(updateImageTileAnimation:) userInfo:nil repeats:YES];
 	[self.timer fire];
 	self.currentAnimatingState = MATAnimatingStateAnimating;
@@ -130,6 +136,8 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
 	[self.fetchQueue cancelAllOperations];
 	self.timer = nil;
 	self.currentAnimatingState = MATAnimatingStateStopped;
+    self.tileOverlay = [[MKTileOverlay alloc] initWithURLTemplate:self.templateURLs[self.currentFrameIndex]];
+    [self.mapView addOverlay:self.tileOverlay];
 }
 
 /*
@@ -462,5 +470,19 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
 }
 
 #pragma mark - Protocol conformance
+
+- (void)loadTileAtPath:(MKTileOverlayPath)path result:(void (^)(NSData *, NSError *))result
+{
+    [self.tileOverlay loadTileAtPath:path result:result];
+}
+
+- (NSURL *)URLForTilePath:(MKTileOverlayPath)path
+{
+    return [self.tileOverlay URLForTilePath:path];
+}
+
+- (NSString *)URLTemplate {
+    return self.tileOverlay.URLTemplate;
+}
 
 @end

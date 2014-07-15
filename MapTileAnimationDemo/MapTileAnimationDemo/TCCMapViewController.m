@@ -82,7 +82,7 @@
 {
 	if (self.startStopButton.tag == MATAnimatingStateStopped) {
 		
-		[self.tileOverlayRenderer setAlpha: 1.0];
+//		[self.tileOverlayRenderer setAlpha: 1.0];
 		      
 		//start downloading the image tiles for the time frame indexes
 
@@ -153,7 +153,7 @@
     
     NSLog(@"test");
     
-	MATAnimatedTileOverlay *overlay = [[MATAnimatedTileOverlay alloc] initWithTemplateURLs: pluckedArray frameDuration: 0.20];
+	MATAnimatedTileOverlay *overlay = [[MATAnimatedTileOverlay alloc] initWithTemplateURLs: pluckedArray frameDuration: 0.20 mapView:self.mapView];
 	overlay.delegate = self;
 		
 	[self.mapView addOverlays: @[overlay] level: MKOverlayLevelAboveRoads];
@@ -243,16 +243,18 @@
 
 - (MKOverlayRenderer *)mapView:(MKMapView *)mapView rendererForOverlay:(id<MKOverlay>)overlay
 {
-	if ([overlay isKindOfClass: [MATTileOverlay class]]) {
-		MKTileOverlayRenderer *renderer = [[MKTileOverlayRenderer alloc] initWithTileOverlay: (MKTileOverlay *)overlay];
-		self.tileOverlayRenderer = renderer;
-		return self.tileOverlayRenderer;
-	} else if ([overlay isKindOfClass: [MATAnimatedTileOverlay class]]) {
+	if ([overlay isKindOfClass: [MATAnimatedTileOverlay class]]) {
 		self.animatedTileOverlay = (MATAnimatedTileOverlay *)overlay;
 		MATAnimatedTileOverlayRenderer *renderer = [[MATAnimatedTileOverlayRenderer alloc] initWithOverlay: overlay];
 		self.animatedTileRenderer = renderer;
 
 		return self.animatedTileRenderer;
+	}
+    if ([overlay isKindOfClass: [MKTileOverlay class]]) {
+		MKTileOverlayRenderer *renderer = [[MKTileOverlayRenderer alloc] initWithTileOverlay:overlay];
+		self.tileOverlayRenderer = renderer;
+//        self.animatedTileOverlay = (MATAnimatedTileOverlay *)overlay;
+		return self.tileOverlayRenderer;
 	}
 	return nil;
 }
