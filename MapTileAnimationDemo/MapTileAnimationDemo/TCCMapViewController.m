@@ -146,7 +146,7 @@
 {
 	NSArray *templateURLs = self.timeFrameParser.templateFrameTimeURLs;
     NSMutableArray *pluckedArray = [[NSMutableArray alloc] init];
-    for(int i = 0; i < 24; i+=2) {
+    for(int i = 0; i < templateURLs.count; i+=2) {
         NSString *url = [templateURLs objectAtIndex:i];
         [pluckedArray addObject:url];
     }
