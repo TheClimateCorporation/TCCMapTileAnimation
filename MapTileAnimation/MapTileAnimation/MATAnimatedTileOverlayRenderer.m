@@ -12,65 +12,45 @@
 
 @implementation MATAnimatedTileOverlayRenderer
 
+#pragma mark - Lifecycle
+
 - (id) initWithOverlay:(id<MKOverlay>)overlay
 {
-	self = [super initWithOverlay: overlay];
+	self = [super initWithOverlay:overlay];
 	if (self)
 	{
-		
+        if (![overlay isKindOfClass:[MATAnimatedTileOverlay class]]) {
+            [NSException raise:@"Unsupported overlay type" format:@"Must be MATAnimatedTileOverlay"];
+        }
 	}
 	return self;
 }
+
+#pragma mark - Public methods
 
 - (BOOL)canDrawMapRect:(MKMapRect)mapRect zoomScale:(MKZoomScale)zoomScale
 {
 	self.zoomScale = zoomScale;
 
     MATAnimatedTileOverlay *mapOverlay = (MATAnimatedTileOverlay *)self.overlay;
-    MATAnimationTile *tile = [mapOverlay tileForMapRect: mapRect zoomScale: zoomScale];
-	if (tile) {
-		return YES;
-	}
-	
-	return NO;
+    MATAnimationTile *tile = [mapOverlay tileForMapRect:mapRect zoomScale:zoomScale];
+    return tile != nil;
 }
 
 /*
- even though this renderer and associated overlay are *NOT* tiled, drawMapRect gets called multilple times with each mapRect being a tiled region within the visibleMapRect.  So MKMapKit drawing is tiled by design even though setNeedsDisplay is only called once.
+ even though this renderer and associated overlay are *NOT* tiled, drawMapRect gets called multilple times with each mapRect being a tiled region within the visibleMapRect. So MKMapKit drawing is tiled by design even though setNeedsDisplay is only called once.
  */
 -(void)drawMapRect:(MKMapRect)mapRect zoomScale:(MKZoomScale)zoomScale inContext:(CGContextRef)context
 {
     MATAnimatedTileOverlay *mapOverlay = (MATAnimatedTileOverlay *)self.overlay;
-    MATAnimationTile *tile = [mapOverlay tileForMapRect: mapRect zoomScale: zoomScale];
+    MATAnimationTile *tile = [mapOverlay tileForMapRect:mapRect zoomScale:zoomScale];
 	if (tile) {
-		// draw each tile in its frame
 		CGRect rect = [self rectForMapRect: mapRect];
-		
 		UIImage *image = tile.currentImageTile;
 		UIGraphicsPushContext(context);
-		[image drawInRect: rect
-				blendMode: kCGBlendModeNormal
-					alpha: 0.75];
+		[image drawInRect:rect blendMode:kCGBlendModeNormal alpha:0.75];
 		UIGraphicsPopContext();
 	}
-	
-//	NSSet *rectTiles = mapOverlay.mapTiles;
-//    for (MATAnimationTile *tile in rectTiles)
-//    {
-//		if (tile.currentImageTile == nil)
-//			continue;
-//
-//		CGRect rect = [self rectForMapRect: tile.mapRectFrame];
-//
-//		UIImage *image = tile.currentImageTile;
-//		UIGraphicsPushContext(context);
-//		[image drawInRect: rect
-//				blendMode: kCGBlendModeNormal
-//					alpha: 0.75];
-//		UIGraphicsPopContext();
-//
-//	}
-
 }
 
 @end

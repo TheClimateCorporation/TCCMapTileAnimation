@@ -10,6 +10,6 @@
 
 @interface MATAnimatedTileOverlayRenderer : MKOverlayRenderer
 
-@property (readwrite, assign) MKZoomScale zoomScale;
+@property (nonatomic) MKZoomScale zoomScale;
 
 @end
