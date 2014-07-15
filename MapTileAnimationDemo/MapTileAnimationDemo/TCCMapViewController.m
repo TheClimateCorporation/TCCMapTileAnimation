@@ -30,9 +30,8 @@
 @property(nonatomic) MKMapRect visibleMapRect;
 @property (nonatomic, readwrite, strong) TCCTimeFrameParser *timeFrameParser;
 @property (nonatomic) BOOL initialLoad;
-@property (readwrite, weak) MKTileOverlayRenderer *tileOverlayRenderer;
 @property (readwrite, weak) MATAnimatedTileOverlay *animatedTileOverlay;
-@property (readwrite, weak) MATAnimatedTileOverlayRenderer *animatedTileRenderer;
+@property (strong, nonatomic) MATAnimatedTileOverlayRenderer *animatedTileRenderer;
 
 @property (readwrite, assign) BOOL shouldStop;
 @end
@@ -81,9 +80,6 @@
 - (IBAction) onHandleStartStopAction: (id)sender
 {
 	if (self.startStopButton.tag == MATAnimatingStateStopped) {
-		
-//		[self.tileOverlayRenderer setAlpha: 1.0];
-		      
 		//start downloading the image tiles for the time frame indexes
 
 		[self.animatedTileOverlay fetchTilesForMapRect: self.mapView.visibleMapRect zoomScale: self.animatedTileRenderer.zoomScale progressBlock: ^(NSUInteger currentTimeIndex, BOOL *stop) {
@@ -95,15 +91,7 @@
                 self.timeSlider.enabled = NO;
               self.timeIndexLabel.text = [NSString stringWithFormat: @"%lu", (unsigned long)currentTimeIndex];
 			}
-            
-//			if (currentTimeIndex == 0) {
-//				[self.tileOverlayRenderer setAlpha: 0.0];
-//				[self.animatedTileRenderer setAlpha: 1.0];
-//			}
-			
-//			[self.animatedTileOverlay updateImageTilesToFrameIndex: currentTimeIndex];
-//			[self.animatedTileRenderer setNeedsDisplayInMapRect: self.mapView.visibleMapRect zoomScale: self.animatedTileRenderer.zoomScale];
-            
+
 			*stop = self.shouldStop;
 			
 			//if we cancelled loading, reset the sliders max value to what we currently have
@@ -116,8 +104,6 @@
             if(success == YES) {
                 self.initialLoad = NO;
                 self.downloadProgressView.hidden = YES;
-				[self.tileOverlayRenderer setAlpha: 0.0];
-				[self.animatedTileRenderer setAlpha: 1.0];
             } else {
                 self.downloadProgressView.hidden = NO;
             }
@@ -151,8 +137,6 @@
         [pluckedArray addObject:url];
     }
     
-    NSLog(@"test");
-    
 	MATAnimatedTileOverlay *overlay = [[MATAnimatedTileOverlay alloc] initWithTemplateURLs: pluckedArray frameDuration: 0.20 mapView:self.mapView];
 	overlay.delegate = self;
 		
@@ -173,7 +157,6 @@
         if(!MKMapRectEqualToRect(self.visibleMapRect, self.mapView.visibleMapRect)) {
             self.downloadProgressView.hidden = NO;
             self.initialLoad = YES;
-            NSLog(@"test");
         }
         self.visibleMapRect = self.mapView.visibleMapRect;
     }
@@ -228,10 +211,6 @@
 	if (self.startStopButton.tag != 0) {
 		[self.animatedTileOverlay pauseAnimating];
 	}
-
-	[self.tileOverlayRenderer setAlpha: 1.0];
-	[self.animatedTileRenderer setAlpha: 0.0];
-
 }
 
 - (void)mapView:(MKMapView *)mapView regionDidChangeAnimated:(BOOL)animated
@@ -245,16 +224,11 @@
 {
 	if ([overlay isKindOfClass: [MATAnimatedTileOverlay class]]) {
 		self.animatedTileOverlay = (MATAnimatedTileOverlay *)overlay;
-		MATAnimatedTileOverlayRenderer *renderer = [[MATAnimatedTileOverlayRenderer alloc] initWithOverlay: overlay];
-		self.animatedTileRenderer = renderer;
-
-		return self.animatedTileRenderer;
+        self.animatedTileRenderer = [[MATAnimatedTileOverlayRenderer alloc] initWithOverlay:overlay];
+        return self.animatedTileRenderer;
 	}
     if ([overlay isKindOfClass: [MKTileOverlay class]]) {
-		MKTileOverlayRenderer *renderer = [[MKTileOverlayRenderer alloc] initWithTileOverlay:overlay];
-		self.tileOverlayRenderer = renderer;
-//        self.animatedTileOverlay = (MATAnimatedTileOverlay *)overlay;
-		return self.tileOverlayRenderer;
+		return [[MKTileOverlayRenderer alloc] initWithTileOverlay:overlay];
 	}
 	return nil;
 }

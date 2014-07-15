@@ -254,6 +254,7 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
     if (self.currentAnimatingState == MATAnimatingStateAnimating) {
         [self pauseAnimating];
     }
+    [self.mapView removeOverlay:self.tileOverlay];
     [self updateTilesToFrameIndex:frameIndex];
 }
 
@@ -467,22 +468,6 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
     if ([self.delegate respondsToSelector:@selector(animatedTileOverlay:didHaveError:)]) {
         [self.delegate animatedTileOverlay:self didHaveError:error];
     }
-}
-
-#pragma mark - Protocol conformance
-
-- (void)loadTileAtPath:(MKTileOverlayPath)path result:(void (^)(NSData *, NSError *))result
-{
-    [self.tileOverlay loadTileAtPath:path result:result];
-}
-
-- (NSURL *)URLForTilePath:(MKTileOverlayPath)path
-{
-    return [self.tileOverlay URLForTilePath:path];
-}
-
-- (NSString *)URLTemplate {
-    return self.tileOverlay.URLTemplate;
 }
 
 @end

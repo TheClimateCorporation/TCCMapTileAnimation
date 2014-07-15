@@ -28,15 +28,15 @@ extern NSString *const MATAnimatedTileOverlayErrorDomain;
 
 @protocol MATAnimatedTileOverlayDelegate;
 
-@interface MATAnimatedTileOverlay : MKTileOverlay <MKOverlay>
+@interface MATAnimatedTileOverlay : NSObject <MKOverlay>
 
 //any object conforming to MATAnimatedTileOverlayDelegate protocol
 @property (weak, nonatomic) id<MATAnimatedTileOverlayDelegate>delegate;
 @property (nonatomic) NSInteger currentFrameIndex;
 @property (readonly, nonatomic) NSInteger numberOfAnimationFrames;
 @property (readonly, nonatomic) MATAnimatingState currentAnimatingState;
-//@property (nonatomic) NSInteger minimumZ;
-//@property (nonatomic) NSInteger maximumZ;
+@property (nonatomic) NSInteger minimumZ;
+@property (nonatomic) NSInteger maximumZ;
 
 - (instancetype)initWithTemplateURLs:(NSArray *)templateURLs frameDuration:(NSTimeInterval)frameDuration mapView:(MKMapView *)mapView;
 
