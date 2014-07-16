@@ -51,7 +51,13 @@
 	}
     
     NSInteger zoomLevel = [self zoomLevelForZoomScale:zoomScale];
-
+    NSInteger overZoom = 1;
+    
+    if (zoomLevel > mapOverlay.maximumZ) {
+        overZoom = pow(2, (zoomLevel - mapOverlay.maximumZ));
+        zoomLevel = mapOverlay.maximumZ;
+    }
+    
     /* Debug information */
     UIGraphicsPushContext(context);
 
@@ -68,7 +74,23 @@
     UIGraphicsPopContext();
     
     NSSet *tiles = [mapOverlay mapTilesInMapRect:mapRect zoomScale:zoomScale];
-    // TODO: draw these tiles!!!!
+    
+    //tile drawing
+    for (MATAnimationTile *tile in tiles) {
+        // For each image tile, draw it in its corresponding MKMapRect frame
+        CGRect rect = [self rectForMapRect:tile.mapRectFrame];
+        CGContextSaveGState(context);
+        CGContextTranslateCTM(context, CGRectGetMinX(rect), CGRectGetMinY(rect));
+        
+        // OverZoom mode - 1 when using tiles as is, 2, 4, 8 etc when overzoomed.
+        CGContextScaleCTM(context, overZoom/zoomScale, overZoom/zoomScale);
+        CGContextTranslateCTM(context, 0, tile.currentImageTile.size.height);
+        CGContextScaleCTM(context, 1, -1);
+        CGContextDrawImage(context, CGRectMake(0, 0, tile.currentImageTile.size.width, tile.currentImageTile.size.height), [tile.currentImageTile CGImage]);
+        CGContextRestoreGState(context);
+
+    }
+    
 }
 
 #pragma mark - Debug methods
