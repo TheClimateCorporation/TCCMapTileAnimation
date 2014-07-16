@@ -23,10 +23,9 @@
                                 </connections>
                             </mapView>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="orF-6A-5Ok">
-                                <rect key="frame" x="258" y="532" width="42" height="21"/>
+                                <rect key="frame" x="287" y="535" width="25" height="21"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="42" id="Qr9-XP-VU9"/>
-                                    <constraint firstAttribute="height" constant="21" id="WkI-az-AHp"/>
+                                    <constraint firstAttribute="width" constant="25" id="Qp2-3W-BGq"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
@@ -36,11 +35,8 @@
                                 <rect key="frame" x="0.0" y="520" width="320" height="2"/>
                             </progressView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="w8o-LB-Opa">
-                                <rect key="frame" x="5" y="530" width="53" height="30"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="53" id="2by-dp-l13"/>
-                                </constraints>
-                                <state key="normal" title="Play">
+                                <rect key="frame" x="8" y="530" width="30" height="30"/>
+                                <state key="normal" title="▶︎">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
@@ -48,7 +44,7 @@
                                 </connections>
                             </button>
                             <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="x64-Mt-sXv">
-                                <rect key="frame" x="64" y="530" width="188" height="31"/>
+                                <rect key="frame" x="44" y="530" width="237" height="31"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <connections>
                                     <action selector="finishedSliding:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="RDZ-pR-a4n"/>
@@ -60,22 +56,21 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="l32-pv-Rsy" firstAttribute="top" secondItem="kh9-bI-dsS" secondAttribute="top" id="0se-Dk-RdH"/>
-                            <constraint firstAttribute="trailing" secondItem="orF-6A-5Ok" secondAttribute="trailing" constant="20" id="KKU-1q-WdW"/>
-                            <constraint firstItem="x64-Mt-sXv" firstAttribute="top" secondItem="mS9-2f-HPy" secondAttribute="bottom" constant="8" id="Lf7-6g-9xd"/>
-                            <constraint firstItem="x64-Mt-sXv" firstAttribute="leading" secondItem="w8o-LB-Opa" secondAttribute="trailing" constant="8" id="MyG-gr-gF8"/>
-                            <constraint firstItem="2fi-mo-0CV" firstAttribute="top" secondItem="w8o-LB-Opa" secondAttribute="bottom" constant="8" id="Ted-tF-SGF"/>
-                            <constraint firstItem="l32-pv-Rsy" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" id="Tnl-pU-Cmr"/>
+                            <constraint firstItem="w8o-LB-Opa" firstAttribute="centerY" secondItem="x64-Mt-sXv" secondAttribute="centerY" id="4vs-d1-8oF"/>
+                            <constraint firstItem="orF-6A-5Ok" firstAttribute="leading" secondItem="x64-Mt-sXv" secondAttribute="trailing" constant="8" id="FaT-hH-waN"/>
+                            <constraint firstAttribute="trailing" secondItem="orF-6A-5Ok" secondAttribute="trailing" constant="8" id="KKU-1q-WdW"/>
+                            <constraint firstItem="2fi-mo-0CV" firstAttribute="top" secondItem="w8o-LB-Opa" secondAttribute="bottom" constant="8" id="Q7E-HR-4md"/>
                             <constraint firstItem="mS9-2f-HPy" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" id="UfH-Ya-hU0"/>
                             <constraint firstAttribute="trailing" secondItem="l32-pv-Rsy" secondAttribute="trailing" id="Vg3-00-7NE"/>
-                            <constraint firstItem="2fi-mo-0CV" firstAttribute="top" secondItem="x64-Mt-sXv" secondAttribute="bottom" constant="8" id="cMS-Dc-GVK"/>
-                            <constraint firstAttribute="trailing" secondItem="l32-pv-Rsy" secondAttribute="trailing" id="m8K-lB-Hud"/>
-                            <constraint firstItem="2fi-mo-0CV" firstAttribute="top" secondItem="orF-6A-5Ok" secondAttribute="bottom" constant="15" id="mNG-e9-WrX"/>
+                            <constraint firstItem="x64-Mt-sXv" firstAttribute="leading" secondItem="w8o-LB-Opa" secondAttribute="trailing" constant="8" id="bhy-6R-wVn"/>
+                            <constraint firstItem="orF-6A-5Ok" firstAttribute="centerY" secondItem="w8o-LB-Opa" secondAttribute="centerY" id="iG6-Ho-k8a"/>
                             <constraint firstItem="l32-pv-Rsy" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" id="myg-Qi-JyI"/>
                             <constraint firstItem="mS9-2f-HPy" firstAttribute="top" secondItem="l32-pv-Rsy" secondAttribute="bottom" constant="3" id="nsQ-ZU-uPf"/>
-                            <constraint firstItem="orF-6A-5Ok" firstAttribute="leading" secondItem="x64-Mt-sXv" secondAttribute="trailing" constant="8" id="obe-VD-1uu"/>
+                            <constraint firstAttribute="trailing" secondItem="l32-pv-Rsy" secondAttribute="trailing" id="oTT-Sk-TiI"/>
                             <constraint firstAttribute="trailing" secondItem="mS9-2f-HPy" secondAttribute="trailing" id="rHZ-60-Tfw"/>
                             <constraint firstItem="w8o-LB-Opa" firstAttribute="top" secondItem="mS9-2f-HPy" secondAttribute="bottom" constant="8" id="sKZ-Yz-2vy"/>
-                            <constraint firstItem="w8o-LB-Opa" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" constant="5" id="v22-1M-rAy"/>
+                            <constraint firstItem="w8o-LB-Opa" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" constant="8" id="v22-1M-rAy"/>
+                            <constraint firstItem="l32-pv-Rsy" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" id="wwL-Lb-xdz"/>
                         </constraints>
                     </view>
                     <connections>

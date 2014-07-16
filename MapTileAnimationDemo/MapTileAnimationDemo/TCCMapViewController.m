@@ -161,7 +161,7 @@
 
     //set titles of button to appropriate string based on currentAnimationState
     if(currentAnimationState == MATAnimatingStateLoading) {
-        [self.startStopButton setTitle: @"Cancel" forState: UIControlStateNormal];
+        [self.startStopButton setTitle: @"◼︎" forState: UIControlStateNormal];
         //check if user has panned (visibleRects different)
         if(!MKMapRectEqualToRect(self.visibleMapRect, self.mapView.visibleMapRect)) {
             self.downloadProgressView.hidden = NO;
@@ -170,11 +170,11 @@
         self.visibleMapRect = self.mapView.visibleMapRect;
     }
     else if(currentAnimationState == MATAnimatingStateStopped) {
-        [self.startStopButton setTitle: @"Play" forState: UIControlStateNormal];
+        [self.startStopButton setTitle: @"▶︎" forState: UIControlStateNormal];
 
     }
     else if(currentAnimationState == MATAnimatingStateAnimating) {
-        [self.startStopButton setTitle: @"Stop" forState: UIControlStateNormal];
+        [self.startStopButton setTitle: @"❚❚" forState: UIControlStateNormal];
     }
     
 }
