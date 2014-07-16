@@ -71,11 +71,19 @@
 {
 	NSInteger sliderVal = floor(self.timeSlider.value);
     if (sliderVal != self.animatedTileOverlay.currentFrameIndex) {
-        [self.animatedTileOverlay moveToFrameIndex:(NSInteger)sliderVal];
+        [self.animatedTileOverlay moveToFrameIndex:(NSInteger)sliderVal isContinuouslyMoving:YES];
         self.timeIndexLabel.text = [NSString stringWithFormat:@"%ld", (long)self.animatedTileOverlay.currentFrameIndex];
         [self.animatedTileRenderer setNeedsDisplayInMapRect:self.mapView.visibleMapRect zoomScale:self.animatedTileRenderer.zoomScale];
-        NSLog(@"Current zoom scale is %f", self.animatedTileRenderer.zoomScale);
 	}
+}
+
+- (IBAction)finishedSliding:(id)sender
+{
+    NSInteger sliderVal = floor(self.timeSlider.value);
+        [self.animatedTileOverlay moveToFrameIndex:(NSInteger)sliderVal isContinuouslyMoving:NO];
+        self.timeIndexLabel.text = [NSString stringWithFormat:@"%ld", (long)self.animatedTileOverlay.currentFrameIndex];
+        [self.animatedTileRenderer setNeedsDisplayInMapRect:self.mapView.visibleMapRect zoomScale:self.animatedTileRenderer.zoomScale];
+
 }
 
 - (IBAction) onHandleStartStopAction: (id)sender
@@ -112,7 +120,7 @@
 			[self.downloadProgressView setProgress: 0.0];
 
 			if (success) {
-				[self.animatedTileOverlay moveToFrameIndex:self.animatedTileOverlay.currentFrameIndex];
+				[self.animatedTileOverlay moveToFrameIndex:self.animatedTileOverlay.currentFrameIndex isContinuouslyMoving:NO];
 				
 				[self.animatedTileRenderer setNeedsDisplayInMapRect: self.mapView.visibleMapRect zoomScale: self.animatedTileRenderer.zoomScale];
 				[self.animatedTileOverlay startAnimating];

@@ -53,8 +53,11 @@ extern NSString *const MATAnimatedTileOverlayErrorDomain;
 /**
  Updates the overlay's underlying tile data to the given frame index. Throws exception if out of bounds.
  If the tile overlay is currently animating, it pauses animation.
+ @param frameIndex The animation frame index to move to
+ @param isContinuouslyMoving A boolean flag to indicate whether the user is currently scrubbing through
+ the animation frames. Passing @c YES suppresses the switch to using the @c MKTileOverlay.
  */
-- (void)moveToFrameIndex:(NSInteger)frameIndex;
+- (void)moveToFrameIndex:(NSInteger)frameIndex isContinuouslyMoving:(BOOL)isContinuouslyMoving;
 
 - (void)fetchTilesForMapRect:(MKMapRect)aMapRect
                    zoomScale:(MKZoomScale)aScale

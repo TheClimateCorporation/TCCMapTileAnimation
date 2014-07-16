@@ -238,7 +238,7 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
 		[self.downloadQueue waitUntilAllOperationsAreFinished];
         
 		//set the current image to the first time index
-		[self moveToFrameIndex:self.currentFrameIndex];
+		[self moveToFrameIndex:self.currentFrameIndex isContinuouslyMoving:YES];
 		
 		dispatch_async(dispatch_get_main_queue(), ^{
             completionBlock(!didStopFlag, nil);
@@ -249,12 +249,20 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
 /*
  updates the MATAnimationTile tile image property to point to the tile image for the current time index
  */
-- (void)moveToFrameIndex:(NSInteger)frameIndex
+- (void)moveToFrameIndex:(NSInteger)frameIndex isContinuouslyMoving:(BOOL)isContinuouslyMoving
 {
     if (self.currentAnimatingState == MATAnimatingStateAnimating) {
         [self pauseAnimating];
     }
-    [self.mapView removeOverlay:self.tileOverlay];
+    
+    if (!isContinuouslyMoving) {
+        self.tileOverlay = [[MKTileOverlay alloc] initWithURLTemplate:self.templateURLs[self.currentFrameIndex]];
+        [self.mapView addOverlay:self.tileOverlay];
+    } else if (self.tileOverlay) {
+        [self.mapView removeOverlay:self.tileOverlay];
+        self.tileOverlay = nil;
+    }
+    
     [self updateTilesToFrameIndex:frameIndex];
 }
 
