@@ -12,8 +12,6 @@
 #import "MATAnimatedTileOverlay.h"
 #import "MATAnimatedTileOverlayDelegate.h"
 
-#import "MATTileOverlay.h"
-
 #import "MKMapView+Extras.h"
 
 

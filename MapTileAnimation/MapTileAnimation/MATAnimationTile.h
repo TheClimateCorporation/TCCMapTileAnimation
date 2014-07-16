@@ -14,7 +14,7 @@ typedef struct
 {
 	NSUInteger xCoordinate;
 	NSUInteger yCoordinate;
-	NSUInteger zCoordiante;
+	NSUInteger zCoordinate;
 } MATTileCoordinate;
 
 @interface MATAnimationTile : NSObject

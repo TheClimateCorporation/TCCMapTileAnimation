@@ -11,7 +11,6 @@
 		32446D8E194A1CAA00664240 /* MATAnimatedTileOverlayRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 32446D8D194A1CAA00664240 /* MATAnimatedTileOverlayRenderer.m */; };
 		3269A4F2194911C2003F1AE3 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3269A4F1194911C2003F1AE3 /* MapKit.framework */; };
 		3269A4F519491E0A003F1AE3 /* MKMapView+Extras.m in Sources */ = {isa = PBXBuildFile; fileRef = 3269A4F419491E0A003F1AE3 /* MKMapView+Extras.m */; };
-		329FE595196E4BEC00D57DEA /* MATTileOverlay.m in Sources */ = {isa = PBXBuildFile; fileRef = 329FE594196E4BEC00D57DEA /* MATTileOverlay.m */; };
 		9B49BBC519490A5700094005 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9B49BBC419490A5700094005 /* Foundation.framework */; };
 		9B49BBC719490A5700094005 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9B49BBC619490A5700094005 /* CoreGraphics.framework */; };
 		9B49BBC919490A5700094005 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9B49BBC819490A5700094005 /* UIKit.framework */; };
@@ -50,8 +49,6 @@
 		3269A4F1194911C2003F1AE3 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		3269A4F319491E0A003F1AE3 /* MKMapView+Extras.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MKMapView+Extras.h"; sourceTree = "<group>"; };
 		3269A4F419491E0A003F1AE3 /* MKMapView+Extras.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MKMapView+Extras.m"; sourceTree = "<group>"; };
-		329FE593196E4BEC00D57DEA /* MATTileOverlay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MATTileOverlay.h; sourceTree = "<group>"; };
-		329FE594196E4BEC00D57DEA /* MATTileOverlay.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MATTileOverlay.m; sourceTree = "<group>"; };
 		9B49BBC119490A5700094005 /* MapTileAnimationDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MapTileAnimationDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9B49BBC419490A5700094005 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		9B49BBC619490A5700094005 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -184,8 +181,6 @@
 		9B49BC5619490CA500094005 /* MapTileAnimation */ = {
 			isa = PBXGroup;
 			children = (
-				329FE593196E4BEC00D57DEA /* MATTileOverlay.h */,
-				329FE594196E4BEC00D57DEA /* MATTileOverlay.m */,
 				32446D8C194A1CAA00664240 /* MATAnimatedTileOverlayRenderer.h */,
 				32446D8D194A1CAA00664240 /* MATAnimatedTileOverlayRenderer.m */,
 				3213A3021962213F0058D302 /* MATAnimatedTileOverlayDelegate.h */,
@@ -304,7 +299,6 @@
 				9B49BC0019490AAE00094005 /* TCCMapViewController.m in Sources */,
 				3269A4F519491E0A003F1AE3 /* MKMapView+Extras.m in Sources */,
 				9B49BC5D19490CA500094005 /* MATAnimationTile.m in Sources */,
-				329FE595196E4BEC00D57DEA /* MATTileOverlay.m in Sources */,
 				32446D8E194A1CAA00664240 /* MATAnimatedTileOverlayRenderer.m in Sources */,
 				32446D8B194A1BE500664240 /* MATAnimatedTileOverlay.m in Sources */,
 				9B49BBD519490A5700094005 /* TCCAppDelegate.m in Sources */,

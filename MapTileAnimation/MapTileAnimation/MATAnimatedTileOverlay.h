@@ -66,8 +66,6 @@ extern NSString *const MATAnimatedTileOverlayErrorDomain;
 
 - (MATAnimationTile *)tileForMapRect:(MKMapRect)aMapRect zoomScale:(MKZoomScale)aZoomScale;
 
-// TODO: After refactoring the tile overlay to be inside this class, this method can be removed
-// from the public interface.
-- (NSString *)templateURLStringForFrameIndex:(NSUInteger)frameIndex;
+- (NSSet *)mapTilesInMapRect:(MKMapRect)aRect zoomScale:(MKZoomScale)zoomScale;
 
 @end

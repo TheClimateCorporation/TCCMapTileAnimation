@@ -63,8 +63,8 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
 		self.tileSize = 256;
 		
 		self.currentAnimatingState = MATAnimatingStateStopped;
-		self.minimumZ = 4;
-		self.maximumZ = 11;
+		self.minimumZ = 3;
+		self.maximumZ = 9;
 
         _mapView = mapView;
         _tileOverlay = [[MKTileOverlay alloc] initWithURLTemplate:_templateURLs[0]];
@@ -270,11 +270,11 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
 {
 	if (self.mapTiles) {
 		MATTileCoordinate coord = [self tileCoordinateForMapRect: aMapRect zoomScale: aZoomScale];
-        NSLog(@"Tile coord for map rect: %d, %d, %d", coord.xCoordinate, coord.yCoordinate, coord.zCoordiante);
+//        NSLog(@"Tile coord for map rect: %d, %d, %d", coord.xCoordinate, coord.yCoordinate, coord.zCoordinate);
 		for (MATAnimationTile *tile in self.mapTiles) {
 			if (coord.xCoordinate == tile.xCoordinate &&
                 coord.yCoordinate == tile.yCoordinate &&
-                coord.zCoordiante == tile.zCoordinate)
+                coord.zCoordinate == tile.zCoordinate)
             {
 				return tile;
 			}
@@ -372,7 +372,7 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
     
 	coord.xCoordinate = tilex;
 	coord.yCoordinate = tiley;
-	coord.zCoordiante = zoomLevel;
+	coord.zCoordinate = zoomLevel;
 	
 	return coord;
 }
@@ -381,30 +381,38 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
  calculates the number of tiles, the tile coordinates and tile MapRect frame given a MapView's MapRect and zoom scale
  returns an array MATAnimationTile objects
  */
-- (NSSet *) mapTilesInMapRect: (MKMapRect)aRect zoomScale: (MKZoomScale)aScale
+- (NSSet *)mapTilesInMapRect:(MKMapRect)aRect zoomScale:(MKZoomScale)zoomScale
 {
-    NSInteger z = [self zoomLevelForZoomScale: aScale];//zoomScaleToZoomLevel(aScale, (double)self.tileSize);
-    NSMutableSet *tiles = nil;
-	
-    NSInteger minX = floor((MKMapRectGetMinX(aRect) * aScale) / self.tileSize);
-    NSInteger maxX = ceil((MKMapRectGetMaxX(aRect) * aScale) / self.tileSize);
-    NSInteger minY = floor((MKMapRectGetMinY(aRect) * aScale) / self.tileSize);
-    NSInteger maxY = ceil((MKMapRectGetMaxY(aRect) * aScale) / self.tileSize);
     
-    if (!tiles) {
-        tiles = [NSMutableSet set];
+    // Ripped from http://stackoverflow.com/a/4445576/766491
+    NSInteger zoomLevel = [self zoomLevelForZoomScale:zoomScale];
+    NSInteger overZoom = 1;
+    
+    if (zoomLevel > self.maximumZ) {
+        zoomLevel = self.maximumZ;
+        overZoom = pow(2, (zoomLevel - self.maximumZ));
     }
     
-	for(NSInteger x = minX; x <= maxX; x++) {
-        for(NSInteger y = minY; y <=maxY; y++) {
-					
-			MKMapRect frame = MKMapRectMake((double)(x * self.tileSize) / aScale, (double)(y * self.tileSize) / aScale, self.tileSize / aScale, self.tileSize / aScale);
-			MATAnimationTile *tile = [[MATAnimationTile alloc] initWithFrame: frame xCord: x yCord: y zCord: z];
+    // When we are zoomed in beyond the tile set, use the tiles
+    // from the maximum z-depth, but render them larger.
+    NSInteger adjustedTileSize = overZoom * self.tileSize;
+
+//    NSInteger z = [self zoomLevelForZoomScale:zoomScale];
+	
+    NSInteger minX = floor((MKMapRectGetMinX(aRect) * zoomScale) / adjustedTileSize);
+    NSInteger maxX = ceil((MKMapRectGetMaxX(aRect) * zoomScale) / adjustedTileSize);
+    NSInteger minY = floor((MKMapRectGetMinY(aRect) * zoomScale) / adjustedTileSize);
+    NSInteger maxY = ceil((MKMapRectGetMaxY(aRect) * zoomScale) / adjustedTileSize);
+
+    NSMutableSet *tiles = [NSMutableSet set];
+	for (NSInteger x = minX; x <= maxX; x++) {
+        for (NSInteger y = minY; y <=maxY; y++) {
+			MKMapRect frame = MKMapRectMake((double)(x * adjustedTileSize) / zoomScale, (double)(y * adjustedTileSize) / zoomScale, adjustedTileSize / zoomScale, adjustedTileSize / zoomScale);
+			MATAnimationTile *tile = [[MATAnimationTile alloc] initWithFrame:frame xCord:x yCord:y zCord:zoomLevel];
 			[tiles addObject:tile];
-            
         }
     }
-    return [NSSet setWithSet: tiles];
+    return [NSSet setWithSet:tiles];
 }
 
 /*

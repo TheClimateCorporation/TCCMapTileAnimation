@@ -32,9 +32,8 @@
 {
 	self.zoomScale = zoomScale;
 
-    MATAnimatedTileOverlay *mapOverlay = (MATAnimatedTileOverlay *)self.overlay;
-    MATAnimationTile *tile = [mapOverlay tileForMapRect:mapRect zoomScale:zoomScale];
-//    return tile != nil;
+    // We can ALWAYS draw a tile, even if the zoom scale/level is not supported by the tile server.
+    // That's because we will draw a scaled version of the minimum/maximum supported tile.
     return YES;
 }
 
@@ -52,19 +51,26 @@
 		[image drawInRect:rect blendMode:kCGBlendModeNormal alpha:0.75];
 		UIGraphicsPopContext();
 	}
-    UIGraphicsPushContext(context);
     
     NSInteger zoomLevel = [self zoomLevelForZoomScale:zoomScale];
 
+    /* Debug information */
+    UIGraphicsPushContext(context);
+
     CGRect rect = [self rectForMapRect: mapRect];
-    UIBezierPath *bezierPath = [UIBezierPath bezierPathWithRect:CGRectMake(rect.origin.x+10, rect.origin.y+10, rect.size.width-10, rect.size.height-10)];
+    UIBezierPath *bezierPath = [UIBezierPath bezierPathWithRect:CGRectMake(rect.origin.x, rect.origin.y, rect.size.width, rect.size.height)];
     [[UIColor blackColor] setStroke];
     bezierPath.lineWidth = 10000.0 * 14/(zoomLevel * 3);
     [bezierPath stroke];
-    NSString *tileCoordinates = [NSString stringWithFormat:@"(%d, %d, %d)", tile.xCoordinate, tile.yCoordinate, tile.zCoordinate];
-    [tileCoordinates drawInRect:rect withAttributes:@{ NSFontAttributeName : [UIFont systemFontOfSize:200000 * 14/(zoomLevel * 3)] }];
+    if (tile) {
+        NSString *tileCoordinates = [NSString stringWithFormat:@"(%d, %d, %d)", tile.xCoordinate, tile.yCoordinate, tile.zCoordinate];
+        [tileCoordinates drawInRect:rect withAttributes:@{ NSFontAttributeName : [UIFont systemFontOfSize:200000 * 14/(zoomLevel * 3)] }];
+    }
     
     UIGraphicsPopContext();
+    
+    NSSet *tiles = [mapOverlay mapTilesInMapRect:mapRect zoomScale:zoomScale];
+    // TODO: draw these tiles!!!!
 }
 
 #pragma mark - Debug methods
