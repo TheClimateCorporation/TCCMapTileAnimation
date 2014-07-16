@@ -103,11 +103,6 @@
 
 			*stop = self.shouldStop;
 			
-			//if we cancelled loading, reset the sliders max value to what we currently have
-			if (self.shouldStop == YES) {
-				self.timeSlider.maximumValue = (CGFloat)currentTimeIndex;
-			}
-			
 		} completionBlock: ^(BOOL success, NSError *error) {
 			
             if(success == YES) {

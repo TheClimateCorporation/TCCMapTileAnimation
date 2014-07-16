@@ -61,7 +61,6 @@
     [[UIColor blackColor] setStroke];
     bezierPath.lineWidth = 10000.0 * 14/(zoomLevel * 3);
     [bezierPath stroke];
-    
     NSString *tileCoordinates = [NSString stringWithFormat:@"(%d, %d, %d)", tile.xCoordinate, tile.yCoordinate, tile.zCoordinate];
     [tileCoordinates drawInRect:rect withAttributes:@{ NSFontAttributeName : [UIFont systemFontOfSize:200000 * 14/(zoomLevel * 3)] }];
     
