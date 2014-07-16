@@ -174,8 +174,8 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
         [message show];
     }
     
-    NSLog(@"zoom scale: %lf", aScale);
 	NSUInteger zoomLevel = [self zoomLevelForZoomScale: aScale];
+    NSLog(@"zoom scale: %lf, zoom level: %d", aScale, zoomLevel);
 	if (zoomLevel > self.maximumZ || zoomLevel < self.minimumZ) {
 		
 		NSError *error = [[NSError alloc] initWithDomain: NSStringFromClass([self class])
@@ -389,8 +389,8 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
     NSInteger overZoom = 1;
     
     if (zoomLevel > self.maximumZ) {
-        zoomLevel = self.maximumZ;
         overZoom = pow(2, (zoomLevel - self.maximumZ));
+        zoomLevel = self.maximumZ;
     }
     
     // When we are zoomed in beyond the tile set, use the tiles
