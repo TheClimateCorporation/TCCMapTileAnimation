@@ -71,7 +71,7 @@
     if (sliderVal != self.animatedTileOverlay.currentFrameIndex) {
         [self.animatedTileOverlay moveToFrameIndex:(NSInteger)sliderVal isContinuouslyMoving:YES];
         self.timeIndexLabel.text = [NSString stringWithFormat:@"%ld", (long)self.animatedTileOverlay.currentFrameIndex];
-        [self.animatedTileRenderer setNeedsDisplayInMapRect:self.mapView.visibleMapRect zoomScale:self.animatedTileRenderer.zoomScale];
+        [self.animatedTileRenderer setNeedsDisplayInMapRect:self.mapView.visibleMapRect zoomScale:self.mapView.currentZoomScale];
 	}
 }
 
@@ -80,7 +80,7 @@
     NSInteger sliderVal = floor(self.timeSlider.value);
         [self.animatedTileOverlay moveToFrameIndex:(NSInteger)sliderVal isContinuouslyMoving:NO];
         self.timeIndexLabel.text = [NSString stringWithFormat:@"%ld", (long)self.animatedTileOverlay.currentFrameIndex];
-        [self.animatedTileRenderer setNeedsDisplayInMapRect:self.mapView.visibleMapRect zoomScale:self.animatedTileRenderer.zoomScale];
+        [self.animatedTileRenderer setNeedsDisplayInMapRect:self.mapView.visibleMapRect zoomScale:self.mapView.currentZoomScale];
 
 }
 
@@ -89,7 +89,7 @@
 	if (self.startStopButton.tag == MATAnimatingStateStopped) {
 		//start downloading the image tiles for the time frame indexes
 
-		[self.animatedTileOverlay fetchTilesForMapRect: self.mapView.visibleMapRect zoomScale: self.animatedTileRenderer.zoomScale progressBlock: ^(NSUInteger currentTimeIndex, BOOL *stop) {
+		[self.animatedTileOverlay fetchTilesForMapRect: self.mapView.visibleMapRect zoomScale: self.mapView.currentZoomScale progressBlock: ^(NSUInteger currentTimeIndex, BOOL *stop) {
 			         
 			CGFloat progressValue = (CGFloat)currentTimeIndex / (CGFloat)(self.animatedTileOverlay.numberOfAnimationFrames - 1);
 			[self.downloadProgressView setProgress: progressValue animated: YES];
@@ -115,7 +115,7 @@
 			if (success) {
 				[self.animatedTileOverlay moveToFrameIndex:self.animatedTileOverlay.currentFrameIndex isContinuouslyMoving:NO];
 				
-				[self.animatedTileRenderer setNeedsDisplayInMapRect: self.mapView.visibleMapRect zoomScale: self.animatedTileRenderer.zoomScale];
+				[self.animatedTileRenderer setNeedsDisplayInMapRect: self.mapView.visibleMapRect zoomScale: self.mapView.currentZoomScale];
 				[self.animatedTileOverlay startAnimating];
 			} else {
 				self.shouldStop = NO;
@@ -174,7 +174,7 @@
 
 - (void)animatedTileOverlay:(MATAnimatedTileOverlay *)animatedTileOverlay didAnimateWithAnimationFrameIndex:(NSInteger)animationFrameIndex
 {
-	[self.animatedTileRenderer setNeedsDisplayInMapRect: self.mapView.visibleMapRect zoomScale: self.animatedTileRenderer.zoomScale];
+	[self.animatedTileRenderer setNeedsDisplayInMapRect: self.mapView.visibleMapRect zoomScale: self.mapView.currentZoomScale];
 	//update the slider if we are loading or animating
     self.timeIndexLabel.text = [NSString stringWithFormat: @"%lu", (unsigned long)animationFrameIndex];
  	if (animatedTileOverlay.currentAnimatingState != MATAnimatingStateStopped) {
