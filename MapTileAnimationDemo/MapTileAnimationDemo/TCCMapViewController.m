@@ -74,6 +74,7 @@
         [self.animatedTileOverlay moveToFrameIndex:(NSInteger)sliderVal];
         self.timeIndexLabel.text = [NSString stringWithFormat:@"%ld", (long)self.animatedTileOverlay.currentFrameIndex];
         [self.animatedTileRenderer setNeedsDisplayInMapRect:self.mapView.visibleMapRect zoomScale:self.animatedTileRenderer.zoomScale];
+        NSLog(@"Current zoom scale is %f", self.animatedTileRenderer.zoomScale);
 	}
 }
 

@@ -262,6 +262,7 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
 {
 	if (self.mapTiles) {
 		MATTileCoordinate coord = [self tileCoordinateForMapRect: aMapRect zoomScale: aZoomScale];
+        NSLog(@"Tile coord for map rect: %d, %d, %d", coord.xCoordinate, coord.yCoordinate, coord.zCoordiante);
 		for (MATAnimationTile *tile in self.mapTiles) {
 			if (coord.xCoordinate == tile.xCoordinate &&
                 coord.yCoordinate == tile.yCoordinate &&
