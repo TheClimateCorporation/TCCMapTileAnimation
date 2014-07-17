@@ -30,6 +30,7 @@
 
 - (BOOL)canDrawMapRect:(MKMapRect)mapRect zoomScale:(MKZoomScale)zoomScale
 {
+    self.zoomScale = zoomScale;
     // We can ALWAYS draw a tile, even if the zoom scale/level is not supported by the tile server.
     // That's because we will draw a scaled version of the minimum/maximum supported tile.
     return YES;
@@ -81,6 +82,7 @@
     for (MATAnimationTile *tile in tiles) {
         // For each image tile, draw it in its corresponding MKMapRect frame
         CGRect rect = [self rectForMapRect:tile.mapRectFrame];
+        if (!MKMapRectIntersectsRect(mapRect, tile.mapRectFrame)) continue;
         CGContextSaveGState(context);
         CGContextTranslateCTM(context, CGRectGetMinX(rect), CGRectGetMinY(rect));
         
@@ -89,6 +91,8 @@
         CGContextTranslateCTM(context, 0, tile.currentImageTile.size.height);
         CGContextScaleCTM(context, 1, -1);
         CGContextDrawImage(context, CGRectMake(0, 0, tile.currentImageTile.size.width, tile.currentImageTile.size.height), [tile.currentImageTile CGImage]);
+        
+        // TODO: burn debug info into image!
         CGContextRestoreGState(context);
     }
 }

@@ -23,10 +23,12 @@
     }
     return self;
 }
-//=================================================================================
 
-//=================================================================================
+#pragma mark - Public methods
 
-//=================================================================================
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"(%d, %d, %d)", self.xCoordinate, self.yCoordinate, self.zCoordinate];
+}
 
 @end
