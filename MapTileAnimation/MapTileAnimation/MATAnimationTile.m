@@ -28,7 +28,7 @@
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"(%d, %d, %d)", self.xCoordinate, self.yCoordinate, self.zCoordinate];
+    return [NSString stringWithFormat:@"(%d, %d, %d). mapRectFrame origin: (%f, %f) size: (%f, %f)", self.xCoordinate, self.yCoordinate, self.zCoordinate, self.mapRectFrame.origin.x, self.mapRectFrame.origin.y, self.mapRectFrame.size.width, self.mapRectFrame.size.height];
 }
 
 @end

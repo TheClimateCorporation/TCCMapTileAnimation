@@ -148,20 +148,18 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
                progressBlock:(void(^)(NSUInteger currentTimeIndex, BOOL *stop))progressBlock
              completionBlock:(void (^)(BOOL success, NSError *error))completionBlock
 {
-	//check to see if our zoom level is supported by our tile server
-
-    
 	NSUInteger zoomLevel = [self zoomLevelForZoomScale: aScale];
-    NSLog(@"zoom scale: %lf, zoom level: %d", aScale, zoomLevel);
+    NSLog(@"Actual zoom scale: %lf, zoom level: %d", aScale, zoomLevel);
     
     if(zoomLevel > self.maximumZ) {
-        zoomLevel = 9;
+        zoomLevel = self.maximumZ;
+        NSLog(@"Capped zoom level: %d", zoomLevel);
+    }
+    if(zoomLevel < self.minimumZ) {
+        zoomLevel = self.minimumZ;
+        NSLog(@"Capped zoom level: %d", zoomLevel);
     }
     
-    if(zoomLevel < self.minimumZ) {
-        zoomLevel = 3;
-    }
-
 	if (zoomLevel > self.maximumZ || zoomLevel < self.minimumZ) {
 		
 		NSError *error = [[NSError alloc] initWithDomain: NSStringFromClass([self class])
@@ -306,7 +304,13 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
 //        }
 //    }
     
-    return [self.mapTiles allObjects];
+    NSMutableArray *tiles = [NSMutableArray array];
+    for (MATAnimationTile *tile in self.mapTiles) {
+        if (!MKMapRectIntersectsRect(rect, tile.mapRectFrame)) continue;
+        [tiles addObject:tile];
+    }
+    
+    return [tiles copy];
 }
 
 #pragma  mark - Private
@@ -405,6 +409,7 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
  */
 - (NSSet *)mapTilesInMapRect:(MKMapRect)aRect zoomScale:(MKZoomScale)zoomScale
 {
+    NSLog(@"Zoom scale in mapTilesInMapRect: %f", zoomScale);
     
     // Ripped from http://stackoverflow.com/a/4445576/766491
     NSInteger zoomLevel = [self zoomLevelForZoomScale:zoomScale];
@@ -429,7 +434,8 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
     NSMutableSet *tiles = [NSMutableSet set];
 	for (NSInteger x = minX; x <= maxX; x++) {
         for (NSInteger y = minY; y <=maxY; y++) {
-			MKMapRect frame = MKMapRectMake((double)(x * adjustedTileSize) / zoomScale, (double)(y * adjustedTileSize) / zoomScale, adjustedTileSize / zoomScale, adjustedTileSize / zoomScale);
+			MKMapRect frame = MKMapRectMake((x * adjustedTileSize) / zoomScale, (y * adjustedTileSize) / zoomScale, adjustedTileSize / zoomScale, adjustedTileSize / zoomScale);
+            if (!MKMapRectIntersectsRect(frame, aRect)) continue;
 			MATAnimationTile *tile = [[MATAnimationTile alloc] initWithFrame:frame xCord:x yCord:y zCord:zoomLevel];
 			[tiles addObject:tile];
         }
