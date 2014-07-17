@@ -65,12 +65,13 @@
     CGRect rect = [self rectForMapRect: mapRect];
     UIBezierPath *bezierPath = [UIBezierPath bezierPathWithRect:CGRectMake(rect.origin.x, rect.origin.y, rect.size.width, rect.size.height)];
     [[UIColor blackColor] setStroke];
-    bezierPath.lineWidth = 10000.0 * 14/(zoomLevel * 3);
+    bezierPath.lineWidth = CGRectGetHeight(rect) / 256;
     [bezierPath stroke];
-    if (tile) {
-        NSString *tileCoordinates = [NSString stringWithFormat:@"(%d, %d, %d)", tile.xCoordinate, tile.yCoordinate, tile.zCoordinate];
-        [tileCoordinates drawInRect:rect withAttributes:@{ NSFontAttributeName : [UIFont systemFontOfSize:200000 * 14/(zoomLevel * 3)] }];
-    }
+
+    // Draw the tile coordinates in the upper left of the tile
+    MATTileCoordinate c = [self tileCoordinateForMapRect:mapRect zoomScale:zoomScale];
+    NSString *tileCoordinates = [NSString stringWithFormat:@"(%d, %d, %d)", c.xCoordinate, c.yCoordinate, c.zCoordinate];
+    [tileCoordinates drawInRect:rect withAttributes:@{ NSFontAttributeName : [UIFont systemFontOfSize:CGRectGetHeight(rect) * .1] }];
     
     UIGraphicsPopContext();
     
@@ -93,6 +94,9 @@
         CGContextDrawImage(context, CGRectMake(0, 0, tile.currentImageTile.size.width, tile.currentImageTile.size.height), [tile.currentImageTile CGImage]);
         
         // TODO: burn debug info into image!
+        NSString *tileCoordinates = [NSString stringWithFormat:@"(%d, %d, %d)", tile.xCoordinate, tile.yCoordinate, tile.zCoordinate];
+        [tileCoordinates drawInRect:rect withAttributes:@{ NSFontAttributeName : [UIFont systemFontOfSize:100000] }];
+        
         CGContextRestoreGState(context);
     }
 }
@@ -111,6 +115,55 @@
 	
     z += ([[UIScreen mainScreen] scale] - 1.0);
     return z;
+}
+
+- (MATTileCoordinate)tileCoordinateForMapRect:(MKMapRect)aMapRect zoomScale:(MKZoomScale)aZoomScale
+{
+	MATTileCoordinate coord = {0, 0, 0};
+	
+	NSUInteger zoomLevel = [self zoomLevelForZoomScale: aZoomScale];
+    CGPoint mercatorPoint = [self mercatorTileOriginForMapRect: aMapRect];
+    NSUInteger tilex = floor(mercatorPoint.x * [self worldTileWidthForZoomLevel:zoomLevel]);
+    NSUInteger tiley = floor(mercatorPoint.y * [self worldTileWidthForZoomLevel:zoomLevel]);
+    
+	coord.xCoordinate = tilex;
+	coord.yCoordinate = tiley;
+	coord.zCoordinate = zoomLevel;
+	
+	return coord;
+}
+
+/*
+ Determine the number of tiles wide *or tall* the world is, at the given zoomLevel.
+ (In the Spherical Mercator projection, the poles are cut off so that the resulting 2D map is "square".)
+ */
+- (NSUInteger)worldTileWidthForZoomLevel:(NSUInteger)zoomLevel
+{
+    return (NSUInteger)(pow(2,zoomLevel));
+}
+
+/**
+ * Given a MKMapRect, this reprojects the center of the mapRect
+ * into the Mercator projection and calculates the rect's top-left point
+ * (so that we can later figure out the tile coordinate).
+ *
+ * See http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames#Derivation_of_tile_names
+ */
+- (CGPoint)mercatorTileOriginForMapRect:(MKMapRect)mapRect
+{
+    MKCoordinateRegion region = MKCoordinateRegionForMapRect(mapRect);
+    
+    // Convert lat/lon to radians
+    CGFloat x = (region.center.longitude) * (M_PI/180.0); // Convert lon to radians
+    CGFloat y = (region.center.latitude) * (M_PI/180.0); // Convert lat to radians
+    y = log(tan(y)+1.0/cos(y));
+    
+    // X and Y should actually be the top-left of the rect (the values above represent
+    // the center of the rect)
+    x = (1.0 + (x/M_PI)) / 2.0;
+    y = (1.0 - (y/M_PI)) / 2.0;
+	
+    return CGPointMake(x, y);
 }
 
 @end
