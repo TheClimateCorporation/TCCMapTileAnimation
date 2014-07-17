@@ -93,11 +93,19 @@
         CGContextScaleCTM(context, 1, -1);
         CGContextDrawImage(context, CGRectMake(0, 0, tile.currentImageTile.size.width, tile.currentImageTile.size.height), [tile.currentImageTile CGImage]);
         
-        // TODO: burn debug info into image!
-        NSString *tileCoordinates = [NSString stringWithFormat:@"(%d, %d, %d)", tile.xCoordinate, tile.yCoordinate, tile.zCoordinate];
-        [tileCoordinates drawInRect:rect withAttributes:@{ NSFontAttributeName : [UIFont systemFontOfSize:100000] }];
-        
         CGContextRestoreGState(context);
+        
+        UIGraphicsPushContext(context);
+        NSString *tileCoordinates = [NSString stringWithFormat:@"(%d, %d, %d)", tile.xCoordinate, tile.yCoordinate, tile.zCoordinate];
+        [tileCoordinates drawInRect:rect withAttributes:@{ NSFontAttributeName : [UIFont systemFontOfSize:CGRectGetHeight(rect) * .1] }];
+        
+        UIBezierPath *bezierPath = [UIBezierPath bezierPathWithRect:CGRectMake(rect.origin.x, rect.origin.y, rect.size.width, rect.size.height)];
+        [[UIColor blueColor] setStroke];
+        bezierPath.lineWidth = CGRectGetHeight(rect) / 256;
+        [bezierPath stroke];
+        
+        UIGraphicsPopContext();
+
     }
 }
 
