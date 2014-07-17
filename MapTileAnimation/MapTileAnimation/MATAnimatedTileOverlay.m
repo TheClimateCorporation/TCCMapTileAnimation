@@ -149,33 +149,19 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
              completionBlock:(void (^)(BOOL success, NSError *error))completionBlock
 {
 	//check to see if our zoom level is supported by our tile server
-    
-    //super zoomed in (cap zoom scale)
-    if(aScale > 0.000500000) {
-        aScale = 0.000500000;
-        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Zoom Scale Alert"
-                                                          message:@"You've zoomed in past tile data we have"
-                                                         delegate:nil
-                                                cancelButtonTitle:@"CLOSE"
-                                                otherButtonTitles:nil];
-        
-        [message show];
-    }
-    
-    //super zoomed out (cap zoom scale)
-    if(aScale < 0.000020000) {
-        aScale = 0.000020000;
-        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Zoom Scale Alert"
-                                                          message:@"You've zoomed out past tile data we have"
-                                                         delegate:nil
-                                                cancelButtonTitle:@"CLOSE"
-                                                otherButtonTitles:nil];
-        
-        [message show];
-    }
+
     
 	NSUInteger zoomLevel = [self zoomLevelForZoomScale: aScale];
     NSLog(@"zoom scale: %lf, zoom level: %d", aScale, zoomLevel);
+    
+    if(zoomLevel > self.maximumZ) {
+        zoomLevel = 9;
+    }
+    
+    if(zoomLevel < self.minimumZ) {
+        zoomLevel = 3;
+    }
+
 	if (zoomLevel > self.maximumZ || zoomLevel < self.minimumZ) {
 		
 		NSError *error = [[NSError alloc] initWithDomain: NSStringFromClass([self class])
@@ -439,7 +425,7 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
     NSInteger maxX = ceil((MKMapRectGetMaxX(aRect) * zoomScale) / adjustedTileSize);
     NSInteger minY = floor((MKMapRectGetMinY(aRect) * zoomScale) / adjustedTileSize);
     NSInteger maxY = ceil((MKMapRectGetMaxY(aRect) * zoomScale) / adjustedTileSize);
-
+    
     NSMutableSet *tiles = [NSMutableSet set];
 	for (NSInteger x = minX; x <= maxX; x++) {
         for (NSInteger y = minY; y <=maxY; y++) {
