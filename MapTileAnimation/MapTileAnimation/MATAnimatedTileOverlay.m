@@ -283,8 +283,44 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
 	return nil;
 }
 
-- (NSString *)templateURLStringForFrameIndex: (NSUInteger)frameIndex {
-	return self.templateURLs[frameIndex];
+- (NSArray *)tilesForMapRect:(MKMapRect)rect zoomScale:(MKZoomScale)zoomScale;
+{
+    // Ripped from http://stackoverflow.com/a/4445576/766491
+    NSInteger zoomLevel = [self zoomLevelForZoomScale:zoomScale];
+    NSInteger overZoom = 1;
+    
+    if (zoomLevel > self.maximumZ) {
+        overZoom = pow(2, (zoomLevel - self.maximumZ));
+        zoomLevel = self.maximumZ;
+    }
+    
+    // When we are zoomed in beyond the tile set, use the tiles
+    // from the maximum z-depth, but render them larger.
+    NSInteger adjustedTileSize = overZoom * self.tileSize;
+    
+    //    NSInteger z = [self zoomLevelForZoomScale:zoomScale];
+	
+    NSInteger minX = floor((MKMapRectGetMinX(rect) * zoomScale) / adjustedTileSize);
+    NSInteger maxX = ceil((MKMapRectGetMaxX(rect) * zoomScale) / adjustedTileSize);
+    NSInteger minY = floor((MKMapRectGetMinY(rect) * zoomScale) / adjustedTileSize);
+    NSInteger maxY = ceil((MKMapRectGetMaxY(rect) * zoomScale) / adjustedTileSize);
+    
+    NSMutableArray *tiles = [NSMutableArray array];
+	for (NSInteger x = minX; x <= maxX; x++) {
+        for (NSInteger y = minY; y <=maxY; y++) {
+//			MKMapRect frame = MKMapRectMake((double)(x * adjustedTileSize) / zoomScale, (double)(y * adjustedTileSize) / zoomScale, adjustedTileSize / zoomScale, adjustedTileSize / zoomScale);
+			for (MATAnimationTile *tile in self.mapTiles) {
+                if (x == tile.xCoordinate &&
+                   y == tile.yCoordinate &&
+                   zoomLevel == tile.zCoordinate)
+                {
+                    [tiles addObject:tile];
+                }
+            }
+        }
+    }
+    
+    return [tiles copy];
 }
 
 #pragma  mark - Private

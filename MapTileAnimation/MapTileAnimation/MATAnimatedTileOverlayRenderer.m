@@ -73,8 +73,10 @@
     
     UIGraphicsPopContext();
     
-    NSSet *tiles = [mapOverlay mapTilesInMapRect:mapRect zoomScale:zoomScale];
+    if (overZoom == 1) return;
     
+    NSArray *tiles = [mapOverlay tilesForMapRect:mapRect zoomScale:zoomScale];
+
     //tile drawing
     for (MATAnimationTile *tile in tiles) {
         // For each image tile, draw it in its corresponding MKMapRect frame
@@ -88,9 +90,7 @@
         CGContextScaleCTM(context, 1, -1);
         CGContextDrawImage(context, CGRectMake(0, 0, tile.currentImageTile.size.width, tile.currentImageTile.size.height), [tile.currentImageTile CGImage]);
         CGContextRestoreGState(context);
-
     }
-    
 }
 
 #pragma mark - Debug methods

@@ -68,4 +68,7 @@ extern NSString *const MATAnimatedTileOverlayErrorDomain;
 
 - (NSSet *)mapTilesInMapRect:(MKMapRect)aRect zoomScale:(MKZoomScale)zoomScale;
 
+- (NSArray *)tilesForMapRect:(MKMapRect)rect zoomScale:(MKZoomScale)zoomScale;
+//- (NSArray *)tilesInMapRect:(MKMapRect)rect zoomScale:(MKZoomScale)zoomScale;
+
 @end
