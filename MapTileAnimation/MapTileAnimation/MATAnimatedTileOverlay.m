@@ -361,6 +361,13 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
             
             BOOL errorOccurred = [self checkResponseForError:(NSHTTPURLResponse *)response data:data];
             
+            //there is an error
+            if(errorOccurred) {
+                NSString *responseURL = [self parseResponseURL:[response.URL absoluteString]];
+                NSLog(@"tile parse response URL: %@", responseURL);
+                [self.failedMapTiles addObject:responseURL];
+            }
+            
             if (!errorOccurred) {
 //                dispatch_async(dispatch_get_main_queue(), ^{
                     tile.currentImageTile = [UIImage imageWithData:data];
