@@ -26,6 +26,7 @@ typedef struct
 @property (nonatomic, readwrite, strong) NSString *tileCoordinate;
 @property (nonatomic, readwrite, assign) MKMapRect mapRectFrame;
 @property (nonatomic, readwrite, strong) UIImage *currentImageTile;
+@property (nonatomic, readwrite, strong) NSString *hashCoords;
 
 /**
  Array of @c NSString objects

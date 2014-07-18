@@ -198,14 +198,11 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
 				NSString *tileURL = tile.tileURLs[timeIndex];
                 
                 //fetch only if not in failedMapTiles (don't want to fetch tiles that do not exist)
-                NSLog(@"tile parse URL: %@", [self parseResponseURL:tileURL]);
-                BOOL containsTileURL = [self.failedMapTiles containsObject:[self parseResponseURL:tileURL]];
+                BOOL containsTile = [self.failedMapTiles containsObject:tile];
                 
-                NSLog(@"contained in failed tile map: %d", containsTileURL);
-                
-                //if tile not in failedMapTiles, go and fetch the tile
-                if(!containsTileURL) {
-                    [self fetchAndCacheImageTileAtURL:tileURL];
+                //if tile not in failedMapTiles, tile not bad -> go and fetch the tile
+                if(!containsTile) {
+                    [self fetchAndCacheImageTileAtURL:tileURL withTile:tile];
                 }
 				
 			}
@@ -279,28 +276,6 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
     // from the maximum z-depth, but render them larger.
     NSInteger adjustedTileSize = overZoom * self.tileSize;
     
-    //    NSInteger z = [self zoomLevelForZoomScale:zoomScale];
-	
-//    NSInteger minX = floor((MKMapRectGetMinX(rect) * zoomScale) / adjustedTileSize);
-//    NSInteger maxX = ceil((MKMapRectGetMaxX(rect) * zoomScale) / adjustedTileSize);
-//    NSInteger minY = floor((MKMapRectGetMinY(rect) * zoomScale) / adjustedTileSize);
-//    NSInteger maxY = ceil((MKMapRectGetMaxY(rect) * zoomScale) / adjustedTileSize);
-//    
-//    NSMutableArray *tiles = [NSMutableArray array];
-//	for (NSInteger x = minX; x <= maxX; x++) {
-//        for (NSInteger y = minY; y <=maxY; y++) {
-////			MKMapRect frame = MKMapRectMake((double)(x * adjustedTileSize) / zoomScale, (double)(y * adjustedTileSize) / zoomScale, adjustedTileSize / zoomScale, adjustedTileSize / zoomScale);
-//			for (MATAnimationTile *tile in self.mapTiles) {
-//                if (x == tile.xCoordinate &&
-//                   y == tile.yCoordinate &&
-//                   zoomLevel == tile.zCoordinate)
-//                {
-//                    [tiles addObject:tile];
-//                }
-//            }
-//        }
-//    }
-    
     NSMutableArray *tiles = [NSMutableArray array];
     for (MATAnimationTile *tile in self.mapTiles) {
         if (!MKMapRectIntersectsRect(rect, tile.mapRectFrame)) continue;
@@ -315,12 +290,12 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
 /*
  will fetch a tile image and cache it to the network cache (i.e. do nothing with it)
  */
-- (void)fetchAndCacheImageTileAtURL:(NSString *)aUrlString
+- (void)fetchAndCacheImageTileAtURL:(NSString *)aUrlString withTile:(MATAnimationTile *)tile
 {
 	[self.downloadQueue addOperationWithBlock: ^{
 		NSString *urlString = [aUrlString copy];
         
-        BOOL containsTileURL = [self.failedMapTiles containsObject:[self parseResponseURL:aUrlString]];
+        BOOL containsTileURL = [self.failedMapTiles containsObject:tile];
         //if tile not in failedMapTiles, go and fetch the tile
         if (containsTileURL) {
             return;
@@ -337,9 +312,7 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
             
             //there is an error 
             if(errorResponse) {
-                NSString *responseURL = [self parseResponseURL:[response.URL absoluteString]];
-                NSLog(@"tile parse response URL: %@", responseURL);
-                [self.failedMapTiles addObject:responseURL];
+                [self.failedMapTiles addObject:tile];
             }
             
             dispatch_semaphore_signal(semaphore);
@@ -361,7 +334,7 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
         for (MATAnimationTile *tile in self.mapTiles) {
             NSURL *url = [[NSURL alloc] initWithString:tile.tileURLs[frameIndex]];
             
-            BOOL containsTileURL = [self.failedMapTiles containsObject:[self parseResponseURL:tile.tileURLs[frameIndex]]];
+            BOOL containsTileURL = [self.failedMapTiles containsObject:tile];
             if (containsTileURL) {
                 continue;
             }
@@ -375,9 +348,7 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
             
             //there is an error
             if(errorOccurred) {
-                NSString *responseURL = [self parseResponseURL:[response.URL absoluteString]];
-                NSLog(@"tile parse response URL: %@", responseURL);
-                [self.failedMapTiles addObject:responseURL];
+                [self.failedMapTiles addObject:tile];
             }
             
             if (!errorOccurred) {
@@ -542,13 +513,6 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
     if ([self.delegate respondsToSelector:@selector(animatedTileOverlay:didHaveError:)]) {
         [self.delegate animatedTileOverlay:self didHaveError:error];
     }
-}
-
-//Parse provided url string into x/y/z.png in order to be used later for storing in failedMapTiles
-- (NSString *)parseResponseURL:(NSString *)responseURL {
-    NSArray *stringArrayURLs = [responseURL componentsSeparatedByString:@"/"];
-    NSString *formattedString = [NSString stringWithFormat:@"%@/%@/%@", stringArrayURLs[7], stringArrayURLs[8], stringArrayURLs[9]];
-    return formattedString;
 }
 
 @end
