@@ -28,6 +28,7 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
 @property (nonatomic, readwrite, strong) NSTimer *timer;
 @property (readwrite, assign) MATAnimatingState currentAnimatingState;
 @property (strong, nonatomic) NSSet *mapTiles;
+@property (strong, nonatomic) NSMutableSet *failedMapTiles;
 @property (nonatomic) NSInteger tileSize;
 @property (strong, nonatomic) MKTileOverlay *tileOverlay;
 @property (strong, nonatomic) MKMapView *mapView;
@@ -55,6 +56,7 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
 		self.numberOfAnimationFrames = [templateURLs count];
 		self.frameDuration = frameDuration;
 		self.currentFrameIndex = 0;
+        self.failedMapTiles = [NSMutableSet set];
 		self.fetchQueue = [[NSOperationQueue alloc] init];
 		[self.fetchQueue setMaxConcurrentOperationCount: 1];  //essentially a serial queue
 		self.downloadQueue = [[NSOperationQueue alloc] init];
@@ -160,21 +162,6 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
         NSLog(@"Capped zoom level: %d", zoomLevel);
     }
     
-	if (zoomLevel > self.maximumZ || zoomLevel < self.minimumZ) {
-		
-		NSError *error = [[NSError alloc] initWithDomain: NSStringFromClass([self class])
-													code: MATAnimatingErrorInvalidZoomLevel
-												userInfo: @{NSLocalizedDescriptionKey: [NSString stringWithFormat: @"Current Zoom Level %lu not supported (min %ld max %ld scale %lf)", (unsigned long)zoomLevel, (long)self.minimumZ, (long)self.maximumZ, aScale]}];
-		
-		[self.delegate animatedTileOverlay: self didHaveError: error];
-
-		dispatch_async(dispatch_get_main_queue(), ^{
-            completionBlock(NO, error);
-		});
-		
-		return;
-	}
-
 	self.currentAnimatingState = MATAnimatingStateLoading;
     
 	[self.fetchQueue addOperationWithBlock:^{
@@ -209,8 +196,18 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
 			//loop over all the tiles for this time index
 			for (MATAnimationTile *tile in self.mapTiles) {
 				NSString *tileURL = tile.tileURLs[timeIndex];
-				//this will return right away
-				[self fetchAndCacheImageTileAtURL:tileURL];
+                
+                //fetch only if not in failedMapTiles (don't want to fetch tiles that do not exist)
+                NSLog(@"tile parse URL: %@", [self parseResponseURL:tileURL]);
+                BOOL containsTileURL = [self.failedMapTiles containsObject:[self parseResponseURL:tileURL]];
+                
+                NSLog(@"contained in failed tile map: %d", containsTileURL);
+                
+                //if tile not in failedMapTiles, go and fetch the tile
+                if(!containsTileURL) {
+                    [self fetchAndCacheImageTileAtURL:tileURL];
+                }
+				
 			}
 			//wait for all the tiles in this time index to download before proceeding the next time index
 			[self.downloadQueue waitUntilAllOperationsAreFinished];
@@ -328,7 +325,17 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
         NSURLSession *session = [NSURLSession sharedSession];
         NSURLRequest *request = [[NSURLRequest alloc] initWithURL:[NSURL URLWithString:urlString] cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:5];
         NSURLSessionTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-            [self checkResponseForError:(NSHTTPURLResponse *)response data:data];
+            
+            //parse URL and add to failed map tiles set
+            BOOL errorResponse = [self checkResponseForError:(NSHTTPURLResponse *)response data:data];
+            
+            //there is an error 
+            if(errorResponse) {
+                NSString *responseURL = [self parseResponseURL:[response.URL absoluteString]];
+                NSLog(@"tile parse response URL: %@", responseURL);
+                [self.failedMapTiles addObject:responseURL];
+            }
+            
             dispatch_semaphore_signal(semaphore);
         }];
         [task resume];
@@ -492,12 +499,15 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
 
 - (BOOL)checkResponseForError:(NSHTTPURLResponse *)response data:(NSData *)data
 {
+    
     if (data) {
         if (response.statusCode != 200) {
+            
             NSString *localizedDescription = [NSString stringWithFormat:@"Error during fetch. Image tile HTTP respsonse code %ld, URL %@", (long)response.statusCode, response.URL];
             NSError *error = [NSError errorWithDomain:MATAnimatedTileOverlayErrorDomain code:MATAnimatingErrorBadURLResponseCode userInfo:@{ NSLocalizedDescriptionKey : localizedDescription }];
             [self sendErrorToDelegate:error];
             return YES;
+            
         }
     } else {
         NSString *localizedDescription = [NSString stringWithFormat:@"No image data. HTTP respsonse code %ld, URL %@", (long)response.statusCode, response.URL];
@@ -513,6 +523,13 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
     if ([self.delegate respondsToSelector:@selector(animatedTileOverlay:didHaveError:)]) {
         [self.delegate animatedTileOverlay:self didHaveError:error];
     }
+}
+
+//Parse provided url string into x/y/z.png in order to be used later for storing in failedMapTiles
+- (NSString *)parseResponseURL:(NSString *)responseURL {
+    NSArray *stringArrayURLs = [responseURL componentsSeparatedByString:@"/"];
+    NSString *formattedString = [NSString stringWithFormat:@"%@/%@/%@", stringArrayURLs[7], stringArrayURLs[8], stringArrayURLs[9]];
+    return formattedString;
 }
 
 @end
