@@ -16,16 +16,9 @@
 
 @interface TCCTimeFrameParser : NSObject
 
-@property (readwrite, weak) id<TCCTimeFrameParserDelegateProtocol>delegate;
+@property (weak, nonatomic) id<TCCTimeFrameParserDelegateProtocol>delegate;
+@property (strong, readonly, nonatomic) NSArray *templateFrameTimeURLs;
 
-@property (readonly) NSString *ingestTimeStampString;
-@property (readonly) NSArray *frameTimeStamps;
-@property (readonly) NSArray *templateFrameTimeURLs;
-@property (readonly) NSArray *timeFrameURLs;
-
-@property (readonly) NSUInteger countOfTimeIndexes;
-
-- (id) initWithURLString: (NSString *)aURLString delegate: (id)aDelegate;
-
+- (id)initWithURLString:(NSString *)aURLString delegate:(id)aDelegate;
 
 @end

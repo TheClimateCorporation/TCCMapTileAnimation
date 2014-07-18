@@ -6,11 +6,11 @@
 //  Copyright (c) 2014 The Climate Corporation. All rights reserved.
 //
 
-
 #import "MATAnimatedTileOverlay.h"
 #import "MATAnimationTile.h"
 #import "MATAnimatedTileOverlayDelegate.h"
 
+// This should be documented as the expected format of the template URLs
 #define Z_INDEX "{z}"
 #define X_INDEX "{x}"
 #define Y_INDEX "{y}"
@@ -19,14 +19,12 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
 
 @interface MATAnimatedTileOverlay ()
 
-@property (nonatomic, readwrite, strong) NSOperationQueue *fetchQueue;
-@property (nonatomic, readwrite, strong) NSOperationQueue *downloadQueue;
-
-@property (nonatomic, readwrite, strong) NSArray *templateURLs;
-@property (nonatomic, readwrite) NSInteger numberOfAnimationFrames;
-@property (nonatomic, assign) NSTimeInterval frameDuration;
-@property (nonatomic, readwrite, strong) NSTimer *timer;
-@property (readwrite, assign) MATAnimatingState currentAnimatingState;
+@property (strong, nonatomic) NSOperationQueue *fetchQueue;
+@property (strong, nonatomic) NSOperationQueue *downloadQueue;
+@property (strong, nonatomic) NSArray *templateURLs;
+@property (nonatomic) NSTimeInterval frameDuration;
+@property (strong, nonatomic) NSTimer *timer;
+@property (readwrite, nonatomic) MATAnimatingState currentAnimatingState;
 @property (strong, nonatomic) NSSet *mapTiles;
 @property (nonatomic) NSInteger tileSize;
 @property (strong, nonatomic) MKTileOverlay *tileOverlay;
@@ -40,7 +38,7 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
 
 #pragma mark - Lifecycle
 
-- (id) initWithTemplateURLs: (NSArray *)templateURLs frameDuration:(NSTimeInterval)frameDuration mapView:(MKMapView *)mapView
+- (instancetype)initWithMapView:(MKMapView *)mapView templateURLs:(NSArray *)templateURLs frameDuration:(NSTimeInterval)frameDuration;
 {
 	self = [super init];
 	if (self)
@@ -51,19 +49,20 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
                                                                  diskPath:nil];
         [NSURLCache setSharedURLCache:URLCache];
         
-		self.templateURLs = templateURLs;
-		self.numberOfAnimationFrames = [templateURLs count];
-		self.frameDuration = frameDuration;
-		self.currentFrameIndex = 0;
-		self.fetchQueue = [[NSOperationQueue alloc] init];
-		[self.fetchQueue setMaxConcurrentOperationCount: 1];  //essentially a serial queue
-		self.downloadQueue = [[NSOperationQueue alloc] init];
-		[self.downloadQueue setMaxConcurrentOperationCount: 25];
+		_templateURLs = templateURLs;
+		_numberOfAnimationFrames = [templateURLs count];
+		_frameDuration = frameDuration;
+		_currentFrameIndex = 0;
+		_fetchQueue = [[NSOperationQueue alloc] init];
+		[_fetchQueue setMaxConcurrentOperationCount: 1];  //essentially a serial queue
+		_downloadQueue = [[NSOperationQueue alloc] init];
+		[_downloadQueue setMaxConcurrentOperationCount: 25];
 		
-		self.tileSize = 256;
+		_currentAnimatingState = MATAnimatingStateStopped;
 		
-		self.currentAnimatingState = MATAnimatingStateStopped;
-		self.minimumZ = 3;
+        // TODO: make this configurable
+        self.tileSize = 256;
+        self.minimumZ = 3;
 		self.maximumZ = 9;
 
         _mapView = mapView;
@@ -75,45 +74,33 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
 
 #pragma mark - Custom accessors
 
-//setter for currentAnimatingState
-- (void) setCurrentAnimatingState:(MATAnimatingState)currentAnimatingState {
-    //set new animating state if state different than old value
+- (void)setCurrentAnimatingState:(MATAnimatingState)currentAnimatingState
+{
+    // Set new animating state if state different than old value
     if(currentAnimatingState != _currentAnimatingState){
         _currentAnimatingState = currentAnimatingState;
-        //call the optional delegate method – ensure the delegate object actually implements an optional method before the method is called
         if ([self.delegate respondsToSelector:@selector(animatedTileOverlay:didChangeAnimationState:)]) {
-            [self.delegate animatedTileOverlay:self didChangeAnimationState:_currentAnimatingState];
+            [self.delegate animatedTileOverlay:self didChangeAnimationState:currentAnimatingState];
         }
     }
 }
 
 #pragma mark MKOverlay
 
-- (CLLocationCoordinate2D)coordinate
-{
+- (CLLocationCoordinate2D)coordinate {
     return MKCoordinateForMapPoint(MKMapPointMake(MKMapRectGetMidX([self boundingMapRect]), MKMapRectGetMidY([self boundingMapRect])));
 }
 
-- (MKMapRect)boundingMapRect
-{
+- (MKMapRect)boundingMapRect {
     return MKMapRectWorld;
 }
 
 #pragma mark - IBActions
 
-/*
- called from the animation timer on a periodic basis
- */
 - (IBAction)updateImageTileAnimation:(NSTimer *)aTimer
 {
 	[self.fetchQueue addOperationWithBlock:^{
-		self.currentFrameIndex++;
-        //        NSLog(@"frame: %@", @(self.currentFrameIndex).stringValue);
-		//reset the index counter if we have rolled over
-		if (self.currentFrameIndex > self.numberOfAnimationFrames - 1) {
-			self.currentFrameIndex = 0;
-		}
-        
+        self.currentFrameIndex = (self.currentFrameIndex + 1) % (self.numberOfAnimationFrames - 1);
         [self updateTilesToFrameIndex:self.currentFrameIndex];
 	}];
 }
@@ -140,54 +127,32 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
     [self.mapView addOverlay:self.tileOverlay];
 }
 
-/*
- will fetch all the tiles for a mapview's map rect and zoom scale.  Provides a download progres block and download completetion block
- */
-- (void)fetchTilesForMapRect:(MKMapRect)aMapRect
-                   zoomScale:(MKZoomScale)aScale
-               progressBlock:(void(^)(NSUInteger currentTimeIndex, BOOL *stop))progressBlock
-             completionBlock:(void (^)(BOOL success, NSError *error))completionBlock
+- (void)fetchTilesForMapRect:(MKMapRect)mapRect
+                   zoomScale:(MKZoomScale)zoomScale
+               progressHandler:(void(^)(NSUInteger currentFrameIndex, BOOL *stop))progressHandler
+             completionHandler:(void (^)(BOOL success, NSError *error))completionHandler
 {
-	NSUInteger zoomLevel = [self zoomLevelForZoomScale: aScale];
-    NSLog(@"Actual zoom scale: %lf, zoom level: %d", aScale, zoomLevel);
+	NSUInteger zoomLevel = [self zoomLevelForZoomScale: zoomScale];
+    NSLog(@"Actual zoom scale: %lf, zoom level: %d", zoomScale, zoomLevel);
     
     if(zoomLevel > self.maximumZ) {
         zoomLevel = self.maximumZ;
-        NSLog(@"Capped zoom level: %d", zoomLevel);
+        NSLog(@"Capped zoom level at %d", zoomLevel);
     }
     if(zoomLevel < self.minimumZ) {
         zoomLevel = self.minimumZ;
-        NSLog(@"Capped zoom level: %d", zoomLevel);
+        NSLog(@"Capped zoom level at %d", zoomLevel);
     }
-    
-	if (zoomLevel > self.maximumZ || zoomLevel < self.minimumZ) {
-		
-		NSError *error = [[NSError alloc] initWithDomain: NSStringFromClass([self class])
-													code: MATAnimatingErrorInvalidZoomLevel
-												userInfo: @{NSLocalizedDescriptionKey: [NSString stringWithFormat: @"Current Zoom Level %lu not supported (min %ld max %ld scale %lf)", (unsigned long)zoomLevel, (long)self.minimumZ, (long)self.maximumZ, aScale]}];
-		
-		[self.delegate animatedTileOverlay: self didHaveError: error];
-
-		dispatch_async(dispatch_get_main_queue(), ^{
-            completionBlock(NO, error);
-		});
-		
-		return;
-	}
 
 	self.currentAnimatingState = MATAnimatingStateLoading;
     
 	[self.fetchQueue addOperationWithBlock:^{
-        
-		//calculate the tiles rects needed for a given mapRect and create the MATAnimationTile objects
-		NSSet *mapTiles = [self mapTilesInMapRect:aMapRect zoomScale:aScale];
+		NSSet *mapTiles = [self mapTilesInMapRect:mapRect zoomScale:zoomScale];
 		
-		//at this point we have a set of MATAnimationTiles we need to derive the urls for each tile, for each time index
 		for (MATAnimationTile *tile in mapTiles) {
-			NSMutableArray *array = [NSMutableArray arrayWithCapacity: self.numberOfAnimationFrames];
+			NSMutableArray *array = [NSMutableArray array];
 			for (NSUInteger timeIndex = 0; timeIndex < self.numberOfAnimationFrames; timeIndex++) {
-				NSString *tileURL = [self URLStringForX:tile.xCoordinate Y:tile.yCoordinate Z:tile.zCoordinate timeIndex:timeIndex];
-				[array addObject:tileURL];
+				[array addObject:[self URLStringForX:tile.x Y:tile.y Z:tile.z timeIndex:timeIndex]];
 			}
 			tile.tileURLs = [array copy];
 		}
@@ -196,9 +161,8 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
 		self.mapTiles = mapTiles;
 		//set and check a flag to see if the calling object has stopped tile loading
 		__block BOOL didStopFlag = NO;
-		//start downloading the tiles for a given time index, we want to download all the tiles for a time index
-		//before we move onto the next time index
-		for (NSUInteger timeIndex = 0; timeIndex < self.numberOfAnimationFrames; timeIndex++) {
+
+		for (NSInteger frameIndex = 0; frameIndex < self.numberOfAnimationFrames; frameIndex++) {
 			if (didStopFlag) {
 				NSLog(@"User Stopped");
 				[self.downloadQueue cancelAllOperations];
@@ -206,17 +170,16 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
 				break;
 			}
             
-			//loop over all the tiles for this time index
+            // Fetch and cache the tile data
 			for (MATAnimationTile *tile in self.mapTiles) {
-				NSString *tileURL = tile.tileURLs[timeIndex];
-				//this will return right away
-				[self fetchAndCacheImageTileAtURL:tileURL];
+				[self enqueueOperationOnQueue:self.downloadQueue toFetchAndCacheTileAtURL:tile.tileURLs[frameIndex]];
 			}
-			//wait for all the tiles in this time index to download before proceeding the next time index
+            
+			// Wait for all the tiles in this frame index to finish downloading before proceeding
 			[self.downloadQueue waitUntilAllOperationsAreFinished];
             
 			dispatch_async(dispatch_get_main_queue(), ^{
-				progressBlock(timeIndex, &didStopFlag);
+				progressHandler(frameIndex, &didStopFlag);
 			});
 		}
 		[self.downloadQueue waitUntilAllOperationsAreFinished];
@@ -225,20 +188,19 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
 		[self moveToFrameIndex:self.currentFrameIndex isContinuouslyMoving:YES];
 		
 		dispatch_async(dispatch_get_main_queue(), ^{
-            completionBlock(!didStopFlag, nil);
+            completionHandler(!didStopFlag, nil);
 		});
 	}];
 }
 
-/*
- updates the MATAnimationTile tile image property to point to the tile image for the current time index
- */
 - (void)moveToFrameIndex:(NSInteger)frameIndex isContinuouslyMoving:(BOOL)isContinuouslyMoving
 {
     if (self.currentAnimatingState == MATAnimatingStateAnimating) {
         [self pauseAnimating];
     }
     
+    // Determine when the user has finished moving animation frames (i.e. scrubbing) to toggle
+    // the tiled overlay on and off.
     if (!isContinuouslyMoving) {
         self.tileOverlay = [[MKTileOverlay alloc] initWithURLTemplate:self.templateURLs[self.currentFrameIndex]];
         [self.mapView addOverlay:self.tileOverlay];
@@ -250,77 +212,33 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
     [self updateTilesToFrameIndex:frameIndex];
 }
 
-- (MATAnimationTile *)tileForMapRect:(MKMapRect)aMapRect zoomScale:(MKZoomScale)aZoomScale;
+- (MATAnimationTile *)tileForMapRect:(MKMapRect)mapRect zoomScale:(MKZoomScale)zoomScale;
 {
-	if (self.mapTiles) {
-		MATTileCoordinate coord = [self tileCoordinateForMapRect: aMapRect zoomScale: aZoomScale];
-//        NSLog(@"Tile coord for map rect: %d, %d, %d", coord.xCoordinate, coord.yCoordinate, coord.zCoordinate);
-		for (MATAnimationTile *tile in self.mapTiles) {
-			if (coord.xCoordinate == tile.xCoordinate &&
-                coord.yCoordinate == tile.yCoordinate &&
-                coord.zCoordinate == tile.zCoordinate)
-            {
-				return tile;
-			}
-		}
-	}
+    MATTileCoordinate coord = [self tileCoordinateForMapRect:mapRect zoomScale:zoomScale];
+    for (MATAnimationTile *tile in self.mapTiles) {
+        if (coord.x == tile.x && coord.y == tile.y && coord.z == tile.z) {
+            return tile;
+        }
+    }
 	return nil;
 }
 
-- (NSArray *)tilesForMapRect:(MKMapRect)rect zoomScale:(MKZoomScale)zoomScale;
+- (NSArray *)cachedTilesForMapRect:(MKMapRect)rect
 {
-    // Ripped from http://stackoverflow.com/a/4445576/766491
-    NSInteger zoomLevel = [self zoomLevelForZoomScale:zoomScale];
-    NSInteger overZoom = 1;
-    
-    if (zoomLevel > self.maximumZ) {
-        overZoom = pow(2, (zoomLevel - self.maximumZ));
-        zoomLevel = self.maximumZ;
-    }
-    
-    // When we are zoomed in beyond the tile set, use the tiles
-    // from the maximum z-depth, but render them larger.
-    NSInteger adjustedTileSize = overZoom * self.tileSize;
-    
-    //    NSInteger z = [self zoomLevelForZoomScale:zoomScale];
-	
-//    NSInteger minX = floor((MKMapRectGetMinX(rect) * zoomScale) / adjustedTileSize);
-//    NSInteger maxX = ceil((MKMapRectGetMaxX(rect) * zoomScale) / adjustedTileSize);
-//    NSInteger minY = floor((MKMapRectGetMinY(rect) * zoomScale) / adjustedTileSize);
-//    NSInteger maxY = ceil((MKMapRectGetMaxY(rect) * zoomScale) / adjustedTileSize);
-//    
-//    NSMutableArray *tiles = [NSMutableArray array];
-//	for (NSInteger x = minX; x <= maxX; x++) {
-//        for (NSInteger y = minY; y <=maxY; y++) {
-////			MKMapRect frame = MKMapRectMake((double)(x * adjustedTileSize) / zoomScale, (double)(y * adjustedTileSize) / zoomScale, adjustedTileSize / zoomScale, adjustedTileSize / zoomScale);
-//			for (MATAnimationTile *tile in self.mapTiles) {
-//                if (x == tile.xCoordinate &&
-//                   y == tile.yCoordinate &&
-//                   zoomLevel == tile.zCoordinate)
-//                {
-//                    [tiles addObject:tile];
-//                }
-//            }
-//        }
-//    }
-    
     NSMutableArray *tiles = [NSMutableArray array];
     for (MATAnimationTile *tile in self.mapTiles) {
-        if (!MKMapRectIntersectsRect(rect, tile.mapRectFrame)) continue;
-        [tiles addObject:tile];
+        if (MKMapRectIntersectsRect(rect, tile.mapRectFrame)) {
+            [tiles addObject:tile];
+        }
     }
-    
     return [tiles copy];
 }
 
 #pragma  mark - Private
 
-/*
- will fetch a tile image and cache it to the network cache (i.e. do nothing with it)
- */
-- (void)fetchAndCacheImageTileAtURL:(NSString *)aUrlString
+- (void)enqueueOperationOnQueue:(NSOperationQueue *)queue toFetchAndCacheTileAtURL:(NSString *)aUrlString
 {
-	[self.downloadQueue addOperationWithBlock: ^{
+	[queue addOperationWithBlock:^{
 		NSString *urlString = [aUrlString copy];
 		
         dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
@@ -332,8 +250,9 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
             dispatch_semaphore_signal(semaphore);
         }];
         [task resume];
-        // have the thread wait until the download task is done
-        dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * 60)); //timeout is 10 secs.
+
+        // Have the thread wait until the download task is done. Timeout is 10 secs.
+        dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * 60));
 	}];
 }
 
@@ -344,28 +263,24 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
     // data. However, scrubbing quickly causes multiple calls to occur concurrently, which causes the
     // currentFrameIndex to enter a race condition. If we want to do this in the background, I think we'll
     // need to create a serial background queue.
-//    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        for (MATAnimationTile *tile in self.mapTiles) {
-            NSURL *url = [[NSURL alloc] initWithString:tile.tileURLs[frameIndex]];
-            NSURLRequest *request = [[NSURLRequest alloc] initWithURL:url cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:1];
-            NSURLResponse *response;
-            NSError *error;
-            NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-            
-            BOOL errorOccurred = [self checkResponseForError:(NSHTTPURLResponse *)response data:data];
-            
-            if (!errorOccurred) {
-//                dispatch_async(dispatch_get_main_queue(), ^{
-                    tile.currentImageTile = [UIImage imageWithData:data];
-//                });
-            }
-        }
+    for (MATAnimationTile *tile in self.mapTiles) {
+        NSURL *url = [[NSURL alloc] initWithString:tile.tileURLs[frameIndex]];
+        NSURLRequest *request = [[NSURLRequest alloc] initWithURL:url cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:1];
+        NSURLResponse *response;
+        NSError *error;
+        NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
         
-        self.currentFrameIndex = frameIndex;
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self.delegate animatedTileOverlay:self didAnimateWithAnimationFrameIndex:self.currentFrameIndex];
-        });
-//    });
+        BOOL errorOccurred = [self checkResponseForError:(NSHTTPURLResponse *)response data:data];
+        
+        if (!errorOccurred) {
+            tile.tileImage = [UIImage imageWithData:data];
+        }
+    }
+    
+    self.currentFrameIndex = frameIndex;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.delegate animatedTileOverlay:self didAnimateWithAnimationFrameIndex:self.currentFrameIndex];
+    });
 }
 
 /*
@@ -387,27 +302,21 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
 	return returnString;
 }
 
-- (MATTileCoordinate) tileCoordinateForMapRect: (MKMapRect)aMapRect zoomScale:(MKZoomScale)aZoomScale
+- (MATTileCoordinate)tileCoordinateForMapRect:(MKMapRect)aMapRect zoomScale:(MKZoomScale)aZoomScale
 {
-	MATTileCoordinate coord = {0 , 0, 0};
-	
+	MATTileCoordinate coord = {0, 0, 0};
+    
 	NSUInteger zoomLevel = [self zoomLevelForZoomScale: aZoomScale];
     CGPoint mercatorPoint = [self mercatorTileOriginForMapRect: aMapRect];
-    NSUInteger tilex = floor(mercatorPoint.x * [self worldTileWidthForZoomLevel:zoomLevel]);
-    NSUInteger tiley = floor(mercatorPoint.y * [self worldTileWidthForZoomLevel:zoomLevel]);
     
-	coord.xCoordinate = tilex;
-	coord.yCoordinate = tiley;
-	coord.zCoordinate = zoomLevel;
-	
+	coord.x = floor(mercatorPoint.x * [self worldTileWidthForZoomLevel:zoomLevel]);;
+	coord.y = floor(mercatorPoint.y * [self worldTileWidthForZoomLevel:zoomLevel]);
+	coord.z = zoomLevel;
 	return coord;
 }
 
-/*
- calculates the number of tiles, the tile coordinates and tile MapRect frame given a MapView's MapRect and zoom scale
- returns an array MATAnimationTile objects
- */
-- (NSSet *)mapTilesInMapRect:(MKMapRect)aRect zoomScale:(MKZoomScale)zoomScale
+// Creates a set of @c MATAnimationTile objects for a given map rect and zoom scale
+- (NSSet *)mapTilesInMapRect:(MKMapRect)rect zoomScale:(MKZoomScale)zoomScale
 {
     NSLog(@"Zoom scale in mapTilesInMapRect: %f", zoomScale);
     
@@ -420,27 +329,25 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
         zoomLevel = self.maximumZ;
     }
     
-    // When we are zoomed in beyond the tile set, use the tiles
-    // from the maximum z-depth, but render them larger.
+    // When we are zoomed in beyond the tile set, use the tiles from the maximum z-depth,
+    // but render them larger.
     NSInteger adjustedTileSize = overZoom * self.tileSize;
-
-//    NSInteger z = [self zoomLevelForZoomScale:zoomScale];
 	
-    NSInteger minX = floor((MKMapRectGetMinX(aRect) * zoomScale) / adjustedTileSize);
-    NSInteger maxX = ceil((MKMapRectGetMaxX(aRect) * zoomScale) / adjustedTileSize);
-    NSInteger minY = floor((MKMapRectGetMinY(aRect) * zoomScale) / adjustedTileSize);
-    NSInteger maxY = ceil((MKMapRectGetMaxY(aRect) * zoomScale) / adjustedTileSize);
+    NSInteger minX = floor((MKMapRectGetMinX(rect) * zoomScale) / adjustedTileSize);
+    NSInteger maxX = ceil((MKMapRectGetMaxX(rect) * zoomScale) / adjustedTileSize);
+    NSInteger minY = floor((MKMapRectGetMinY(rect) * zoomScale) / adjustedTileSize);
+    NSInteger maxY = ceil((MKMapRectGetMaxY(rect) * zoomScale) / adjustedTileSize);
     
     NSMutableSet *tiles = [NSMutableSet set];
 	for (NSInteger x = minX; x <= maxX; x++) {
         for (NSInteger y = minY; y <=maxY; y++) {
 			MKMapRect frame = MKMapRectMake((x * adjustedTileSize) / zoomScale, (y * adjustedTileSize) / zoomScale, adjustedTileSize / zoomScale, adjustedTileSize / zoomScale);
-            if (!MKMapRectIntersectsRect(frame, aRect)) continue;
-			MATAnimationTile *tile = [[MATAnimationTile alloc] initWithFrame:frame xCord:x yCord:y zCord:zoomLevel];
-			[tiles addObject:tile];
+            if (MKMapRectIntersectsRect(frame, rect)) {
+                [tiles addObject:[[MATAnimationTile alloc] initWithFrame:frame x:x y:y z:zoomLevel]];
+            }
         }
     }
-    return [NSSet setWithSet:tiles];
+    return [tiles copy];
 }
 
 /*

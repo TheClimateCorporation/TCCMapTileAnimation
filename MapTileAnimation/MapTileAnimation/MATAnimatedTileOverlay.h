@@ -38,7 +38,7 @@ extern NSString *const MATAnimatedTileOverlayErrorDomain;
 @property (nonatomic) NSInteger minimumZ;
 @property (nonatomic) NSInteger maximumZ;
 
-- (instancetype)initWithTemplateURLs:(NSArray *)templateURLs frameDuration:(NSTimeInterval)frameDuration mapView:(MKMapView *)mapView;
+- (instancetype)initWithMapView:(MKMapView *)mapView templateURLs:(NSArray *)templateURLs frameDuration:(NSTimeInterval)frameDuration;
 
 /**
  Begins animating the tile overlay, starting from the current frame index.
@@ -46,29 +46,48 @@ extern NSString *const MATAnimatedTileOverlayErrorDomain;
 - (void)startAnimating;
 
 /**
- Pauses animation at the current frame index
+ Pauses animation at the current frame index.
  */
 - (void)pauseAnimating;
 
 /**
- Updates the overlay's underlying tile data to the given frame index. Throws exception if out of bounds.
- If the tile overlay is currently animating, it pauses animation.
+ Moves the overlay's animated tile data to the given frame index. If it is currently animating,
+ it pauses animation. Throws exception if out of bounds.
+ 
  @param frameIndex The animation frame index to move to
- @param isContinuouslyMoving A boolean flag to indicate whether the user is currently scrubbing through
- the animation frames. Passing @c YES suppresses the switch to using the @c MKTileOverlay.
+ @param isContinuouslyMoving A boolean flag to indicate whether the user is currently scrubbing
+ through the animation frames. Passing @c YES suppresses the switch to using the @c MKTileOverlay.
  */
 - (void)moveToFrameIndex:(NSInteger)frameIndex isContinuouslyMoving:(BOOL)isContinuouslyMoving;
 
-- (void)fetchTilesForMapRect:(MKMapRect)aMapRect
-                   zoomScale:(MKZoomScale)aScale
-               progressBlock:(void(^)(NSUInteger currentTimeIndex, BOOL *stop))progressBlock
-             completionBlock:(void (^)(BOOL success, NSError *error))completionBlock;
+/**
+ Begins fetching the tiles from the tile server.
+ 
+ @param mapRect The current visible rect of the map view.
+ @param zoomScale The current zoom scale of the map view.
+ @param progressHandler Invoked after each frame of animation has loaded. Set the @c stop boolean
+ flag if you want to cancel the fetch operation. If you want the overlay to display updated tile
+ data as it loads, you can call @c moveToFrameIndex from here.
+ @param completionHandler Called when all the data has loaded. @c success is YES when the
+ user has not cancelled loading. @c error is not currently used...
+ */
+- (void)fetchTilesForMapRect:(MKMapRect)mapRect
+                   zoomScale:(MKZoomScale)zoomScale
+             progressHandler:(void(^)(NSUInteger currentFrameIndex, BOOL *stop))progressHandler
+           completionHandler:(void (^)(BOOL success, NSError *error))completionHandler;
 
-- (MATAnimationTile *)tileForMapRect:(MKMapRect)aMapRect zoomScale:(MKZoomScale)aZoomScale;
+/**
+ For a given map rect that corresponds to the area of a tile, this returns the @c MATAnimationTile
+ object that contains the tile image data.
+ 
+ Returns @c nil if a fetch operation has not executed for this tile.
+ */
+- (MATAnimationTile *)tileForMapRect:(MKMapRect)mapRect zoomScale:(MKZoomScale)mapRect;
 
-- (NSSet *)mapTilesInMapRect:(MKMapRect)aRect zoomScale:(MKZoomScale)zoomScale;
-
-- (NSArray *)tilesForMapRect:(MKMapRect)rect zoomScale:(MKZoomScale)zoomScale;
-//- (NSArray *)tilesInMapRect:(MKMapRect)rect zoomScale:(MKZoomScale)zoomScale;
+/**
+ Returns an array of @c MATAnimationTile objects that have been fetched and cached for a given
+ map rect.
+ */
+- (NSArray *)cachedTilesForMapRect:(MKMapRect)rect;
 
 @end

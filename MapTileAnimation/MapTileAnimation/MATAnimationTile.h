@@ -9,30 +9,36 @@
 #import <UIKit/UIKit.h>
 #import <MapKit/MapKit.h>
 
-// TODO: fix this up
 typedef struct
 {
-	NSUInteger xCoordinate;
-	NSUInteger yCoordinate;
-	NSUInteger zCoordinate;
+	NSInteger x;
+	NSInteger y;
+	NSInteger z;
 } MATTileCoordinate;
 
 @interface MATAnimationTile : NSObject
 
-@property (nonatomic, readwrite, assign) NSInteger xCoordinate;
-@property (nonatomic, readwrite, assign) NSInteger yCoordinate;
-@property (nonatomic, readwrite, assign) NSInteger zCoordinate;
-
-@property (nonatomic, readwrite, strong) NSString *tileCoordinate;
-@property (nonatomic, readwrite, assign) MKMapRect mapRectFrame;
-@property (nonatomic, readwrite, strong) UIImage *currentImageTile;
+@property (nonatomic) NSInteger x;
+@property (nonatomic) NSInteger y;
+@property (nonatomic) NSInteger z;
 
 /**
- Array of @c NSString objects
+ The @c MKMapRect that corresponds to the x, y, and z coordinates of this animation tile object.
  */
-@property (nonatomic, readwrite, strong) NSArray *tileURLs;
+@property (nonatomic) MKMapRect mapRectFrame;
 
-- (id) initWithFrame:(MKMapRect)aTileFrame xCord: (NSInteger)aXCord yCord: (NSInteger)aYCord zCord: (NSInteger)aZCord;
+/**
+ A place to store image data for a tile. This is mostly a convenience so that the 
+ @c MATAnimatedTileOverlay doesn't have to directly manage the storing and retrieval of images.
+ */
+@property (strong, nonatomic) UIImage *tileImage;
 
+/**
+ An array of @c NSString objects that represent the URL at which the tile image asset can be
+ fetched. The URLs maintain the order in which the tile images should be animated.
+ */
+@property (copy, nonatomic) NSArray *tileURLs;
+
+- (id)initWithFrame:(MKMapRect)frame x:(NSInteger)x y:(NSInteger)y z:(NSInteger)z;
 
 @end

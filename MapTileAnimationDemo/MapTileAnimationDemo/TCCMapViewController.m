@@ -11,30 +11,30 @@
 #import "MATAnimatedTileOverlayRenderer.h"
 #import "MATAnimatedTileOverlay.h"
 #import "MATAnimatedTileOverlayDelegate.h"
-
 #import "MKMapView+Extras.h"
 
-
-//#define FUTURE_RADAR_FRAMES_URI "https://qa1-twi.climate.com/assets/wdt-future-radar/LKG.txt?grower_apps=true"
-#define FUTURE_RADAR_FRAMES_URI "http://climate.com/assets/wdt-future-radar/LKG.txt?grower_apps=true"
+#define FUTURE_RADAR_FRAMES_URI @"http://climate.com/assets/wdt-future-radar/LKG.txt?grower_apps=true"
 
 @interface TCCMapViewController () <MKMapViewDelegate, MATAnimatedTileOverlayDelegate, TCCTimeFrameParserDelegateProtocol, UIAlertViewDelegate>
 
-@property (nonatomic, readwrite, weak) IBOutlet MKMapView *mapView;
+@property (weak, nonatomic) IBOutlet MKMapView *mapView;
 @property (weak, nonatomic) IBOutlet UILabel *timeIndexLabel;
 @property (weak, nonatomic) IBOutlet UIProgressView *downloadProgressView;
 @property (weak, nonatomic) IBOutlet UIButton *startStopButton;
 @property (weak, nonatomic) IBOutlet UISlider *timeSlider;
-@property(nonatomic) MKMapRect visibleMapRect;
-@property (nonatomic, readwrite, strong) TCCTimeFrameParser *timeFrameParser;
+@property (nonatomic) MKMapRect visibleMapRect;
+@property (strong, nonatomic) TCCTimeFrameParser *timeFrameParser;
 @property (nonatomic) BOOL initialLoad;
-@property (readwrite, weak) MATAnimatedTileOverlay *animatedTileOverlay;
+@property (weak, nonatomic) MATAnimatedTileOverlay *animatedTileOverlay;
 @property (strong, nonatomic) MATAnimatedTileOverlayRenderer *animatedTileRenderer;
 
-@property (readwrite, assign) BOOL shouldStop;
+@property (nonatomic) BOOL shouldStop;
+
 @end
 
 @implementation TCCMapViewController
+
+#pragma mark - Lifecycle
 
 - (void)viewDidLoad
 {
@@ -50,74 +50,61 @@
 	
 	[self.mapView setRegion: region animated: NO];
 	
-	self.shouldStop = NO;
 	self.startStopButton.tag = MATAnimatingStateStopped;
-    self.downloadProgressView.hidden = NO;
     self.initialLoad = YES;
     self.visibleMapRect = self.mapView.visibleMapRect;
-
-}
-
-- (void) viewDidAppear:(BOOL)animated
-{
-	[super viewDidAppear: animated];
-	self.timeFrameParser = [[TCCTimeFrameParser alloc] initWithURLString: @FUTURE_RADAR_FRAMES_URI delegate: self];
-
+    
+    self.timeFrameParser = [[TCCTimeFrameParser alloc] initWithURLString:FUTURE_RADAR_FRAMES_URI delegate:self];
 }
 
 - (IBAction)onHandleTimeIndexChange:(id)sender
 {
 	NSInteger sliderVal = floor(self.timeSlider.value);
-    if (sliderVal != self.animatedTileOverlay.currentFrameIndex) {
-        [self.animatedTileOverlay moveToFrameIndex:(NSInteger)sliderVal isContinuouslyMoving:YES];
-        self.timeIndexLabel.text = [NSString stringWithFormat:@"%ld", (long)self.animatedTileOverlay.currentFrameIndex];
-        [self.animatedTileRenderer setNeedsDisplayInMapRect:self.mapView.visibleMapRect zoomScale:self.mapView.currentZoomScale];
-	}
+    if (sliderVal == self.animatedTileOverlay.currentFrameIndex) return;
+    
+    [self.animatedTileOverlay moveToFrameIndex:sliderVal isContinuouslyMoving:YES];
+    self.timeIndexLabel.text = [NSString stringWithFormat:@"%ld", (long)self.animatedTileOverlay.currentFrameIndex];
+    [self.animatedTileRenderer setNeedsDisplayInMapRect:self.mapView.visibleMapRect zoomScale:self.mapView.zoomScale];
 }
 
 - (IBAction)finishedSliding:(id)sender
 {
     NSInteger sliderVal = floor(self.timeSlider.value);
-        [self.animatedTileOverlay moveToFrameIndex:(NSInteger)sliderVal isContinuouslyMoving:NO];
-        self.timeIndexLabel.text = [NSString stringWithFormat:@"%ld", (long)self.animatedTileOverlay.currentFrameIndex];
-        [self.animatedTileRenderer setNeedsDisplayInMapRect:self.mapView.visibleMapRect zoomScale:self.mapView.currentZoomScale];
-
+    [self.animatedTileOverlay moveToFrameIndex:(NSInteger)sliderVal isContinuouslyMoving:NO];
+    self.timeIndexLabel.text = [NSString stringWithFormat:@"%ld", (long)self.animatedTileOverlay.currentFrameIndex];
+    [self.animatedTileRenderer setNeedsDisplayInMapRect:self.mapView.visibleMapRect zoomScale:self.mapView.zoomScale];
 }
 
-- (IBAction) onHandleStartStopAction: (id)sender
+- (IBAction)onHandleStartStopAction: (id)sender
 {
 	if (self.startStopButton.tag == MATAnimatingStateStopped) {
 		//start downloading the image tiles for the time frame indexes
 
-		[self.animatedTileOverlay fetchTilesForMapRect: self.mapView.visibleMapRect zoomScale: self.mapView.currentZoomScale progressBlock: ^(NSUInteger currentTimeIndex, BOOL *stop) {
+		[self.animatedTileOverlay fetchTilesForMapRect:self.mapView.visibleMapRect zoomScale:self.mapView.zoomScale progressHandler:^(NSUInteger currentTimeIndex, BOOL *stop) {
 			         
-			CGFloat progressValue = (CGFloat)currentTimeIndex / (CGFloat)(self.animatedTileOverlay.numberOfAnimationFrames - 1);
+			CGFloat progressValue = (CGFloat)currentTimeIndex / (self.animatedTileOverlay.numberOfAnimationFrames - 1);
 			[self.downloadProgressView setProgress: progressValue animated: YES];
             
-            if(self.initialLoad == YES) {
+            if (self.initialLoad) {
                 self.timeSlider.enabled = NO;
-              self.timeIndexLabel.text = [NSString stringWithFormat: @"%lu", (unsigned long)currentTimeIndex];
+                self.timeIndexLabel.text = [NSString stringWithFormat:@"%lu", (unsigned long)currentTimeIndex];
 			}
 
 			*stop = self.shouldStop;
-			
-		} completionBlock: ^(BOOL success, NSError *error) {
-			
-            if(success == YES) {
-                self.initialLoad = NO;
-                self.downloadProgressView.hidden = YES;
-            } else {
-                self.downloadProgressView.hidden = NO;
-            }
-            
-			[self.downloadProgressView setProgress: 0.0];
+		} completionHandler:^(BOOL success, NSError *error) {
+			self.downloadProgressView.progress = 0.0;
 
 			if (success) {
-				[self.animatedTileOverlay moveToFrameIndex:self.animatedTileOverlay.currentFrameIndex isContinuouslyMoving:NO];
-				
-				[self.animatedTileRenderer setNeedsDisplayInMapRect: self.mapView.visibleMapRect zoomScale: self.mapView.currentZoomScale];
+                self.initialLoad = NO;
+                self.downloadProgressView.hidden = YES;
+                
+				[self.animatedTileOverlay moveToFrameIndex:self.animatedTileOverlay.currentFrameIndex
+                                      isContinuouslyMoving:NO];
+				[self.animatedTileRenderer setNeedsDisplayInMapRect:self.mapView.visibleMapRect
+                                                          zoomScale: self.mapView.zoomScale];
 				[self.animatedTileOverlay startAnimating];
 			} else {
+                self.downloadProgressView.hidden = NO;
 				self.shouldStop = NO;
 			}
 		}];
@@ -128,34 +115,35 @@
 	}
 }
 
-#pragma mark - TCCTimeFrameParserDelegate Protocol
+#pragma mark - Protocol conformance
 
-- (void) didLoadTimeStampData;
+#pragma mark TCCTimeFrameParserDelegate
+
+- (void)didLoadTimeStampData;
 {
 	NSArray *templateURLs = self.timeFrameParser.templateFrameTimeURLs;
     NSMutableArray *pluckedArray = [[NSMutableArray alloc] init];
-    for(int i = 0; i < templateURLs.count; i+=3) {
-        NSString *url = [templateURLs objectAtIndex:i];
-        [pluckedArray addObject:url];
+    for (int i = 0; i < templateURLs.count; i+=3) {
+        [pluckedArray addObject:templateURLs[i]];
     }
     
-	MATAnimatedTileOverlay *overlay = [[MATAnimatedTileOverlay alloc] initWithTemplateURLs: pluckedArray frameDuration: 0.20 mapView:self.mapView];
+	MATAnimatedTileOverlay *overlay = [[MATAnimatedTileOverlay alloc] initWithMapView:self.mapView templateURLs:pluckedArray frameDuration:0.20];
 	overlay.delegate = self;
 		
-	[self.mapView addOverlays: @[overlay] level: MKOverlayLevelAboveRoads];
-	self.timeSlider.maximumValue = (CGFloat)pluckedArray.count - 1;
+	[self.mapView addOverlay:overlay level:MKOverlayLevelAboveRoads];
+	self.timeSlider.maximumValue = pluckedArray.count - 1;
 }
 
-#pragma mark - MATAnimatedTileOverlayDelegate Protocol
+#pragma mark MATAnimatedTileOverlayDelegate
 
 - (void)animatedTileOverlay:(MATAnimatedTileOverlay *)animatedTileOverlay didChangeAnimationState:(MATAnimatingState)currentAnimationState {
    
     self.startStopButton.tag = currentAnimationState;
 
     //set titles of button to appropriate string based on currentAnimationState
-    if(currentAnimationState == MATAnimatingStateLoading) {
+    if (currentAnimationState == MATAnimatingStateLoading) {
         [self.startStopButton setTitle: @"◼︎" forState: UIControlStateNormal];
-        //check if user has panned (visibleRects different)
+        // check if user has panned (visibleRects different)
         if(!MKMapRectEqualToRect(self.visibleMapRect, self.mapView.visibleMapRect)) {
             self.downloadProgressView.hidden = NO;
             self.initialLoad = YES;
@@ -174,12 +162,13 @@
 
 - (void)animatedTileOverlay:(MATAnimatedTileOverlay *)animatedTileOverlay didAnimateWithAnimationFrameIndex:(NSInteger)animationFrameIndex
 {
-	[self.animatedTileRenderer setNeedsDisplayInMapRect: self.mapView.visibleMapRect zoomScale: self.mapView.currentZoomScale];
+	[self.animatedTileRenderer setNeedsDisplayInMapRect:self.mapView.visibleMapRect
+                                              zoomScale:self.mapView.zoomScale];
 	//update the slider if we are loading or animating
     self.timeIndexLabel.text = [NSString stringWithFormat: @"%lu", (unsigned long)animationFrameIndex];
  	if (animatedTileOverlay.currentAnimatingState != MATAnimatingStateStopped) {
         self.timeSlider.enabled = YES;
-		self.timeSlider.value = (CGFloat)animationFrameIndex;
+		self.timeSlider.value = animationFrameIndex;
 	}
 }
 
@@ -198,27 +187,12 @@
 }
 
 
-#pragma mark - MKMapViewDelegate Protocol
-
-- (void)mapViewDidFinishRenderingMap:(MKMapView *)mapView fullyRendered:(BOOL)fullyRendered
-{
-	if (fullyRendered == YES) {
-
-
-	}
-}
+#pragma mark MKMapViewDelegate
 
 - (void)mapView:(MKMapView *)mapView regionWillChangeAnimated:(BOOL)animated
 {
 	if (self.startStopButton.tag != 0) {
 		[self.animatedTileOverlay pauseAnimating];
-	}
-}
-
-- (void)mapView:(MKMapView *)mapView regionDidChangeAnimated:(BOOL)animated
-{
-	if (animated == NO) {
-		
 	}
 }
 
@@ -234,13 +208,5 @@
 	}
 	return nil;
 }
-
-#pragma mark - UIAlertViewDelegate
-
-- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
-{
-	MKCoordinateRegion region = self.mapView.region;
-}
-
 
 @end

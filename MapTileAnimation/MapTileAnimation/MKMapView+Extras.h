@@ -10,12 +10,16 @@
 
 @interface MKMapView (Extras)
 
-- (MKZoomScale) currentZoomScale;
-
-- (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(NSUInteger)zoomLevel animated:(BOOL)animated;
--(MKCoordinateRegion)coordinateRegionWithMapView:(MKMapView *)mapView centerCoordinate:(CLLocationCoordinate2D)centerCoordinate andZoomLevel:(NSUInteger)zoomLevel;
 - (NSUInteger)zoomLevel;
 
-NSString *NSStringFromMapRect(MKMapRect aRect);
+- (MKZoomScale)zoomScale;
+
+- (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate
+                  zoomLevel:(NSUInteger)zoomLevel
+                   animated:(BOOL)animated;
+
+-(MKCoordinateRegion)coordinateRegionWithMapView:(MKMapView *)mapView
+                                centerCoordinate:(CLLocationCoordinate2D)centerCoordinate
+                                    andZoomLevel:(NSUInteger)zoomLevel;
 
 @end

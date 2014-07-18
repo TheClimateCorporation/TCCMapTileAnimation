@@ -30,7 +30,6 @@
 
 - (BOOL)canDrawMapRect:(MKMapRect)mapRect zoomScale:(MKZoomScale)zoomScale
 {
-    self.zoomScale = zoomScale;
     // We can ALWAYS draw a tile, even if the zoom scale/level is not supported by the tile server.
     // That's because we will draw a scaled version of the minimum/maximum supported tile.
     return YES;
@@ -45,7 +44,7 @@
     MATAnimationTile *tile = [mapOverlay tileForMapRect:mapRect zoomScale:zoomScale];
 	if (tile) {
 		CGRect rect = [self rectForMapRect: mapRect];
-		UIImage *image = tile.currentImageTile;
+		UIImage *image = tile.tileImage;
 		UIGraphicsPushContext(context);
 		[image drawInRect:rect blendMode:kCGBlendModeNormal alpha:0.75];
 		UIGraphicsPopContext();
@@ -70,7 +69,7 @@
 
     // Draw the tile coordinates in the upper left of the tile
     MATTileCoordinate c = [self tileCoordinateForMapRect:mapRect zoomScale:zoomScale];
-    NSString *tileCoordinates = [NSString stringWithFormat:@"(%d, %d, %d)", c.xCoordinate, c.yCoordinate, c.zCoordinate];
+    NSString *tileCoordinates = [NSString stringWithFormat:@"(%d, %d, %d)", c.x, c.y, c.z];
     [tileCoordinates drawInRect:rect withAttributes:@{ NSFontAttributeName : [UIFont systemFontOfSize:CGRectGetHeight(rect) * .1] }];
     
     UIGraphicsPopContext();
@@ -89,14 +88,14 @@
         
         // OverZoom mode - 1 when using tiles as is, 2, 4, 8 etc when overzoomed.
         CGContextScaleCTM(context, overZoom/zoomScale, overZoom/zoomScale);
-        CGContextTranslateCTM(context, 0, tile.currentImageTile.size.height);
+        CGContextTranslateCTM(context, 0, tile.tileImage.size.height);
         CGContextScaleCTM(context, 1, -1);
-        CGContextDrawImage(context, CGRectMake(0, 0, tile.currentImageTile.size.width, tile.currentImageTile.size.height), [tile.currentImageTile CGImage]);
+        CGContextDrawImage(context, CGRectMake(0, 0, tile.tileImage.size.width, tile.tileImage.size.height), [tile.tileImage CGImage]);
         
         CGContextRestoreGState(context);
         
         UIGraphicsPushContext(context);
-        NSString *tileCoordinates = [NSString stringWithFormat:@"(%d, %d, %d)", tile.xCoordinate, tile.yCoordinate, tile.zCoordinate];
+        NSString *tileCoordinates = [NSString stringWithFormat:@"(%d, %d, %d)", tile.x, tile.y, tile.z];
         [tileCoordinates drawInRect:rect withAttributes:@{ NSFontAttributeName : [UIFont systemFontOfSize:CGRectGetHeight(rect) * .1] }];
         
         UIBezierPath *bezierPath = [UIBezierPath bezierPathWithRect:CGRectMake(rect.origin.x, rect.origin.y, rect.size.width, rect.size.height)];
@@ -134,9 +133,9 @@
     NSUInteger tilex = floor(mercatorPoint.x * [self worldTileWidthForZoomLevel:zoomLevel]);
     NSUInteger tiley = floor(mercatorPoint.y * [self worldTileWidthForZoomLevel:zoomLevel]);
     
-	coord.xCoordinate = tilex;
-	coord.yCoordinate = tiley;
-	coord.zCoordinate = zoomLevel;
+	coord.x = tilex;
+	coord.y = tiley;
+	coord.z = zoomLevel;
 	
 	return coord;
 }
