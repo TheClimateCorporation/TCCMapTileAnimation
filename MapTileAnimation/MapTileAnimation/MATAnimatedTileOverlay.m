@@ -319,11 +319,17 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
 {
 	[self.downloadQueue addOperationWithBlock: ^{
 		NSString *urlString = [aUrlString copy];
+        
+        BOOL containsTileURL = [self.failedMapTiles containsObject:[self parseResponseURL:aUrlString]];
+        //if tile not in failedMapTiles, go and fetch the tile
+        if (containsTileURL) {
+            return;
+        }
 		
         dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
         
         NSURLSession *session = [NSURLSession sharedSession];
-        NSURLRequest *request = [[NSURLRequest alloc] initWithURL:[NSURL URLWithString:urlString] cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:5];
+        NSURLRequest *request = [[NSURLRequest alloc] initWithURL:[NSURL URLWithString:urlString] cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:0];
         NSURLSessionTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
             
             //parse URL and add to failed map tiles set
@@ -354,6 +360,12 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
 //    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         for (MATAnimationTile *tile in self.mapTiles) {
             NSURL *url = [[NSURL alloc] initWithString:tile.tileURLs[frameIndex]];
+            
+            BOOL containsTileURL = [self.failedMapTiles containsObject:[self parseResponseURL:tile.tileURLs[frameIndex]]];
+            if (containsTileURL) {
+                continue;
+            }
+            
             NSURLRequest *request = [[NSURLRequest alloc] initWithURL:url cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:1];
             NSURLResponse *response;
             NSError *error;
