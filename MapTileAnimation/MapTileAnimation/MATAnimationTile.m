@@ -29,4 +29,24 @@
     return [NSString stringWithFormat:@"(%d, %d, %d). mapRectFrame origin: (%f, %f) size: (%f, %f)", self.x, self.y, self.z, self.mapRectFrame.origin.x, self.mapRectFrame.origin.y, self.mapRectFrame.size.width, self.mapRectFrame.size.height];
 }
 
+#pragma mark - Overridden methods
+
+//checks to see if hashCoords is equal on the two tiles being compared
+- (BOOL)isEqual:(id)object
+{
+    if (![object isKindOfClass:[MATAnimationTile class]]) return NO;
+    
+    MATAnimationTile *other = (MATAnimationTile *)object;
+    return [self hash] == [other hash] &&
+            self.x == other.x &&
+            self.y == other.y &&
+            self.z == other.z;
+}
+
+//custom hash to identify tiles by their x/y/z (their hashCoords)
+- (NSUInteger)hash
+{
+    return [[NSString stringWithFormat:@"%d/%d/%d", self.x, self.y, self.z] hash];
+}
+
 @end

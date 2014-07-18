@@ -26,6 +26,7 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
 @property (strong, nonatomic) NSTimer *timer;
 @property (readwrite, nonatomic) MATAnimatingState currentAnimatingState;
 @property (strong, nonatomic) NSSet *mapTiles;
+@property (strong, nonatomic) NSMutableSet *failedMapTiles;
 @property (nonatomic) NSInteger tileSize;
 @property (strong, nonatomic) MKTileOverlay *tileOverlay;
 @property (strong, nonatomic) MKMapView *mapView;
@@ -57,6 +58,7 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
 		[_fetchQueue setMaxConcurrentOperationCount: 1];  //essentially a serial queue
 		_downloadQueue = [[NSOperationQueue alloc] init];
 		[_downloadQueue setMaxConcurrentOperationCount: 25];
+        _failedMapTiles = [NSMutableSet set];
 		
 		_currentAnimatingState = MATAnimatingStateStopped;
 		
@@ -172,7 +174,12 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
             
             // Fetch and cache the tile data
 			for (MATAnimationTile *tile in self.mapTiles) {
-				[self enqueueOperationOnQueue:self.downloadQueue toFetchAndCacheTileAtURL:tile.tileURLs[frameIndex]];
+                BOOL isFailedTile = [self.failedMapTiles containsObject:tile];
+                
+                //if tile not in failedMapTiles, tile not bad -> go and fetch the tile
+                if (!isFailedTile) {
+                    [self enqueueOperationOnQueue:self.downloadQueue toFetchAndCacheTile:tile forFrameIndex:frameIndex];
+                }
 			}
             
 			// Wait for all the tiles in this frame index to finish downloading before proceeding
@@ -236,17 +243,33 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
 
 #pragma  mark - Private
 
-- (void)enqueueOperationOnQueue:(NSOperationQueue *)queue toFetchAndCacheTileAtURL:(NSString *)aUrlString
+
+- (void)enqueueOperationOnQueue:(NSOperationQueue *)queue toFetchAndCacheTile:(MATAnimationTile *)tile forFrameIndex:(NSInteger)frameIndex
 {
+    // TODO: do we really need to check failedMapTiles both here and in fetch?
+    //if tile not in failedMapTiles, go and fetch the tile
+    if ([self.failedMapTiles containsObject:tile]) {
+        return;
+    }
+    
 	[queue addOperationWithBlock:^{
-		NSString *urlString = [aUrlString copy];
-		
         dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
         
         NSURLSession *session = [NSURLSession sharedSession];
-        NSURLRequest *request = [[NSURLRequest alloc] initWithURL:[NSURL URLWithString:urlString] cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:5];
+        NSURL *url = [NSURL URLWithString:tile.tileURLs[frameIndex]];
+        NSURLRequest *request = [[NSURLRequest alloc] initWithURL:url
+                                                      cachePolicy:NSURLRequestReturnCacheDataElseLoad
+                                                  timeoutInterval:0];
         NSURLSessionTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-            [self checkResponseForError:(NSHTTPURLResponse *)response data:data];
+            
+            //parse URL and add to failed map tiles set
+            BOOL errorResponse = [self checkResponseForError:(NSHTTPURLResponse *)response data:data];
+            
+            //there is an error 
+            if(errorResponse) {
+                [self.failedMapTiles addObject:tile];
+            }
+            
             dispatch_semaphore_signal(semaphore);
         }];
         [task resume];
@@ -264,6 +287,10 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
     // currentFrameIndex to enter a race condition. If we want to do this in the background, I think we'll
     // need to create a serial background queue.
     for (MATAnimationTile *tile in self.mapTiles) {
+        if ([self.failedMapTiles containsObject:tile]) {
+            continue;
+        }
+        
         NSURL *url = [[NSURL alloc] initWithString:tile.tileURLs[frameIndex]];
         NSURLRequest *request = [[NSURLRequest alloc] initWithURL:url cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:1];
         NSURLResponse *response;
@@ -399,12 +426,15 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
 
 - (BOOL)checkResponseForError:(NSHTTPURLResponse *)response data:(NSData *)data
 {
+    
     if (data) {
         if (response.statusCode != 200) {
+            
             NSString *localizedDescription = [NSString stringWithFormat:@"Error during fetch. Image tile HTTP respsonse code %ld, URL %@", (long)response.statusCode, response.URL];
             NSError *error = [NSError errorWithDomain:MATAnimatedTileOverlayErrorDomain code:MATAnimatingErrorBadURLResponseCode userInfo:@{ NSLocalizedDescriptionKey : localizedDescription }];
             [self sendErrorToDelegate:error];
             return YES;
+            
         }
     } else {
         NSString *localizedDescription = [NSString stringWithFormat:@"No image data. HTTP respsonse code %ld, URL %@", (long)response.statusCode, response.URL];

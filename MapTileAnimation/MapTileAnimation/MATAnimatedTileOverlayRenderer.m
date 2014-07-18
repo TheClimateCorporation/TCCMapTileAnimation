@@ -76,7 +76,7 @@
     
     if (overZoom == 1) return;
     
-    NSArray *tiles = [mapOverlay tilesForMapRect:mapRect zoomScale:zoomScale];
+    NSArray *tiles = [mapOverlay cachedTilesForMapRect:mapRect];
 
     //tile drawing
     for (MATAnimationTile *tile in tiles) {
