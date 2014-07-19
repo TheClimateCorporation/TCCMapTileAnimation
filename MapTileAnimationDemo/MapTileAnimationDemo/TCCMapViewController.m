@@ -11,6 +11,7 @@
 #import "MATAnimatedTileOverlayRenderer.h"
 #import "MATAnimatedTileOverlay.h"
 #import "MATAnimatedTileOverlayDelegate.h"
+#import "MKOverzoomTileOverlayRenderer.h"
 #import "MKMapView+Extras.h"
 
 #define FUTURE_RADAR_FRAMES_URI @"http://climate.com/assets/wdt-future-radar/LKG.txt?grower_apps=true"
@@ -198,13 +199,14 @@
 
 - (MKOverlayRenderer *)mapView:(MKMapView *)mapView rendererForOverlay:(id<MKOverlay>)overlay
 {
+
 	if ([overlay isKindOfClass: [MATAnimatedTileOverlay class]]) {
 		self.animatedTileOverlay = (MATAnimatedTileOverlay *)overlay;
         self.animatedTileRenderer = [[MATAnimatedTileOverlayRenderer alloc] initWithOverlay:overlay];
         return self.animatedTileRenderer;
 	}
     if ([overlay isKindOfClass: [MKTileOverlay class]]) {
-		return [[MKTileOverlayRenderer alloc] initWithTileOverlay:overlay];
+        return [[MKOverzoomTileOverlayRenderer alloc] initWithOverlay:overlay];
 	}
 	return nil;
 }

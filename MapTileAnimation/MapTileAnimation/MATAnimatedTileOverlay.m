@@ -296,7 +296,7 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
         NSURLResponse *response;
         NSError *error;
         NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-        
+
         BOOL errorOccurred = [self checkResponseForError:(NSHTTPURLResponse *)response data:data];
         
         if (!errorOccurred) {
