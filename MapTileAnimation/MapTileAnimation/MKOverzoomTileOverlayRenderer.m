@@ -36,35 +36,39 @@
 {
     MKTileOverlay *mapOverlay = (MKTileOverlay *)self.overlay;
     
-    //get x,y,z for tile
+    //get x ,y,z coords for tile
     NSUInteger aZoomLevel = [self zoomLevelForZoomScale: zoomScale];
     CGPoint mercatorPoint = [self mercatorTileOriginForMapRect: mapRect];
-    int x,y,z = 0;
-    x = floor(mercatorPoint.x * [self worldTileWidthForZoomLevel:aZoomLevel]);
-    y = floor(mercatorPoint.y * [self worldTileWidthForZoomLevel:aZoomLevel]);
-    z = aZoomLevel;
+    int x = floor(mercatorPoint.x * [self worldTileWidthForZoomLevel:aZoomLevel]);
+    int y = floor(mercatorPoint.y * [self worldTileWidthForZoomLevel:aZoomLevel]);
+    int z = aZoomLevel;
     
     //Store path for tile in struct for MKTileOverlay
     MKTileOverlayPath coordPaths;
     coordPaths.x = x;
     coordPaths.y = y;
     coordPaths.z = z;
-
-    [mapOverlay loadTileAtPath:coordPaths result:^(NSData *tileData, NSError *error) {
-        UIImage *image = [UIImage imageWithData:tileData];
-        NSLog(@"test! %zd", image);
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if (image) {
-                CGRect rect = [self rectForMapRect: mapRect];
-                UIGraphicsPushContext(context);
-                [image drawInRect:rect blendMode:kCGBlendModeNormal alpha:0.75];
-                UIGraphicsPopContext();
-            }
-        });
-        
-    }];
     
+    //log coords
+    NSLog(@"x: %zd", x);
+    NSLog(@"y: %zd", y);
+    NSLog(@"z: %zd", z);
+    
+    //grab tile for this specific x,y,z path
+    [mapOverlay loadTileAtPath:coordPaths result:^(NSData *tileData, NSError *error) {
+       
+        UIImage *image = [UIImage imageWithData:tileData];
+        CGRect rect = [self rectForMapRect: mapRect];
+      
+       // dispatch_async(dispatch_get_main_queue(), ^{
+            UIGraphicsPushContext(context);
+            [image drawInRect:rect blendMode:kCGBlendModeNormal alpha:0.75];
+            UIGraphicsPopContext();
+      //  });
+        
+
+    }];
+
    /*
     NSInteger overZoom = 1;
     

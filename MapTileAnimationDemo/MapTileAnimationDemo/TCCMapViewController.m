@@ -42,7 +42,7 @@
     [super viewDidLoad];
 
     // Set the starting  location.
-    CLLocationCoordinate2D startingLocation = {40.2444, -111.6608};
+    CLLocationCoordinate2D startingLocation = {30.33, -81.52};
 //	MKCoordinateSpan span = {8.403266, 7.031250};
 	MKCoordinateSpan span = {7.0, 7.0};
 	//calling regionThatFits: is very important, this will line up the visible map rect with the screen aspect ratio
