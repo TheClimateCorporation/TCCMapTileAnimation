@@ -10,4 +10,6 @@
 
 @interface MKOverzoomTileOverlayRenderer : MKTileOverlayRenderer
 
+@property (nonatomic) NSUInteger lastZoomLevel;
+
 @end

@@ -10,6 +10,10 @@
 #import "MATAnimatedTileOverlay.h"
 #import "MATAnimationTile.h"
 
+@interface MKOverzoomTileOverlayRenderer ()
+@property (strong, nonatomic) NSMutableSet *tileSet;
+@end
+
 @implementation MKOverzoomTileOverlayRenderer
 
 #pragma mark - Lifecycle
@@ -17,6 +21,9 @@
 - (id) initWithOverlay:(id<MKOverlay>)overlay
 {
 	self = [super initWithOverlay:overlay];
+    if (self) {
+        _tileSet = [NSMutableSet set];
+    }
 	return self;
 }
 
@@ -24,9 +31,64 @@
 
 - (BOOL)canDrawMapRect:(MKMapRect)mapRect zoomScale:(MKZoomScale)zoomScale
 {
-    // We can ALWAYS draw a tile, even if the zoom scale/level is not supported by the tile server.
-    // That's because we will draw a scaled version of the minimum/maximum supported tile.
-    return YES;
+    
+    // get map overlay
+    MKTileOverlay *mapOverlay = (MKTileOverlay *)self.overlay;
+    
+    // get zoom level
+    NSUInteger aZoomLevel = [self zoomLevelForZoomScale: zoomScale];
+    NSUInteger oldZoomLevel = [self zoomLevelForZoomScale: zoomScale];
+
+    // cap aZoomLevel
+    if(aZoomLevel > mapOverlay.maximumZ) {
+        aZoomLevel = mapOverlay.maximumZ;
+    }
+    if(aZoomLevel < mapOverlay.minimumZ) {
+        aZoomLevel = mapOverlay.minimumZ;
+    }
+
+    // empty tileDict if new zoom level is different than last zoom level
+    if(aZoomLevel != self.lastZoomLevel) {
+        [self.tileSet removeAllObjects];
+        
+        // set zoom level property
+        self.lastZoomLevel = aZoomLevel;
+    }
+    
+    // Create coord struct with proper values of x, y, z at zoom level
+    MATTileCoordinate coord = [self tileCoordinateForMapRect:mapRect zoomLevel:aZoomLevel];
+    
+    // Store path for tile in struct for MKTileOverlay
+    MKTileOverlayPath coordPaths;
+    coordPaths.x = coord.x;
+    coordPaths.y = coord.y;
+    coordPaths.z = coord.z;
+    
+    // create tile, passed x, y, and capped z
+    MATAnimationTile *tile = [[MATAnimationTile alloc] initWithFrame:mapRect x:coordPaths.x y:coordPaths.y z:oldZoomLevel];
+
+    // check if tile is in dictionary, if so we return YES to render it with drawMapRect
+    if([self.tileSet containsObject:tile]) {
+        return YES;
+    }
+    
+    // else, return NO and go and fetch tile data with loadTileAtPath and store in tilesDict.
+    // grab main thread and call setNeedsDisplay to render tile on screen with drawMapRect
+    else {
+        [mapOverlay loadTileAtPath:coordPaths result:^(NSData *tileData, NSError *error) {
+            
+            tile.tileImage = [UIImage imageWithData:tileData];
+            [self.tileSet addObject:tile];
+
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self setNeedsDisplayInMapRect:mapRect zoomScale:zoomScale];
+            });
+            
+        }];
+        return NO;
+ 
+    }
+    
 }
 
 /*
@@ -34,67 +96,83 @@
  */
 -(void)drawMapRect:(MKMapRect)mapRect zoomScale:(MKZoomScale)zoomScale inContext:(CGContextRef)context
 {
-    MKTileOverlay *mapOverlay = (MKTileOverlay *)self.overlay;
+
+    // get map overlay
+    MATAnimatedTileOverlay *mapOverlay = (MATAnimatedTileOverlay *)self.overlay;
     
-    //get x ,y,z coords for tile
+    // get zoom level
     NSUInteger aZoomLevel = [self zoomLevelForZoomScale: zoomScale];
-    CGPoint mercatorPoint = [self mercatorTileOriginForMapRect: mapRect];
-    int x = floor(mercatorPoint.x * [self worldTileWidthForZoomLevel:aZoomLevel]);
-    int y = floor(mercatorPoint.y * [self worldTileWidthForZoomLevel:aZoomLevel]);
-    int z = aZoomLevel;
     
-    //Store path for tile in struct for MKTileOverlay
-    MKTileOverlayPath coordPaths;
-    coordPaths.x = x;
-    coordPaths.y = y;
-    coordPaths.z = z;
-    
-    //log coords
-    NSLog(@"x: %zd", x);
-    NSLog(@"y: %zd", y);
-    NSLog(@"z: %zd", z);
-    
-    //grab tile for this specific x,y,z path
-    [mapOverlay loadTileAtPath:coordPaths result:^(NSData *tileData, NSError *error) {
-       
-        UIImage *image = [UIImage imageWithData:tileData];
-        CGRect rect = [self rectForMapRect: mapRect];
-      
-       // dispatch_async(dispatch_get_main_queue(), ^{
-            UIGraphicsPushContext(context);
-            [image drawInRect:rect blendMode:kCGBlendModeNormal alpha:0.75];
-            UIGraphicsPopContext();
-      //  });
-        
-
-    }];
-
-   /*
+    // overzoom is 1 by default, get zoom level from zoom scale
     NSInteger overZoom = 1;
     
+    // calculate amount of overzoom
     if (aZoomLevel > mapOverlay.maximumZ) {
         overZoom = pow(2, (aZoomLevel - mapOverlay.maximumZ));
         aZoomLevel = mapOverlay.maximumZ;
     }
     
-    UIGraphicsPushContext(context);
+    // cap zoom level
+    if(aZoomLevel < mapOverlay.minimumZ) {
+        aZoomLevel = mapOverlay.minimumZ;
+    }
+    if(aZoomLevel > mapOverlay.maximumZ) {
+        aZoomLevel = mapOverlay.maximumZ;
+    }
     
-    CGRect rect = [self rectForMapRect: mapRect];
-    UIBezierPath *bezierPath = [UIBezierPath bezierPathWithRect:CGRectMake(rect.origin.x, rect.origin.y, rect.size.width, rect.size.height)];
-    [[UIColor blackColor] setStroke];
-    bezierPath.lineWidth = CGRectGetHeight(rect) / 256;
-    [bezierPath stroke];
+    // get x ,y, z coords for tile
+    CGPoint mercatorPoint = [self mercatorTileOriginForMapRect: mapRect];
+    int x = floor(mercatorPoint.x * [self worldTileWidthForZoomLevel:aZoomLevel]);
+    int y = floor(mercatorPoint.y * [self worldTileWidthForZoomLevel:aZoomLevel]);
+    int z = aZoomLevel;
     
-    // Draw the tile coordinates in the upper left of the tile
-    MATTileCoordinate c = [self tileCoordinateForMapRect:mapRect zoomScale:zoomScale];
-    NSString *tileCoordinates = [NSString stringWithFormat:@"(%d, %d, %d)", c.x, c.y, c.z];
-    [tileCoordinates drawInRect:rect withAttributes:@{ NSFontAttributeName : [UIFont systemFontOfSize:CGRectGetHeight(rect) * .1] }];
+    // grab tile from set
+    MATAnimationTile *tile;
+    for (MATAnimationTile *tileInd in self.tileSet) {
+        if (x == tileInd.x && y == tileInd.y && z == tileInd.z) {
+            tile = tileInd;
+        }
+    }
+
+    // if no overzoom
+    if (overZoom == 1) {
+        
+        CGRect rect = [self rectForMapRect: mapRect];
+        UIImage *image = tile.tileImage;
+        UIGraphicsPushContext(context);
+        [image drawInRect:rect blendMode:kCGBlendModeNormal alpha:0.75];
+        UIGraphicsPopContext();
+        
+    }
+
+    // map is overzoomed
+    else {
+        
+        CGRect rect = [self rectForMapRect:tile.mapRectFrame];
+        CGContextSaveGState(context);
+        CGContextTranslateCTM(context, CGRectGetMinX(rect), CGRectGetMinY(rect));
+        
+        // OverZoom mode - 1 when using tiles as is, 2, 4, 8 etc when overzoomed.
+        CGContextScaleCTM(context, overZoom/zoomScale, overZoom/zoomScale);
+        CGContextTranslateCTM(context, 0, tile.tileImage.size.height);
+        CGContextScaleCTM(context, 1, -1);
+        CGContextDrawImage(context, CGRectMake(0, 0, tile.tileImage.size.width, tile.tileImage.size.height), [tile.tileImage CGImage]);
+        CGContextRestoreGState(context);
+        
+        
+        UIGraphicsPushContext(context);
+        NSString *tileCoordinates = [NSString stringWithFormat:@"(%d, %d, %d)", tile.x, tile.y, tile.z];
+        [tileCoordinates drawInRect:rect withAttributes:@{ NSFontAttributeName : [UIFont systemFontOfSize:CGRectGetHeight(rect) * .1] }];
+        
+        UIBezierPath *bezierPath = [UIBezierPath bezierPathWithRect:CGRectMake(rect.origin.x, rect.origin.y, rect.size.width, rect.size.height)];
+        [[UIColor blueColor] setStroke];
+        bezierPath.lineWidth = CGRectGetHeight(rect) / 256;
+        [bezierPath stroke];
+        
+        UIGraphicsPopContext();
+        
+    }
     
-    UIGraphicsPopContext();
-    
-    if (overZoom == 1) return;
-     */
-     
 }
 
 #pragma mark - Debug methods
@@ -113,11 +191,10 @@
     return z;
 }
 
-- (MATTileCoordinate)tileCoordinateForMapRect:(MKMapRect)aMapRect zoomScale:(MKZoomScale)aZoomScale
+- (MATTileCoordinate)tileCoordinateForMapRect:(MKMapRect)aMapRect zoomLevel:(NSInteger)zoomLevel
 {
 	MATTileCoordinate coord = {0, 0, 0};
 	
-	NSUInteger zoomLevel = [self zoomLevelForZoomScale: aZoomScale];
     CGPoint mercatorPoint = [self mercatorTileOriginForMapRect: aMapRect];
     NSUInteger tilex = floor(mercatorPoint.x * [self worldTileWidthForZoomLevel:zoomLevel]);
     NSUInteger tiley = floor(mercatorPoint.y * [self worldTileWidthForZoomLevel:zoomLevel]);
@@ -161,5 +238,7 @@
 	
     return CGPointMake(x, y);
 }
+
+
 
 @end

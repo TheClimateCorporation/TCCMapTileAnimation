@@ -69,6 +69,9 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
 
         _mapView = mapView;
         _tileOverlay = [[MKTileOverlay alloc] initWithURLTemplate:_templateURLs[0]];
+        _tileOverlay.minimumZ = self.minimumZ;
+        _tileOverlay.maximumZ = self.maximumZ;
+        //TODO: refactor min/max of tileOverlay to update everywhere at once
         [_mapView addOverlay:_tileOverlay];
 	}
 	return self;
@@ -126,6 +129,8 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
 	self.timer = nil;
 	self.currentAnimatingState = MATAnimatingStateStopped;
     self.tileOverlay = [[MKTileOverlay alloc] initWithURLTemplate:self.templateURLs[self.currentFrameIndex]];
+    self.tileOverlay.minimumZ = self.minimumZ;
+    self.tileOverlay.maximumZ = self.maximumZ;
     [self.mapView addOverlay:self.tileOverlay];
 }
 
@@ -210,6 +215,8 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
     // the tiled overlay on and off.
     if (!isContinuouslyMoving) {
         self.tileOverlay = [[MKTileOverlay alloc] initWithURLTemplate:self.templateURLs[self.currentFrameIndex]];
+        self.tileOverlay.minimumZ = self.minimumZ;
+        self.tileOverlay.maximumZ = self.maximumZ;
         [self.mapView addOverlay:self.tileOverlay];
     } else if (self.tileOverlay) {
         [self.mapView removeOverlay:self.tileOverlay];
