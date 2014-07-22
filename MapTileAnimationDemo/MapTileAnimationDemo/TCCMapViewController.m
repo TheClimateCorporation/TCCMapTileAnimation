@@ -206,7 +206,9 @@
         return self.animatedTileRenderer;
 	}
     if ([overlay isKindOfClass: [MKTileOverlay class]]) {
-        return [[MKOverzoomTileOverlayRenderer alloc] initWithOverlay:overlay];
+        MKOverzoomTileOverlayRenderer *renderer = [[MKOverzoomTileOverlayRenderer alloc] initWithOverlay:overlay];
+        renderer.alpha = .75;
+        return renderer;
 	}
 	return nil;
 }

@@ -12,6 +12,7 @@
 
 @interface MKOverzoomTileOverlayRenderer ()
 @property (strong, nonatomic) NSMutableSet *tileSet;
+@property (strong, nonatomic) NSLock *tileSetLock;
 @end
 
 @implementation MKOverzoomTileOverlayRenderer
@@ -23,6 +24,7 @@
 	self = [super initWithOverlay:overlay];
     if (self) {
         _tileSet = [NSMutableSet set];
+        _tileSetLock = [[NSLock alloc] init];
     }
 	return self;
 }
@@ -48,15 +50,21 @@
     }
 
     // empty tileDict if new zoom level is different than last zoom level
-    if(aZoomLevel != self.lastZoomLevel) {
+    if (aZoomLevel != self.lastZoomLevel) {
+        [self.tileSetLock lock];
         [self.tileSet removeAllObjects];
+        [self.tileSetLock unlock];
         
         // set zoom level property
         self.lastZoomLevel = aZoomLevel;
     }
     
     // Create coord struct with proper values of x, y, z at zoom level
+//    MATTileCoordinate coord = [self tileCoordinateForMapRect:mapRect zoomLevel:oldZoomLevel];
+//    NSLog(@"Uncapped MATTileCoordinate is (%d, %d, %d)", coord.x, coord.y, coord.z);
     MATTileCoordinate coord = [self tileCoordinateForMapRect:mapRect zoomLevel:aZoomLevel];
+//    NSLog(@"Capped MATTileCoordinate is (%d, %d, %d)", coord.x, coord.y, coord.z);
+
     
     // Store path for tile in struct for MKTileOverlay
     MKTileOverlayPath coordPaths;
@@ -64,31 +72,36 @@
     coordPaths.y = coord.y;
     coordPaths.z = coord.z;
     
+    MKMapRect cappedMapRect = [self mapRectForTileCoordinate:coord];
+    NSLog(@"Capped map rect is (%f, %f), (%f, %f)", cappedMapRect.origin.x, cappedMapRect.origin.y,
+          cappedMapRect.size.width, cappedMapRect.size.height);
+    
     // create tile, passed x, y, and capped z
-    MATAnimationTile *tile = [[MATAnimationTile alloc] initWithFrame:mapRect x:coordPaths.x y:coordPaths.y z:oldZoomLevel];
+    MATAnimationTile *tile = [[MATAnimationTile alloc] initWithFrame:cappedMapRect x:coordPaths.x y:coordPaths.y z:aZoomLevel];
 
     // check if tile is in dictionary, if so we return YES to render it with drawMapRect
-    if([self.tileSet containsObject:tile]) {
+    [self.tileSetLock lock];
+    if ([self.tileSet containsObject:tile]) {
+        [self.tileSetLock unlock];
         return YES;
     }
+    [self.tileSetLock unlock];
     
     // else, return NO and go and fetch tile data with loadTileAtPath and store in tilesDict.
     // grab main thread and call setNeedsDisplay to render tile on screen with drawMapRect
-    else {
-        [mapOverlay loadTileAtPath:coordPaths result:^(NSData *tileData, NSError *error) {
-            
-            tile.tileImage = [UIImage imageWithData:tileData];
-            [self.tileSet addObject:tile];
+    [mapOverlay loadTileAtPath:coordPaths result:^(NSData *tileData, NSError *error) {
+        
+        tile.tileImage = [UIImage imageWithData:tileData];
+        [self.tileSetLock lock];
+        [self.tileSet addObject:tile];
+        [self.tileSetLock unlock];
 
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self setNeedsDisplayInMapRect:mapRect zoomScale:zoomScale];
-            });
-            
-        }];
-        return NO;
- 
-    }
-    
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self setNeedsDisplayInMapRect:mapRect zoomScale:zoomScale];
+        });
+        
+    }];
+    return NO;
 }
 
 /*
@@ -128,11 +141,14 @@
     
     // grab tile from set
     MATAnimationTile *tile;
+    [self.tileSetLock lock];
     for (MATAnimationTile *tileInd in self.tileSet) {
         if (x == tileInd.x && y == tileInd.y && z == tileInd.z) {
             tile = tileInd;
+            break;
         }
     }
+    [self.tileSetLock unlock];
 
     // if no overzoom
     if (overZoom == 1) {
@@ -193,17 +209,21 @@
 
 - (MATTileCoordinate)tileCoordinateForMapRect:(MKMapRect)aMapRect zoomLevel:(NSInteger)zoomLevel
 {
-	MATTileCoordinate coord = {0, 0, 0};
-	
-    CGPoint mercatorPoint = [self mercatorTileOriginForMapRect: aMapRect];
+    CGPoint mercatorPoint = [self mercatorTileOriginForMapRect:aMapRect];
     NSUInteger tilex = floor(mercatorPoint.x * [self worldTileWidthForZoomLevel:zoomLevel]);
     NSUInteger tiley = floor(mercatorPoint.y * [self worldTileWidthForZoomLevel:zoomLevel]);
-    
-	coord.x = tilex;
-	coord.y = tiley;
-	coord.z = zoomLevel;
-	
-	return coord;
+    return (MATTileCoordinate){tilex, tiley, zoomLevel};
+}
+
+- (MKMapRect)mapRectForTileCoordinate:(MATTileCoordinate)coordinate
+{
+    CGFloat xScale = (double)coordinate.x / [self worldTileWidthForZoomLevel:coordinate.z];
+    CGFloat yScale = (double)coordinate.y / [self worldTileWidthForZoomLevel:coordinate.z];
+    MKMapRect world = MKMapRectWorld;
+    return MKMapRectMake(world.size.width * xScale,
+                         world.size.height * yScale,
+                         world.size.width / [self worldTileWidthForZoomLevel:coordinate.z],
+                         world.size.height / [self worldTileWidthForZoomLevel:coordinate.z]);
 }
 
 /*
