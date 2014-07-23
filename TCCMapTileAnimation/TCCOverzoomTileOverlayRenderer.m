@@ -77,7 +77,6 @@
     if ([self.tileSet containsObject:tile]) {
         return YES;
     }
-    [self.tileSetLock unlock];
     
     // else, return NO and go and fetch tile data with loadTileAtPath and store in tilesDict.
     // grab main thread and call setNeedsDisplay to render tile on screen with drawMapRect
