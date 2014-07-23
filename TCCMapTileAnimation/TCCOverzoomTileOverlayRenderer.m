@@ -75,7 +75,10 @@
     TCCAnimationTile *tile = [[TCCAnimationTile alloc] initWithFrame:cappedMapRect x:coordPaths.x y:coordPaths.y z:currentZoomLevel];
 
     // check if tile is in dictionary, if so we return YES to render it with drawMapRect
-    if ([self.tileSet containsObject:tile]) {
+    [self.tileSetLock lock];
+    BOOL tileSetHasTile = [self.tileSet containsObject:tile];
+    [self.tileSetLock unlock];
+    if (tileSetHasTile) {
         return YES;
     }
     
@@ -163,18 +166,26 @@
         CGContextDrawImage(context, CGRectMake(0, 0, tile.tileImage.size.width, tile.tileImage.size.height), [tile.tileImage CGImage]);
         CGContextRestoreGState(context);
         
-        
-        UIGraphicsPushContext(context);
-        NSString *tileCoordinates = [NSString stringWithFormat:@"(%ld, %ld, %ld)", (long)tile.x, (long)tile.y, (long)tile.z];
-        [tileCoordinates drawInRect:rect withAttributes:@{ NSFontAttributeName : [UIFont systemFontOfSize:CGRectGetHeight(rect) * .1] }];
-        
-        UIBezierPath *bezierPath = [UIBezierPath bezierPathWithRect:CGRectMake(rect.origin.x, rect.origin.y, rect.size.width, rect.size.height)];
-        [[UIColor blueColor] setStroke];
-        bezierPath.lineWidth = CGRectGetHeight(rect) / 256;
-        [bezierPath stroke];
-        
-        UIGraphicsPopContext();
+        if (self.drawDebugInfo) {
+            [self drawDebugInfoForTile:tile inRect:rect context:context];
+        }
     }
+}
+
+#pragma mark - Private methods
+
+- (void)drawDebugInfoForTile:(TCCAnimationTile *)tile inRect:(CGRect)rect context:(CGContextRef)context
+{
+    UIGraphicsPushContext(context);
+    NSString *tileCoordinates = [NSString stringWithFormat:@"(%ld, %ld, %ld)", (long)tile.x, (long)tile.y, (long)tile.z];
+    [tileCoordinates drawInRect:rect withAttributes:@{ NSFontAttributeName : [UIFont systemFontOfSize:CGRectGetHeight(rect) * .1] }];
+    
+    UIBezierPath *bezierPath = [UIBezierPath bezierPathWithRect:CGRectMake(rect.origin.x, rect.origin.y, rect.size.width, rect.size.height)];
+    [[UIColor blueColor] setStroke];
+    bezierPath.lineWidth = CGRectGetHeight(rect) / 256;
+    [bezierPath stroke];
+    
+    UIGraphicsPopContext();
 }
 
 @end

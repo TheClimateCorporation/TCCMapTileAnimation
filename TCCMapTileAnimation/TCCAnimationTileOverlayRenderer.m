@@ -47,6 +47,7 @@
 		CGRect rect = [self rectForMapRect: mapRect];
 		UIImage *image = tile.tileImage;
 		UIGraphicsPushContext(context);
+        // TODO: make this alpha configurable
 		[image drawInRect:rect blendMode:kCGBlendModeNormal alpha:0.75];
 		UIGraphicsPopContext();
 	}
@@ -69,7 +70,7 @@
     [bezierPath stroke];
 
     // Draw the tile coordinates in the upper left of the tile
-    TCCTileCoordinate c = [TCCTileOverlayHelpers tileCoordinateForMapRect:mapRect zoomLevel:zoomLevel];
+    TCCTileCoordinate c = [TCCTileOverlayHelpers tileCoordinateForMapRect:mapRect zoomLevel:[TCCTileOverlayHelpers zoomLevelForZoomScale:zoomScale]];
     NSString *tileCoordinates = [NSString stringWithFormat:@"(%ld, %ld, %ld)", (long)c.x, (long)c.y, (long)c.z];
     [tileCoordinates drawInRect:rect withAttributes:@{ NSFontAttributeName : [UIFont systemFontOfSize:CGRectGetHeight(rect) * .1] }];
     
@@ -95,18 +96,29 @@
         
         CGContextRestoreGState(context);
         
-        UIGraphicsPushContext(context);
-        NSString *tileCoordinates = [NSString stringWithFormat:@"(%d, %d, %d)", tile.x, tile.y, tile.z];
-        [tileCoordinates drawInRect:rect withAttributes:@{ NSFontAttributeName : [UIFont systemFontOfSize:CGRectGetHeight(rect) * .1] }];
-        
-        UIBezierPath *bezierPath = [UIBezierPath bezierPathWithRect:CGRectMake(rect.origin.x, rect.origin.y, rect.size.width, rect.size.height)];
-        [[UIColor blueColor] setStroke];
-        bezierPath.lineWidth = CGRectGetHeight(rect) / 256;
-        [bezierPath stroke];
-        
-        UIGraphicsPopContext();
+        if (self.drawDebugInfo) {
+            [self drawDebugInfoForTile:tile inRect:rect context:context];
+        }
 
     }
+}
+
+#pragma mark - Private methods
+
+- (void)drawDebugInfoForTile:(TCCAnimationTile *)tile inRect:(CGRect)rect context:(CGContextRef)context
+{
+    UIGraphicsPushContext(context);
+    
+    NSString *tileCoordinates = [NSString stringWithFormat:@"(%d, %d, %d)", tile.x, tile.y, tile.z];
+    [tileCoordinates drawInRect:rect withAttributes:@{ NSFontAttributeName : [UIFont systemFontOfSize:CGRectGetHeight(rect) * .1] }];
+    
+    UIBezierPath *bezierPath = [UIBezierPath bezierPathWithRect:CGRectMake(rect.origin.x, rect.origin.y, rect.size.width, rect.size.height)];
+    [[UIColor blueColor] setStroke];
+    // TODO: Should be divided by the tile size
+    bezierPath.lineWidth = CGRectGetHeight(rect) / 256;
+    [bezierPath stroke];
+    
+    UIGraphicsPopContext();
 }
 
 @end

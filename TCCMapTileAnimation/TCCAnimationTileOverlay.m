@@ -27,7 +27,7 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 @property (strong, nonatomic) NSSet *mapTiles;
 @property (strong, nonatomic) NSMutableSet *failedMapTiles;
 @property (nonatomic) NSInteger tileSize;
-@property (strong, nonatomic) MKTileOverlay *tileOverlay;
+@property (weak, nonatomic) MKTileOverlay *tileOverlay;
 @property (strong, nonatomic) MKMapView *mapView;
 
 @end
@@ -68,11 +68,7 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 		self.maximumZ = 9;
 
         _mapView = mapView;
-        _tileOverlay = [[MKTileOverlay alloc] initWithURLTemplate:_templateURLs[0]];
-        _tileOverlay.minimumZ = self.minimumZ;
-        _tileOverlay.maximumZ = self.maximumZ;
-        //TODO: refactor min/max of tileOverlay to update everywhere at once
-        [_mapView addOverlay:_tileOverlay];
+        [self addStaticTileOverlay];
 	}
 	return self;
 }
@@ -112,7 +108,7 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 
 - (void)startAnimating;
 {
-    [self.mapView removeOverlay:self.tileOverlay];
+    [self removeStaticTileOverlay];
 	self.timer = [NSTimer scheduledTimerWithTimeInterval:self.frameDuration target:self selector:@selector(updateImageTileAnimation:) userInfo:nil repeats:YES];
 	[self.timer fire];
 	self.currentAnimatingState = TCCAnimationStateAnimating;
@@ -126,10 +122,7 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 	[self.fetchQueue cancelAllOperations];
 	self.timer = nil;
 	self.currentAnimatingState = TCCAnimationStateStopped;
-    self.tileOverlay = [[MKTileOverlay alloc] initWithURLTemplate:self.templateURLs[self.currentFrameIndex]];
-    self.tileOverlay.minimumZ = self.minimumZ;
-    self.tileOverlay.maximumZ = self.maximumZ;
-    [self.mapView addOverlay:self.tileOverlay];
+    [self addStaticTileOverlay];
 }
 
 - (void)fetchTilesForMapRect:(MKMapRect)mapRect
@@ -209,13 +202,9 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
     // Determine when the user has finished moving animation frames (i.e. scrubbing) to toggle
     // the tiled overlay on and off.
     if (!isContinuouslyMoving) {
-        self.tileOverlay = [[MKTileOverlay alloc] initWithURLTemplate:self.templateURLs[self.currentFrameIndex]];
-        self.tileOverlay.minimumZ = self.minimumZ;
-        self.tileOverlay.maximumZ = self.maximumZ;
-        [self.mapView addOverlay:self.tileOverlay];
+        [self addStaticTileOverlay];
     } else if (self.tileOverlay) {
-        [self.mapView removeOverlay:self.tileOverlay];
-        self.tileOverlay = nil;
+        [self removeStaticTileOverlay];
     }
     
     [self updateTilesToFrameIndex:frameIndex];
@@ -447,6 +436,20 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
     if ([self.delegate respondsToSelector:@selector(animationTileOverlay:didHaveError:)]) {
         [self.delegate animationTileOverlay:self didHaveError:error];
     }
+}
+
+- (void)addStaticTileOverlay
+{
+    MKTileOverlay *tileOverlay = [[MKTileOverlay alloc] initWithURLTemplate:self.templateURLs[self.currentFrameIndex]];
+    tileOverlay.minimumZ = self.minimumZ;
+    tileOverlay.maximumZ = self.maximumZ;
+    [self.mapView addOverlay:tileOverlay];
+    self.tileOverlay = tileOverlay;
+}
+
+- (void)removeStaticTileOverlay
+{
+    [self.mapView removeOverlay:self.tileOverlay];
 }
 
 @end

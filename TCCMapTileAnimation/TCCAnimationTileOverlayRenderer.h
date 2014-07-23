@@ -10,4 +10,6 @@
 
 @interface TCCAnimationTileOverlayRenderer : MKOverlayRenderer
 
+@property (nonatomic) BOOL drawDebugInfo;
+
 @end

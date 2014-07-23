@@ -12,4 +12,6 @@
 
 @property (nonatomic) NSUInteger lastZoomLevel;
 
+@property (nonatomic) BOOL drawDebugInfo;
+
 @end

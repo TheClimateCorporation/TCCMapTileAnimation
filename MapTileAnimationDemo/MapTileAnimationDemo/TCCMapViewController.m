@@ -202,11 +202,12 @@
 	if ([overlay isKindOfClass: [TCCAnimationTileOverlay class]]) {
 		self.animatedTileOverlay = (TCCAnimationTileOverlay *)overlay;
         self.animatedTileRenderer = [[TCCAnimationTileOverlayRenderer alloc] initWithOverlay:overlay];
+        self.animatedTileRenderer.drawDebugInfo = YES;
         return self.animatedTileRenderer;
 	}
     if ([overlay isKindOfClass: [MKTileOverlay class]]) {
         TCCOverzoomTileOverlayRenderer *renderer = [[TCCOverzoomTileOverlayRenderer alloc] initWithOverlay:overlay];
-        renderer.alpha = .75;
+        renderer.drawDebugInfo = YES;
         return renderer;
 	}
 	return nil;
