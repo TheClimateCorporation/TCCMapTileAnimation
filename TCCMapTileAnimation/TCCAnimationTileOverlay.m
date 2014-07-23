@@ -54,9 +54,10 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 		_frameDuration = frameDuration;
 		_currentFrameIndex = 0;
 		_fetchQueue = [[NSOperationQueue alloc] init];
-		[_fetchQueue setMaxConcurrentOperationCount: 1];  //essentially a serial queue
+        // Essentially a serial queue
+		_fetchQueue.maxConcurrentOperationCount = 1;
+        // Download queue uses NSOperationQueueDefaultMaxConcurrentOperationCount by default
 		_downloadQueue = [[NSOperationQueue alloc] init];
-		[_downloadQueue setMaxConcurrentOperationCount: 25];
         _failedMapTiles = [NSMutableSet set];
 		
 		_currentAnimatingState = TCCAnimationStateStopped;

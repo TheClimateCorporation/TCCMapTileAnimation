@@ -33,36 +33,31 @@
 
 - (BOOL)canDrawMapRect:(MKMapRect)mapRect zoomScale:(MKZoomScale)zoomScale
 {
-    
-    // get map overlay
     MKTileOverlay *mapOverlay = (MKTileOverlay *)self.overlay;
     
-    // get zoom level
-    NSUInteger aZoomLevel = [self zoomLevelForZoomScale: zoomScale];
-    NSUInteger oldZoomLevel = [self zoomLevelForZoomScale: zoomScale];
-
-    // cap aZoomLevel
-    if(aZoomLevel > mapOverlay.maximumZ) {
-        aZoomLevel = mapOverlay.maximumZ;
+    // Get current zoom level, and cap if necessary
+    NSUInteger currentZoomLevel = [self zoomLevelForZoomScale: zoomScale];
+    if (currentZoomLevel > mapOverlay.maximumZ) {
+        currentZoomLevel = mapOverlay.maximumZ;
     }
-    if(aZoomLevel < mapOverlay.minimumZ) {
-        aZoomLevel = mapOverlay.minimumZ;
+    if (currentZoomLevel < mapOverlay.minimumZ) {
+        currentZoomLevel = mapOverlay.minimumZ;
     }
 
-    // empty tileDict if new zoom level is different than last zoom level
-    if (aZoomLevel != self.lastZoomLevel) {
+    // empty tileSet if new zoom level is different than last zoom level
+    if (currentZoomLevel != self.lastZoomLevel) {
         [self.tileSetLock lock];
         [self.tileSet removeAllObjects];
         [self.tileSetLock unlock];
         
         // set zoom level property
-        self.lastZoomLevel = aZoomLevel;
+        self.lastZoomLevel = currentZoomLevel;
     }
     
     // Create coord struct with proper values of x, y, z at zoom level
 //    MATTileCoordinate coord = [self tileCoordinateForMapRect:mapRect zoomLevel:oldZoomLevel];
 //    NSLog(@"Uncapped MATTileCoordinate is (%d, %d, %d)", coord.x, coord.y, coord.z);
-    TCCTileCoordinate coord = [self tileCoordinateForMapRect:mapRect zoomLevel:aZoomLevel];
+    TCCTileCoordinate coord = [self tileCoordinateForMapRect:mapRect zoomLevel:currentZoomLevel];
 //    NSLog(@"Capped MATTileCoordinate is (%d, %d, %d)", coord.x, coord.y, coord.z);
 
     
@@ -76,12 +71,10 @@
 //    NSLog(@"Capped map rect is (%f, %f), (%f, %f)", cappedMapRect.origin.x, cappedMapRect.origin.y, cappedMapRect.size.width, cappedMapRect.size.height);
     
     // create tile, passed x, y, and capped z
-    TCCAnimationTile *tile = [[TCCAnimationTile alloc] initWithFrame:cappedMapRect x:coordPaths.x y:coordPaths.y z:aZoomLevel];
+    TCCAnimationTile *tile = [[TCCAnimationTile alloc] initWithFrame:cappedMapRect x:coordPaths.x y:coordPaths.y z:currentZoomLevel];
 
     // check if tile is in dictionary, if so we return YES to render it with drawMapRect
-    [self.tileSetLock lock];
     if ([self.tileSet containsObject:tile]) {
-        [self.tileSetLock unlock];
         return YES;
     }
     [self.tileSetLock unlock];
@@ -89,7 +82,8 @@
     // else, return NO and go and fetch tile data with loadTileAtPath and store in tilesDict.
     // grab main thread and call setNeedsDisplay to render tile on screen with drawMapRect
     [mapOverlay loadTileAtPath:coordPaths result:^(NSData *tileData, NSError *error) {
-        
+        if (tile.z != self.lastZoomLevel) return;
+
         tile.tileImage = [UIImage imageWithData:tileData];
         [self.tileSetLock lock];
         [self.tileSet addObject:tile];
@@ -98,7 +92,6 @@
         dispatch_async(dispatch_get_main_queue(), ^{
             [self setNeedsDisplayInMapRect:mapRect zoomScale:zoomScale];
         });
-        
     }];
     return NO;
 }
@@ -113,30 +106,29 @@
     TCCAnimationTileOverlay *mapOverlay = (TCCAnimationTileOverlay *)self.overlay;
     
     // get zoom level
-    NSUInteger aZoomLevel = [self zoomLevelForZoomScale: zoomScale];
+    NSUInteger currentZoomLevel = [self zoomLevelForZoomScale: zoomScale];
     
     // overzoom is 1 by default, get zoom level from zoom scale
     NSInteger overZoom = 1;
     
     // calculate amount of overzoom
-    if (aZoomLevel > mapOverlay.maximumZ) {
-        overZoom = pow(2, (aZoomLevel - mapOverlay.maximumZ));
-        aZoomLevel = mapOverlay.maximumZ;
+    if (currentZoomLevel > mapOverlay.maximumZ) {
+        overZoom = pow(2, (currentZoomLevel - mapOverlay.maximumZ));
+        currentZoomLevel = mapOverlay.maximumZ;
     }
-    
     // cap zoom level
-    if(aZoomLevel < mapOverlay.minimumZ) {
-        aZoomLevel = mapOverlay.minimumZ;
+    if(currentZoomLevel < mapOverlay.minimumZ) {
+        currentZoomLevel = mapOverlay.minimumZ;
     }
-    if(aZoomLevel > mapOverlay.maximumZ) {
-        aZoomLevel = mapOverlay.maximumZ;
+    if(currentZoomLevel > mapOverlay.maximumZ) {
+        currentZoomLevel = mapOverlay.maximumZ;
     }
     
     // get x ,y, z coords for tile
     CGPoint mercatorPoint = [self mercatorTileOriginForMapRect: mapRect];
-    int x = floor(mercatorPoint.x * [self worldTileWidthForZoomLevel:aZoomLevel]);
-    int y = floor(mercatorPoint.y * [self worldTileWidthForZoomLevel:aZoomLevel]);
-    int z = aZoomLevel;
+    NSInteger x = floor(mercatorPoint.x * [self worldTileWidthForZoomLevel:currentZoomLevel]);
+    NSInteger y = floor(mercatorPoint.y * [self worldTileWidthForZoomLevel:currentZoomLevel]);
+    NSInteger z = currentZoomLevel;
     
     // grab tile from set
     TCCAnimationTile *tile;
@@ -151,15 +143,12 @@
 
     // if no overzoom
     if (overZoom == 1) {
-        
         CGRect rect = [self rectForMapRect: mapRect];
         UIImage *image = tile.tileImage;
         UIGraphicsPushContext(context);
         [image drawInRect:rect blendMode:kCGBlendModeNormal alpha:0.75];
         UIGraphicsPopContext();
-        
     }
-
     // map is overzoomed
     else {
         
@@ -176,7 +165,7 @@
         
         
         UIGraphicsPushContext(context);
-        NSString *tileCoordinates = [NSString stringWithFormat:@"(%d, %d, %d)", tile.x, tile.y, tile.z];
+        NSString *tileCoordinates = [NSString stringWithFormat:@"(%ld, %ld, %ld)", (long)tile.x, (long)tile.y, (long)tile.z];
         [tileCoordinates drawInRect:rect withAttributes:@{ NSFontAttributeName : [UIFont systemFontOfSize:CGRectGetHeight(rect) * .1] }];
         
         UIBezierPath *bezierPath = [UIBezierPath bezierPathWithRect:CGRectMake(rect.origin.x, rect.origin.y, rect.size.width, rect.size.height)];
@@ -185,9 +174,7 @@
         [bezierPath stroke];
         
         UIGraphicsPopContext();
-        
     }
-    
 }
 
 #pragma mark - Debug methods
