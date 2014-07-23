@@ -9,7 +9,6 @@
 #import "TCCAnimationTileOverlayRenderer.h"
 #import "TCCAnimationTileOverlay.h"
 #import "TCCAnimationTile.h"
-#import "TCCTileOverlayHelpers.h"
 
 @implementation TCCAnimationTileOverlayRenderer
 
@@ -51,7 +50,7 @@
 		UIGraphicsPopContext();
 	}
     
-    NSInteger zoomLevel = [TCCTileOverlayHelpers zoomLevelForZoomScale:zoomScale];
+    NSInteger zoomLevel = [self zoomLevelForZoomScale:zoomScale];
     NSInteger overZoom = 1;
     
     if (zoomLevel > mapOverlay.maximumZ) {
@@ -69,7 +68,7 @@
     [bezierPath stroke];
 
     // Draw the tile coordinates in the upper left of the tile
-    TCCTileCoordinate c = [TCCTileOverlayHelpers tileCoordinateForMapRect:mapRect zoomLevel:zoomScale];
+    TCCTileCoordinate c = [self tileCoordinateForMapRect:mapRect zoomScale:zoomScale];
     NSString *tileCoordinates = [NSString stringWithFormat:@"(%d, %d, %d)", c.x, c.y, c.z];
     [tileCoordinates drawInRect:rect withAttributes:@{ NSFontAttributeName : [UIFont systemFontOfSize:CGRectGetHeight(rect) * .1] }];
     
@@ -107,6 +106,71 @@
         UIGraphicsPopContext();
 
     }
+}
+
+#pragma mark - Debug methods
+
+/**
+ * Similar to above, but uses a MKZoomScale to determine the
+ * Mercator zoomLevel. (MKZoomScale is a ratio of screen points to
+ * map points.)
+ */
+- (NSUInteger)zoomLevelForZoomScale:(MKZoomScale)zoomScale
+{
+    CGFloat realScale = zoomScale / [[UIScreen mainScreen] scale];
+    NSUInteger z = (NSUInteger)(log(realScale)/log(2.0)+20.0);
+	
+    z += ([[UIScreen mainScreen] scale] - 1.0);
+    return z;
+}
+
+- (TCCTileCoordinate)tileCoordinateForMapRect:(MKMapRect)aMapRect zoomScale:(MKZoomScale)aZoomScale
+{
+	TCCTileCoordinate coord = {0, 0, 0};
+	
+	NSUInteger zoomLevel = [self zoomLevelForZoomScale: aZoomScale];
+    CGPoint mercatorPoint = [self mercatorTileOriginForMapRect: aMapRect];
+    NSUInteger tilex = floor(mercatorPoint.x * [self worldTileWidthForZoomLevel:zoomLevel]);
+    NSUInteger tiley = floor(mercatorPoint.y * [self worldTileWidthForZoomLevel:zoomLevel]);
+    
+	coord.x = tilex;
+	coord.y = tiley;
+	coord.z = zoomLevel;
+	
+	return coord;
+}
+
+/*
+ Determine the number of tiles wide *or tall* the world is, at the given zoomLevel.
+ (In the Spherical Mercator projection, the poles are cut off so that the resulting 2D map is "square".)
+ */
+- (NSUInteger)worldTileWidthForZoomLevel:(NSUInteger)zoomLevel
+{
+    return (NSUInteger)(pow(2,zoomLevel));
+}
+
+/**
+ * Given a MKMapRect, this reprojects the center of the mapRect
+ * into the Mercator projection and calculates the rect's top-left point
+ * (so that we can later figure out the tile coordinate).
+ *
+ * See http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames#Derivation_of_tile_names
+ */
+- (CGPoint)mercatorTileOriginForMapRect:(MKMapRect)mapRect
+{
+    MKCoordinateRegion region = MKCoordinateRegionForMapRect(mapRect);
+    
+    // Convert lat/lon to radians
+    CGFloat x = (region.center.longitude) * (M_PI/180.0); // Convert lon to radians
+    CGFloat y = (region.center.latitude) * (M_PI/180.0); // Convert lat to radians
+    y = log(tan(y)+1.0/cos(y));
+    
+    // X and Y should actually be the top-left of the rect (the values above represent
+    // the center of the rect)
+    x = (1.0 + (x/M_PI)) / 2.0;
+    y = (1.0 - (y/M_PI)) / 2.0;
+	
+    return CGPointMake(x, y);
 }
 
 @end
