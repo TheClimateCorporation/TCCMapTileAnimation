@@ -7,7 +7,6 @@
 //
 
 #import <MapKit/MapKit.h>
-#import "TCCMapViewController.h"
 
 @class MATAnimationTile;
 
