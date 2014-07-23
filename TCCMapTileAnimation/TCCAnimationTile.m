@@ -26,7 +26,7 @@
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"(%d, %d, %d). mapRectFrame origin: (%f, %f) size: (%f, %f)", self.x, self.y, self.z, self.mapRectFrame.origin.x, self.mapRectFrame.origin.y, self.mapRectFrame.size.width, self.mapRectFrame.size.height];
+    return [NSString stringWithFormat:@"(%d, %d, %d) mapRectFrame origin: (%f, %f) size: (%f, %f)", self.x, self.y, self.z, self.mapRectFrame.origin.x, self.mapRectFrame.origin.y, self.mapRectFrame.size.width, self.mapRectFrame.size.height];
 }
 
 #pragma mark - Overridden methods

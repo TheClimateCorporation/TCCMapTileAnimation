@@ -9,7 +9,7 @@
 #import "TCCAnimationTileOverlayRenderer.h"
 #import "TCCAnimationTileOverlay.h"
 #import "TCCAnimationTile.h"
-#import "TCCTileOverlayHelpers.h"
+#import "TCCMapKitHelpers.h"
 
 @implementation TCCAnimationTileOverlayRenderer
 
@@ -48,11 +48,11 @@
 		UIImage *image = tile.tileImage;
 		UIGraphicsPushContext(context);
         // TODO: make this alpha configurable
-		[image drawInRect:rect blendMode:kCGBlendModeNormal alpha:0.75];
+		[image drawInRect:rect blendMode:kCGBlendModeNormal alpha:self.alpha];
 		UIGraphicsPopContext();
 	}
     
-    NSInteger zoomLevel = [TCCTileOverlayHelpers zoomLevelForZoomScale:zoomScale];
+    NSInteger zoomLevel = [TCCMapKitHelpers zoomLevelForZoomScale:zoomScale];
     NSInteger overZoom = 1;
     
     if (zoomLevel > mapOverlay.maximumZ) {
@@ -60,21 +60,11 @@
         zoomLevel = mapOverlay.maximumZ;
     }
     
-    /* Debug information */
-    UIGraphicsPushContext(context);
-
-    CGRect rect = [self rectForMapRect: mapRect];
-    UIBezierPath *bezierPath = [UIBezierPath bezierPathWithRect:CGRectMake(rect.origin.x, rect.origin.y, rect.size.width, rect.size.height)];
-    [[UIColor blackColor] setStroke];
-    bezierPath.lineWidth = CGRectGetHeight(rect) / 256;
-    [bezierPath stroke];
-
-    // Draw the tile coordinates in the upper left of the tile
-    TCCTileCoordinate c = [TCCTileOverlayHelpers tileCoordinateForMapRect:mapRect zoomLevel:[TCCTileOverlayHelpers zoomLevelForZoomScale:zoomScale]];
-    NSString *tileCoordinates = [NSString stringWithFormat:@"(%ld, %ld, %ld)", (long)c.x, (long)c.y, (long)c.z];
-    [tileCoordinates drawInRect:rect withAttributes:@{ NSFontAttributeName : [UIFont systemFontOfSize:CGRectGetHeight(rect) * .1] }];
     
-    UIGraphicsPopContext();
+    if (self.drawDebugInfo) {
+        TCCTileCoordinate c = [TCCMapKitHelpers tileCoordinateForMapRect:mapRect zoomLevel:[TCCMapKitHelpers zoomLevelForZoomScale:zoomScale]];
+        [TCCMapKitHelpers drawDebugInfoForX:c.x Y:c.y Z:c.z color:[UIColor blackColor] inRect:[self rectForMapRect:mapRect] context:context];
+    }
     
     if (overZoom == 1) return;
     
@@ -85,40 +75,20 @@
         // For each image tile, draw it in its corresponding MKMapRect frame
         CGRect rect = [self rectForMapRect:tile.mapRectFrame];
         if (!MKMapRectIntersectsRect(mapRect, tile.mapRectFrame)) continue;
+        
         CGContextSaveGState(context);
         CGContextTranslateCTM(context, CGRectGetMinX(rect), CGRectGetMinY(rect));
-        
         // OverZoom mode - 1 when using tiles as is, 2, 4, 8 etc when overzoomed.
         CGContextScaleCTM(context, overZoom/zoomScale, overZoom/zoomScale);
         CGContextTranslateCTM(context, 0, tile.tileImage.size.height);
         CGContextScaleCTM(context, 1, -1);
         CGContextDrawImage(context, CGRectMake(0, 0, tile.tileImage.size.width, tile.tileImage.size.height), [tile.tileImage CGImage]);
-        
         CGContextRestoreGState(context);
         
         if (self.drawDebugInfo) {
-            [self drawDebugInfoForTile:tile inRect:rect context:context];
+            [TCCMapKitHelpers drawDebugInfoForX:tile.x Y:tile.y Z:tile.z color:[UIColor blueColor] inRect:rect context:context];
         }
-
     }
-}
-
-#pragma mark - Private methods
-
-- (void)drawDebugInfoForTile:(TCCAnimationTile *)tile inRect:(CGRect)rect context:(CGContextRef)context
-{
-    UIGraphicsPushContext(context);
-    
-    NSString *tileCoordinates = [NSString stringWithFormat:@"(%d, %d, %d)", tile.x, tile.y, tile.z];
-    [tileCoordinates drawInRect:rect withAttributes:@{ NSFontAttributeName : [UIFont systemFontOfSize:CGRectGetHeight(rect) * .1] }];
-    
-    UIBezierPath *bezierPath = [UIBezierPath bezierPathWithRect:CGRectMake(rect.origin.x, rect.origin.y, rect.size.width, rect.size.height)];
-    [[UIColor blueColor] setStroke];
-    // TODO: Should be divided by the tile size
-    bezierPath.lineWidth = CGRectGetHeight(rect) / 256;
-    [bezierPath stroke];
-    
-    UIGraphicsPopContext();
 }
 
 @end

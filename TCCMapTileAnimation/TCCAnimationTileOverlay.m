@@ -203,6 +203,7 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
     // the tiled overlay on and off.
     if (!isContinuouslyMoving) {
         [self addStaticTileOverlay];
+        return;
     } else if (self.tileOverlay) {
         [self removeStaticTileOverlay];
     }
@@ -359,7 +360,8 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
         for (NSInteger y = minY; y <=maxY; y++) {
 			MKMapRect frame = MKMapRectMake((x * adjustedTileSize) / zoomScale, (y * adjustedTileSize) / zoomScale, adjustedTileSize / zoomScale, adjustedTileSize / zoomScale);
             if (MKMapRectIntersectsRect(frame, rect)) {
-                [tiles addObject:[[TCCAnimationTile alloc] initWithFrame:frame x:x y:y z:zoomLevel]];
+                TCCAnimationTile *tile = [[TCCAnimationTile alloc] initWithFrame:frame x:x y:y z:zoomLevel];
+                [tiles addObject:tile];
             }
         }
     }
@@ -450,6 +452,7 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 - (void)removeStaticTileOverlay
 {
     [self.mapView removeOverlay:self.tileOverlay];
+    self.tileOverlay = nil;
 }
 
 @end

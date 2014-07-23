@@ -9,7 +9,7 @@
 #import "TCCOverzoomTileOverlayRenderer.h"
 #import "TCCAnimationTileOverlay.h"
 #import "TCCAnimationTile.h"
-#import "TCCTileOverlayHelpers.h"
+#import "TCCMapKitHelpers.h"
 
 @interface TCCOverzoomTileOverlayRenderer ()
 @property (strong, nonatomic) NSMutableSet *tileSet;
@@ -37,7 +37,7 @@
     MKTileOverlay *mapOverlay = (MKTileOverlay *)self.overlay;
     
     // Get current zoom level, and cap if necessary
-    NSUInteger currentZoomLevel = [TCCTileOverlayHelpers zoomLevelForZoomScale: zoomScale];
+    NSUInteger currentZoomLevel = [TCCMapKitHelpers zoomLevelForZoomScale: zoomScale];
     if (currentZoomLevel > mapOverlay.maximumZ) {
         currentZoomLevel = mapOverlay.maximumZ;
     }
@@ -58,7 +58,7 @@
     // Create coord struct with proper values of x, y, z at zoom level
 //    MATTileCoordinate coord = [self tileCoordinateForMapRect:mapRect zoomLevel:oldZoomLevel];
 //    NSLog(@"Uncapped MATTileCoordinate is (%d, %d, %d)", coord.x, coord.y, coord.z);
-    TCCTileCoordinate coord = [TCCTileOverlayHelpers tileCoordinateForMapRect:mapRect zoomLevel:currentZoomLevel];
+    TCCTileCoordinate coord = [TCCMapKitHelpers tileCoordinateForMapRect:mapRect zoomLevel:currentZoomLevel];
 //    NSLog(@"Capped MATTileCoordinate is (%d, %d, %d)", coord.x, coord.y, coord.z);
 
     
@@ -68,7 +68,7 @@
     coordPaths.y = coord.y;
     coordPaths.z = coord.z;
     
-    MKMapRect cappedMapRect = [TCCTileOverlayHelpers mapRectForTileCoordinate:coord];
+    MKMapRect cappedMapRect = [TCCMapKitHelpers mapRectForTileCoordinate:coord];
 //    NSLog(@"Capped map rect is (%f, %f), (%f, %f)", cappedMapRect.origin.x, cappedMapRect.origin.y, cappedMapRect.size.width, cappedMapRect.size.height);
     
     // create tile, passed x, y, and capped z
@@ -109,7 +109,7 @@
     TCCAnimationTileOverlay *mapOverlay = (TCCAnimationTileOverlay *)self.overlay;
     
     // get zoom level
-    NSUInteger currentZoomLevel = [TCCTileOverlayHelpers zoomLevelForZoomScale: zoomScale];
+    NSUInteger currentZoomLevel = [TCCMapKitHelpers zoomLevelForZoomScale: zoomScale];
     
     // overzoom is 1 by default, get zoom level from zoom scale
     NSInteger overZoom = 1;
@@ -128,9 +128,9 @@
     }
     
     // get x ,y, z coords for tile
-    CGPoint mercatorPoint = [TCCTileOverlayHelpers mercatorTileOriginForMapRect: mapRect];
-    NSInteger x = floor(mercatorPoint.x * [TCCTileOverlayHelpers worldTileWidthForZoomLevel:currentZoomLevel]);
-    NSInteger y = floor(mercatorPoint.y * [TCCTileOverlayHelpers worldTileWidthForZoomLevel:currentZoomLevel]);
+    CGPoint mercatorPoint = [TCCMapKitHelpers mercatorTileOriginForMapRect: mapRect];
+    NSInteger x = floor(mercatorPoint.x * [TCCMapKitHelpers worldTileWidthForZoomLevel:currentZoomLevel]);
+    NSInteger y = floor(mercatorPoint.y * [TCCMapKitHelpers worldTileWidthForZoomLevel:currentZoomLevel]);
     NSInteger z = currentZoomLevel;
     
     // grab tile from set
@@ -146,10 +146,10 @@
 
     // if no overzoom
     if (overZoom == 1) {
-        CGRect rect = [self rectForMapRect: mapRect];
+        CGRect rect = [self rectForMapRect:mapRect];
         UIImage *image = tile.tileImage;
         UIGraphicsPushContext(context);
-        [image drawInRect:rect blendMode:kCGBlendModeNormal alpha:0.75];
+        [image drawInRect:rect blendMode:kCGBlendModeNormal alpha:self.alpha];
         UIGraphicsPopContext();
     }
     // map is overzoomed
@@ -167,25 +167,9 @@
         CGContextRestoreGState(context);
         
         if (self.drawDebugInfo) {
-            [self drawDebugInfoForTile:tile inRect:rect context:context];
+            [TCCMapKitHelpers drawDebugInfoForX:tile.x Y:tile.y Z:tile.z color:[UIColor blueColor] inRect:rect context:context];
         }
     }
-}
-
-#pragma mark - Private methods
-
-- (void)drawDebugInfoForTile:(TCCAnimationTile *)tile inRect:(CGRect)rect context:(CGContextRef)context
-{
-    UIGraphicsPushContext(context);
-    NSString *tileCoordinates = [NSString stringWithFormat:@"(%ld, %ld, %ld)", (long)tile.x, (long)tile.y, (long)tile.z];
-    [tileCoordinates drawInRect:rect withAttributes:@{ NSFontAttributeName : [UIFont systemFontOfSize:CGRectGetHeight(rect) * .1] }];
-    
-    UIBezierPath *bezierPath = [UIBezierPath bezierPathWithRect:CGRectMake(rect.origin.x, rect.origin.y, rect.size.width, rect.size.height)];
-    [[UIColor blueColor] setStroke];
-    bezierPath.lineWidth = CGRectGetHeight(rect) / 256;
-    [bezierPath stroke];
-    
-    UIGraphicsPopContext();
 }
 
 @end

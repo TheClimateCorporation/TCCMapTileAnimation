@@ -64,7 +64,7 @@
     
     [self.animatedTileOverlay moveToFrameIndex:sliderVal isContinuouslyMoving:YES];
     self.timeIndexLabel.text = [NSString stringWithFormat:@"%ld", (long)self.animatedTileOverlay.currentFrameIndex];
-    [self.animatedTileRenderer setNeedsDisplayInMapRect:self.mapView.visibleMapRect zoomScale:self.mapView.zoomScale];
+    [self.animatedTileRenderer setNeedsDisplay];
 }
 
 - (IBAction)finishedSliding:(id)sender
@@ -72,7 +72,7 @@
     NSInteger sliderVal = floor(self.timeSlider.value);
     [self.animatedTileOverlay moveToFrameIndex:(NSInteger)sliderVal isContinuouslyMoving:NO];
     self.timeIndexLabel.text = [NSString stringWithFormat:@"%ld", (long)self.animatedTileOverlay.currentFrameIndex];
-    [self.animatedTileRenderer setNeedsDisplayInMapRect:self.mapView.visibleMapRect zoomScale:self.mapView.zoomScale];
+    [self.animatedTileRenderer setNeedsDisplay];
 }
 
 - (IBAction)onHandleStartStopAction: (id)sender
@@ -203,11 +203,13 @@
 		self.animatedTileOverlay = (TCCAnimationTileOverlay *)overlay;
         self.animatedTileRenderer = [[TCCAnimationTileOverlayRenderer alloc] initWithOverlay:overlay];
         self.animatedTileRenderer.drawDebugInfo = YES;
+        self.animatedTileRenderer.alpha = .75;
         return self.animatedTileRenderer;
 	}
     if ([overlay isKindOfClass: [MKTileOverlay class]]) {
         TCCOverzoomTileOverlayRenderer *renderer = [[TCCOverzoomTileOverlayRenderer alloc] initWithOverlay:overlay];
         renderer.drawDebugInfo = YES;
+        renderer.alpha = .75;
         return renderer;
 	}
 	return nil;

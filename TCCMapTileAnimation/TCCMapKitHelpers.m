@@ -6,9 +6,9 @@
 //  Copyright (c) 2014 The Climate Corporation. All rights reserved.
 //
 
-#import "TCCTileOverlayHelpers.h"
+#import "TCCMapKitHelpers.h"
 
-@implementation TCCTileOverlayHelpers
+@implementation TCCMapKitHelpers
 
 /**
  * Similar to above, but uses a MKZoomScale to determine the
@@ -74,6 +74,22 @@
     y = (1.0 - (y/M_PI)) / 2.0;
 	
     return CGPointMake(x, y);
+}
+
++ (void)drawDebugInfoForX:(NSInteger)x Y:(NSInteger)y Z:(NSInteger)z color:(UIColor *)color inRect:(CGRect)rect context:(CGContextRef)context
+{
+    UIGraphicsPushContext(context);
+    
+    NSString *tileCoordinates = [NSString stringWithFormat:@"(%d, %d, %d)", x, y, z];
+    [tileCoordinates drawInRect:rect withAttributes:@{ NSFontAttributeName : [UIFont systemFontOfSize:CGRectGetHeight(rect) * .1], NSForegroundColorAttributeName : color }];
+    
+    UIBezierPath *bezierPath = [UIBezierPath bezierPathWithRect:CGRectMake(rect.origin.x, rect.origin.y, rect.size.width, rect.size.height)];
+    [color setStroke];
+    // TODO: Should be divided by the tile size
+    bezierPath.lineWidth = CGRectGetHeight(rect) / 256;
+    [bezierPath stroke];
+    
+    UIGraphicsPopContext();
 }
 
 @end
