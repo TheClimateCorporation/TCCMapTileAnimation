@@ -1,5 +1,5 @@
 //
-//  TCCMapTileRenderer.h
+//  TCCAnimationTileOverlayRenderer.h
 //  MapTileAnimationDemo
 //
 //  Created by Bruce Johnson on 6/12/14.
@@ -8,6 +8,6 @@
 
 #import <MapKit/MapKit.h>
 
-@interface MATAnimatedTileOverlayRenderer : MKOverlayRenderer
+@interface TCCAnimationTileOverlayRenderer : MKOverlayRenderer
 
 @end

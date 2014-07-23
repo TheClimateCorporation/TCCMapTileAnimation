@@ -7,11 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		32446D8B194A1BE500664240 /* MATAnimatedTileOverlay.m in Sources */ = {isa = PBXBuildFile; fileRef = 32446D8A194A1BE500664240 /* MATAnimatedTileOverlay.m */; };
-		32446D8E194A1CAA00664240 /* MATAnimatedTileOverlayRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 32446D8D194A1CAA00664240 /* MATAnimatedTileOverlayRenderer.m */; };
 		3269A4F2194911C2003F1AE3 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3269A4F1194911C2003F1AE3 /* MapKit.framework */; };
-		3269A4F519491E0A003F1AE3 /* MKMapView+Extras.m in Sources */ = {isa = PBXBuildFile; fileRef = 3269A4F419491E0A003F1AE3 /* MKMapView+Extras.m */; };
-		8DF0D4F81979C0D600F5AAE4 /* MKOverzoomTileOverlayRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 8DF0D4F71979C0D600F5AAE4 /* MKOverzoomTileOverlayRenderer.m */; };
 		9B49BBC519490A5700094005 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9B49BBC419490A5700094005 /* Foundation.framework */; };
 		9B49BBC719490A5700094005 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9B49BBC619490A5700094005 /* CoreGraphics.framework */; };
 		9B49BBC919490A5700094005 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9B49BBC819490A5700094005 /* UIKit.framework */; };
@@ -24,11 +20,13 @@
 		9B49BBE719490A5700094005 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9B49BBE619490A5700094005 /* XCTest.framework */; };
 		9B49BBE819490A5700094005 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9B49BBC419490A5700094005 /* Foundation.framework */; };
 		9B49BBE919490A5700094005 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9B49BBC819490A5700094005 /* UIKit.framework */; };
-		9B49BBF119490A5700094005 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 9B49BBEF19490A5700094005 /* InfoPlist.strings */; };
-		9B49BBF319490A5700094005 /* MapTileAnimationDemoTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B49BBF219490A5700094005 /* MapTileAnimationDemoTests.m */; };
 		9B49BC0019490AAE00094005 /* TCCMapViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B49BBFD19490AAE00094005 /* TCCMapViewController.m */; };
 		9B49BC0119490AAE00094005 /* TCCTimeFrameParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B49BBFF19490AAE00094005 /* TCCTimeFrameParser.m */; };
-		9B49BC5D19490CA500094005 /* MATAnimationTile.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B49BC5919490CA500094005 /* MATAnimationTile.m */; };
+		9B8B305B1980298D00EECFDC /* TCCAnimationTileOverlay.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B8B30511980298D00EECFDC /* TCCAnimationTileOverlay.m */; };
+		9B8B305C1980298D00EECFDC /* TCCAnimationTileOverlayRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B8B30541980298D00EECFDC /* TCCAnimationTileOverlayRenderer.m */; };
+		9B8B305D1980298D00EECFDC /* TCCAnimationTile.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B8B30561980298D00EECFDC /* TCCAnimationTile.m */; };
+		9B8B305E1980298D00EECFDC /* MKMapView+Extras.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B8B30581980298D00EECFDC /* MKMapView+Extras.m */; };
+		9B8B305F1980298D00EECFDC /* TCCOverzoomTileOverlayRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B8B305A1980298D00EECFDC /* TCCOverzoomTileOverlayRenderer.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -42,16 +40,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		3213A3021962213F0058D302 /* MATAnimatedTileOverlayDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MATAnimatedTileOverlayDelegate.h; sourceTree = "<group>"; };
-		32446D89194A1BE500664240 /* MATAnimatedTileOverlay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MATAnimatedTileOverlay.h; sourceTree = "<group>"; };
-		32446D8A194A1BE500664240 /* MATAnimatedTileOverlay.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MATAnimatedTileOverlay.m; sourceTree = "<group>"; };
-		32446D8C194A1CAA00664240 /* MATAnimatedTileOverlayRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MATAnimatedTileOverlayRenderer.h; sourceTree = "<group>"; };
-		32446D8D194A1CAA00664240 /* MATAnimatedTileOverlayRenderer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MATAnimatedTileOverlayRenderer.m; sourceTree = "<group>"; };
 		3269A4F1194911C2003F1AE3 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
-		3269A4F319491E0A003F1AE3 /* MKMapView+Extras.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MKMapView+Extras.h"; sourceTree = "<group>"; };
-		3269A4F419491E0A003F1AE3 /* MKMapView+Extras.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MKMapView+Extras.m"; sourceTree = "<group>"; };
-		8DF0D4F61979C0D600F5AAE4 /* MKOverzoomTileOverlayRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MKOverzoomTileOverlayRenderer.h; sourceTree = "<group>"; };
-		8DF0D4F71979C0D600F5AAE4 /* MKOverzoomTileOverlayRenderer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MKOverzoomTileOverlayRenderer.m; sourceTree = "<group>"; };
 		9B49BBC119490A5700094005 /* MapTileAnimationDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MapTileAnimationDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9B49BBC419490A5700094005 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		9B49BBC619490A5700094005 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -67,15 +56,20 @@
 		9B49BBDF19490A5700094005 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		9B49BBE519490A5700094005 /* MapTileAnimationDemoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MapTileAnimationDemoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9B49BBE619490A5700094005 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
-		9B49BBEE19490A5700094005 /* MapTileAnimationDemoTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "MapTileAnimationDemoTests-Info.plist"; sourceTree = "<group>"; };
-		9B49BBF019490A5700094005 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		9B49BBF219490A5700094005 /* MapTileAnimationDemoTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MapTileAnimationDemoTests.m; sourceTree = "<group>"; };
 		9B49BBFC19490AAE00094005 /* TCCMapViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCCMapViewController.h; sourceTree = "<group>"; };
 		9B49BBFD19490AAE00094005 /* TCCMapViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCCMapViewController.m; sourceTree = "<group>"; };
 		9B49BBFE19490AAE00094005 /* TCCTimeFrameParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCCTimeFrameParser.h; sourceTree = "<group>"; };
 		9B49BBFF19490AAE00094005 /* TCCTimeFrameParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCCTimeFrameParser.m; sourceTree = "<group>"; };
-		9B49BC5819490CA500094005 /* MATAnimationTile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MATAnimationTile.h; sourceTree = "<group>"; };
-		9B49BC5919490CA500094005 /* MATAnimationTile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MATAnimationTile.m; sourceTree = "<group>"; };
+		9B8B30501980298D00EECFDC /* TCCAnimationTileOverlay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCCAnimationTileOverlay.h; sourceTree = "<group>"; };
+		9B8B30511980298D00EECFDC /* TCCAnimationTileOverlay.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCCAnimationTileOverlay.m; sourceTree = "<group>"; };
+		9B8B30531980298D00EECFDC /* TCCAnimationTileOverlayRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCCAnimationTileOverlayRenderer.h; sourceTree = "<group>"; };
+		9B8B30541980298D00EECFDC /* TCCAnimationTileOverlayRenderer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCCAnimationTileOverlayRenderer.m; sourceTree = "<group>"; };
+		9B8B30551980298D00EECFDC /* TCCAnimationTile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCCAnimationTile.h; sourceTree = "<group>"; };
+		9B8B30561980298D00EECFDC /* TCCAnimationTile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCCAnimationTile.m; sourceTree = "<group>"; };
+		9B8B30571980298D00EECFDC /* MKMapView+Extras.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MKMapView+Extras.h"; sourceTree = "<group>"; };
+		9B8B30581980298D00EECFDC /* MKMapView+Extras.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MKMapView+Extras.m"; sourceTree = "<group>"; };
+		9B8B30591980298D00EECFDC /* TCCOverzoomTileOverlayRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCCOverzoomTileOverlayRenderer.h; sourceTree = "<group>"; };
+		9B8B305A1980298D00EECFDC /* TCCOverzoomTileOverlayRenderer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCCOverzoomTileOverlayRenderer.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -107,8 +101,7 @@
 			isa = PBXGroup;
 			children = (
 				9B49BBCA19490A5700094005 /* MapTileAnimationDemo */,
-				9B49BC5619490CA500094005 /* MapTileAnimation */,
-				9B49BBEC19490A5700094005 /* MapTileAnimationDemoTests */,
+				9B8B304E1980298D00EECFDC /* TCCMapTileAnimation */,
 				9B49BBC319490A5700094005 /* Frameworks */,
 				9B49BBC219490A5700094005 /* Products */,
 			);
@@ -163,41 +156,22 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		9B49BBEC19490A5700094005 /* MapTileAnimationDemoTests */ = {
+		9B8B304E1980298D00EECFDC /* TCCMapTileAnimation */ = {
 			isa = PBXGroup;
 			children = (
-				9B49BBF219490A5700094005 /* MapTileAnimationDemoTests.m */,
-				9B49BBED19490A5700094005 /* Supporting Files */,
+				9B8B30501980298D00EECFDC /* TCCAnimationTileOverlay.h */,
+				9B8B30511980298D00EECFDC /* TCCAnimationTileOverlay.m */,
+				9B8B30531980298D00EECFDC /* TCCAnimationTileOverlayRenderer.h */,
+				9B8B30541980298D00EECFDC /* TCCAnimationTileOverlayRenderer.m */,
+				9B8B30551980298D00EECFDC /* TCCAnimationTile.h */,
+				9B8B30561980298D00EECFDC /* TCCAnimationTile.m */,
+				9B8B30571980298D00EECFDC /* MKMapView+Extras.h */,
+				9B8B30581980298D00EECFDC /* MKMapView+Extras.m */,
+				9B8B30591980298D00EECFDC /* TCCOverzoomTileOverlayRenderer.h */,
+				9B8B305A1980298D00EECFDC /* TCCOverzoomTileOverlayRenderer.m */,
 			);
-			path = MapTileAnimationDemoTests;
-			sourceTree = "<group>";
-		};
-		9B49BBED19490A5700094005 /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				9B49BBEE19490A5700094005 /* MapTileAnimationDemoTests-Info.plist */,
-				9B49BBEF19490A5700094005 /* InfoPlist.strings */,
-			);
-			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		9B49BC5619490CA500094005 /* MapTileAnimation */ = {
-			isa = PBXGroup;
-			children = (
-				8DF0D4F61979C0D600F5AAE4 /* MKOverzoomTileOverlayRenderer.h */,
-				8DF0D4F71979C0D600F5AAE4 /* MKOverzoomTileOverlayRenderer.m */,
-				32446D8C194A1CAA00664240 /* MATAnimatedTileOverlayRenderer.h */,
-				32446D8D194A1CAA00664240 /* MATAnimatedTileOverlayRenderer.m */,
-				3213A3021962213F0058D302 /* MATAnimatedTileOverlayDelegate.h */,
-				9B49BC5819490CA500094005 /* MATAnimationTile.h */,
-				9B49BC5919490CA500094005 /* MATAnimationTile.m */,
-				32446D89194A1BE500664240 /* MATAnimatedTileOverlay.h */,
-				32446D8A194A1BE500664240 /* MATAnimatedTileOverlay.m */,
-				3269A4F319491E0A003F1AE3 /* MKMapView+Extras.h */,
-				3269A4F419491E0A003F1AE3 /* MKMapView+Extras.m */,
-			);
-			name = MapTileAnimation;
-			path = ../MapTileAnimation/MapTileAnimation;
+			name = TCCMapTileAnimation;
+			path = ../TCCMapTileAnimation;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -288,7 +262,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9B49BBF119490A5700094005 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -299,14 +272,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9B8B305E1980298D00EECFDC /* MKMapView+Extras.m in Sources */,
+				9B8B305D1980298D00EECFDC /* TCCAnimationTile.m in Sources */,
+				9B8B305B1980298D00EECFDC /* TCCAnimationTileOverlay.m in Sources */,
+				9B8B305F1980298D00EECFDC /* TCCOverzoomTileOverlayRenderer.m in Sources */,
 				9B49BC0119490AAE00094005 /* TCCTimeFrameParser.m in Sources */,
 				9B49BBD119490A5700094005 /* main.m in Sources */,
 				9B49BC0019490AAE00094005 /* TCCMapViewController.m in Sources */,
-				8DF0D4F81979C0D600F5AAE4 /* MKOverzoomTileOverlayRenderer.m in Sources */,
-				3269A4F519491E0A003F1AE3 /* MKMapView+Extras.m in Sources */,
-				9B49BC5D19490CA500094005 /* MATAnimationTile.m in Sources */,
-				32446D8E194A1CAA00664240 /* MATAnimatedTileOverlayRenderer.m in Sources */,
-				32446D8B194A1BE500664240 /* MATAnimatedTileOverlay.m in Sources */,
+				9B8B305C1980298D00EECFDC /* TCCAnimationTileOverlayRenderer.m in Sources */,
 				9B49BBD519490A5700094005 /* TCCAppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -315,7 +288,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9B49BBF319490A5700094005 /* MapTileAnimationDemoTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -352,14 +324,6 @@
 				9B49BBDA19490A5700094005 /* Base */,
 			);
 			name = Main_iPad.storyboard;
-			sourceTree = "<group>";
-		};
-		9B49BBEF19490A5700094005 /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				9B49BBF019490A5700094005 /* en */,
-			);
-			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

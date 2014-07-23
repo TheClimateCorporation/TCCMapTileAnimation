@@ -1,14 +1,14 @@
 //
-//  TCCMapTile.m
+//  TCCAnimationTile.h
 //  MapTileAnimation
 //
 //  Created by Bruce Johnson on 6/11/14.
 //  Copyright (c) 2014 The Climate Corporation. All rights reserved.
 //
 
-#import "MATAnimationTile.h"
+#import "TCCAnimationTile.h"
 
-@implementation MATAnimationTile
+@implementation TCCAnimationTile
 
 - (id)initWithFrame:(MKMapRect)frame x:(NSInteger)x y:(NSInteger)y z:(NSInteger)z
 {
@@ -34,9 +34,9 @@
 //checks to see if hashCoords is equal on the two tiles being compared
 - (BOOL)isEqual:(id)object
 {
-    if (![object isKindOfClass:[MATAnimationTile class]]) return NO;
+    if (![object isKindOfClass:[TCCAnimationTile class]]) return NO;
     
-    MATAnimationTile *other = (MATAnimationTile *)object;
+    TCCAnimationTile *other = (TCCAnimationTile *)object;
     return [self hash] == [other hash] &&
             self.x == other.x &&
             self.y == other.y &&

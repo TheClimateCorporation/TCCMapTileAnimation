@@ -1,16 +1,16 @@
 //
-//  TCCMapTileRenderer.m
+//  TCCAnimationTileOverlayRenderer.m
 //  MapTileAnimationDemo
 //
 //  Created by Bruce Johnson on 6/12/14.
 //  Copyright (c) 2014 The Climate Corporation. All rights reserved.
 //
 
-#import "MATAnimatedTileOverlayRenderer.h"
-#import "MATAnimatedTileOverlay.h"
-#import "MATAnimationTile.h"
+#import "TCCAnimationTileOverlayRenderer.h"
+#import "TCCAnimationTileOverlay.h"
+#import "TCCAnimationTile.h"
 
-@implementation MATAnimatedTileOverlayRenderer
+@implementation TCCAnimationTileOverlayRenderer
 
 #pragma mark - Lifecycle
 
@@ -19,7 +19,7 @@
 	self = [super initWithOverlay:overlay];
 	if (self)
 	{
-        if (![overlay isKindOfClass:[MATAnimatedTileOverlay class]]) {
+        if (![overlay isKindOfClass:[TCCAnimationTileOverlay class]]) {
             [NSException raise:@"Unsupported overlay type" format:@"Must be MATAnimatedTileOverlay"];
         }
 	}
@@ -40,8 +40,8 @@
  */
 -(void)drawMapRect:(MKMapRect)mapRect zoomScale:(MKZoomScale)zoomScale inContext:(CGContextRef)context
 {
-    MATAnimatedTileOverlay *mapOverlay = (MATAnimatedTileOverlay *)self.overlay;
-    MATAnimationTile *tile = [mapOverlay tileForMapRect:mapRect zoomScale:zoomScale];
+    TCCAnimationTileOverlay *mapOverlay = (TCCAnimationTileOverlay *)self.overlay;
+    TCCAnimationTile *tile = [mapOverlay tileForMapRect:mapRect zoomScale:zoomScale];
 	if (tile) {
 		CGRect rect = [self rectForMapRect: mapRect];
 		UIImage *image = tile.tileImage;
@@ -68,7 +68,7 @@
     [bezierPath stroke];
 
     // Draw the tile coordinates in the upper left of the tile
-    MATTileCoordinate c = [self tileCoordinateForMapRect:mapRect zoomScale:zoomScale];
+    TCCTileCoordinate c = [self tileCoordinateForMapRect:mapRect zoomScale:zoomScale];
     NSString *tileCoordinates = [NSString stringWithFormat:@"(%d, %d, %d)", c.x, c.y, c.z];
     [tileCoordinates drawInRect:rect withAttributes:@{ NSFontAttributeName : [UIFont systemFontOfSize:CGRectGetHeight(rect) * .1] }];
     
@@ -79,7 +79,7 @@
     NSArray *tiles = [mapOverlay cachedTilesForMapRect:mapRect];
 
     //tile drawing
-    for (MATAnimationTile *tile in tiles) {
+    for (TCCAnimationTile *tile in tiles) {
         // For each image tile, draw it in its corresponding MKMapRect frame
         CGRect rect = [self rectForMapRect:tile.mapRectFrame];
         if (!MKMapRectIntersectsRect(mapRect, tile.mapRectFrame)) continue;
@@ -124,9 +124,9 @@
     return z;
 }
 
-- (MATTileCoordinate)tileCoordinateForMapRect:(MKMapRect)aMapRect zoomScale:(MKZoomScale)aZoomScale
+- (TCCTileCoordinate)tileCoordinateForMapRect:(MKMapRect)aMapRect zoomScale:(MKZoomScale)aZoomScale
 {
-	MATTileCoordinate coord = {0, 0, 0};
+	TCCTileCoordinate coord = {0, 0, 0};
 	
 	NSUInteger zoomLevel = [self zoomLevelForZoomScale: aZoomScale];
     CGPoint mercatorPoint = [self mercatorTileOriginForMapRect: aMapRect];

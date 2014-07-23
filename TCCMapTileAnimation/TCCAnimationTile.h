@@ -14,9 +14,9 @@ typedef struct
 	NSInteger x;
 	NSInteger y;
 	NSInteger z;
-} MATTileCoordinate;
+} TCCTileCoordinate;
 
-@interface MATAnimationTile : NSObject
+@interface TCCAnimationTile : NSObject
 
 @property (nonatomic) NSInteger x;
 @property (nonatomic) NSInteger y;

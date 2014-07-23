@@ -1,30 +1,29 @@
 //
-//  MATAnimatedTileOverlay.m
+//  TCCAnimationTileOverlay.m
 //  MapTileAnimationDemo
 //
 //  Created by Bruce Johnson on 6/12/14.
 //  Copyright (c) 2014 The Climate Corporation. All rights reserved.
 //
 
-#import "MATAnimatedTileOverlay.h"
-#import "MATAnimationTile.h"
-#import "MATAnimatedTileOverlayDelegate.h"
+#import "TCCAnimationTileOverlay.h"
+#import "TCCAnimationTile.h"
 
-// This should be documented as the expected format of the template URLs
+// TODO: This should be documented as the expected format of the template URLs
 #define Z_INDEX "{z}"
 #define X_INDEX "{x}"
 #define Y_INDEX "{y}"
 
-NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayError";
+NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayError";
 
-@interface MATAnimatedTileOverlay ()
+@interface TCCAnimationTileOverlay ()
 
 @property (strong, nonatomic) NSOperationQueue *fetchQueue;
 @property (strong, nonatomic) NSOperationQueue *downloadQueue;
 @property (strong, nonatomic) NSArray *templateURLs;
 @property (nonatomic) NSTimeInterval frameDuration;
 @property (strong, nonatomic) NSTimer *timer;
-@property (readwrite, nonatomic) MATAnimatingState currentAnimatingState;
+@property (readwrite, nonatomic) TCCAnimationState currentAnimatingState;
 @property (strong, nonatomic) NSSet *mapTiles;
 @property (strong, nonatomic) NSMutableSet *failedMapTiles;
 @property (nonatomic) NSInteger tileSize;
@@ -35,7 +34,7 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
 
 // TODO: Purge NSURLCache on memory warnings
 
-@implementation MATAnimatedTileOverlay
+@implementation TCCAnimationTileOverlay
 
 #pragma mark - Lifecycle
 
@@ -60,7 +59,7 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
 		[_downloadQueue setMaxConcurrentOperationCount: 25];
         _failedMapTiles = [NSMutableSet set];
 		
-		_currentAnimatingState = MATAnimatingStateStopped;
+		_currentAnimatingState = TCCAnimationStateStopped;
 		
         // TODO: make this configurable
         self.tileSize = 256;
@@ -79,14 +78,12 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
 
 #pragma mark - Custom accessors
 
-- (void)setCurrentAnimatingState:(MATAnimatingState)currentAnimatingState
+- (void)setCurrentAnimatingState:(TCCAnimationState)currentAnimatingState
 {
     // Set new animating state if state different than old value
     if(currentAnimatingState != _currentAnimatingState){
         _currentAnimatingState = currentAnimatingState;
-        if ([self.delegate respondsToSelector:@selector(animatedTileOverlay:didChangeAnimationState:)]) {
-            [self.delegate animatedTileOverlay:self didChangeAnimationState:currentAnimatingState];
-        }
+        [self.delegate animationTileOverlay:self didChangeAnimationState:currentAnimatingState];
     }
 }
 
@@ -117,7 +114,7 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
     [self.mapView removeOverlay:self.tileOverlay];
 	self.timer = [NSTimer scheduledTimerWithTimeInterval:self.frameDuration target:self selector:@selector(updateImageTileAnimation:) userInfo:nil repeats:YES];
 	[self.timer fire];
-	self.currentAnimatingState = MATAnimatingStateAnimating;
+	self.currentAnimatingState = TCCAnimationStateAnimating;
     
 }
 
@@ -127,7 +124,7 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
     [self.downloadQueue cancelAllOperations];
 	[self.fetchQueue cancelAllOperations];
 	self.timer = nil;
-	self.currentAnimatingState = MATAnimatingStateStopped;
+	self.currentAnimatingState = TCCAnimationStateStopped;
     self.tileOverlay = [[MKTileOverlay alloc] initWithURLTemplate:self.templateURLs[self.currentFrameIndex]];
     self.tileOverlay.minimumZ = self.minimumZ;
     self.tileOverlay.maximumZ = self.maximumZ;
@@ -140,23 +137,20 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
              completionHandler:(void (^)(BOOL success, NSError *error))completionHandler
 {
 	NSUInteger zoomLevel = [self zoomLevelForZoomScale: zoomScale];
-    NSLog(@"Actual zoom scale: %lf, zoom level: %d", zoomScale, zoomLevel);
     
     if(zoomLevel > self.maximumZ) {
         zoomLevel = self.maximumZ;
-        NSLog(@"Capped zoom level at %d", zoomLevel);
     }
     if(zoomLevel < self.minimumZ) {
         zoomLevel = self.minimumZ;
-        NSLog(@"Capped zoom level at %d", zoomLevel);
     }
 
-	self.currentAnimatingState = MATAnimatingStateLoading;
+	self.currentAnimatingState = TCCAnimationStateLoading;
     
 	[self.fetchQueue addOperationWithBlock:^{
 		NSSet *mapTiles = [self mapTilesInMapRect:mapRect zoomScale:zoomScale];
 		
-		for (MATAnimationTile *tile in mapTiles) {
+		for (TCCAnimationTile *tile in mapTiles) {
 			NSMutableArray *array = [NSMutableArray array];
 			for (NSUInteger timeIndex = 0; timeIndex < self.numberOfAnimationFrames; timeIndex++) {
 				[array addObject:[self URLStringForX:tile.x Y:tile.y Z:tile.z timeIndex:timeIndex]];
@@ -173,12 +167,12 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
 			if (didStopFlag) {
 				NSLog(@"User Stopped");
 				[self.downloadQueue cancelAllOperations];
-				self.currentAnimatingState = MATAnimatingStateStopped;
+				self.currentAnimatingState = TCCAnimationStateStopped;
 				break;
 			}
             
             // Fetch and cache the tile data
-			for (MATAnimationTile *tile in self.mapTiles) {
+			for (TCCAnimationTile *tile in self.mapTiles) {
                 BOOL isFailedTile = [self.failedMapTiles containsObject:tile];
                 
                 //if tile not in failedMapTiles, tile not bad -> go and fetch the tile
@@ -207,7 +201,7 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
 
 - (void)moveToFrameIndex:(NSInteger)frameIndex isContinuouslyMoving:(BOOL)isContinuouslyMoving
 {
-    if (self.currentAnimatingState == MATAnimatingStateAnimating) {
+    if (self.currentAnimatingState == TCCAnimationStateAnimating) {
         [self pauseAnimating];
     }
     
@@ -226,10 +220,10 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
     [self updateTilesToFrameIndex:frameIndex];
 }
 
-- (MATAnimationTile *)tileForMapRect:(MKMapRect)mapRect zoomScale:(MKZoomScale)zoomScale;
+- (TCCAnimationTile *)tileForMapRect:(MKMapRect)mapRect zoomScale:(MKZoomScale)zoomScale;
 {
-    MATTileCoordinate coord = [self tileCoordinateForMapRect:mapRect zoomScale:zoomScale];
-    for (MATAnimationTile *tile in self.mapTiles) {
+    TCCTileCoordinate coord = [self tileCoordinateForMapRect:mapRect zoomScale:zoomScale];
+    for (TCCAnimationTile *tile in self.mapTiles) {
         if (coord.x == tile.x && coord.y == tile.y && coord.z == tile.z) {
             return tile;
         }
@@ -240,7 +234,7 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
 - (NSArray *)cachedTilesForMapRect:(MKMapRect)rect
 {
     NSMutableArray *tiles = [NSMutableArray array];
-    for (MATAnimationTile *tile in self.mapTiles) {
+    for (TCCAnimationTile *tile in self.mapTiles) {
         if (MKMapRectIntersectsRect(rect, tile.mapRectFrame)) {
             [tiles addObject:tile];
         }
@@ -251,7 +245,7 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
 #pragma  mark - Private
 
 
-- (void)enqueueOperationOnQueue:(NSOperationQueue *)queue toFetchAndCacheTile:(MATAnimationTile *)tile forFrameIndex:(NSInteger)frameIndex
+- (void)enqueueOperationOnQueue:(NSOperationQueue *)queue toFetchAndCacheTile:(TCCAnimationTile *)tile forFrameIndex:(NSInteger)frameIndex
 {
     // TODO: do we really need to check failedMapTiles both here and in fetch?
     //if tile not in failedMapTiles, go and fetch the tile
@@ -293,7 +287,7 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
     // data. However, scrubbing quickly causes multiple calls to occur concurrently, which causes the
     // currentFrameIndex to enter a race condition. If we want to do this in the background, I think we'll
     // need to create a serial background queue.
-    for (MATAnimationTile *tile in self.mapTiles) {
+    for (TCCAnimationTile *tile in self.mapTiles) {
         if ([self.failedMapTiles containsObject:tile]) {
             continue;
         }
@@ -313,7 +307,7 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
     
     self.currentFrameIndex = frameIndex;
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self.delegate animatedTileOverlay:self didAnimateWithAnimationFrameIndex:self.currentFrameIndex];
+        [self.delegate animationTileOverlay:self didAnimateWithAnimationFrameIndex:self.currentFrameIndex];
     });
 }
 
@@ -336,9 +330,9 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
 	return returnString;
 }
 
-- (MATTileCoordinate)tileCoordinateForMapRect:(MKMapRect)aMapRect zoomScale:(MKZoomScale)aZoomScale
+- (TCCTileCoordinate)tileCoordinateForMapRect:(MKMapRect)aMapRect zoomScale:(MKZoomScale)aZoomScale
 {
-	MATTileCoordinate coord = {0, 0, 0};
+	TCCTileCoordinate coord = {0, 0, 0};
     
 	NSUInteger zoomLevel = [self zoomLevelForZoomScale: aZoomScale];
     CGPoint mercatorPoint = [self mercatorTileOriginForMapRect: aMapRect];
@@ -352,8 +346,6 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
 // Creates a set of @c MATAnimationTile objects for a given map rect and zoom scale
 - (NSSet *)mapTilesInMapRect:(MKMapRect)rect zoomScale:(MKZoomScale)zoomScale
 {
-    NSLog(@"Zoom scale in mapTilesInMapRect: %f", zoomScale);
-    
     // Ripped from http://stackoverflow.com/a/4445576/766491
     NSInteger zoomLevel = [self zoomLevelForZoomScale:zoomScale];
     NSInteger overZoom = 1;
@@ -377,7 +369,7 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
         for (NSInteger y = minY; y <=maxY; y++) {
 			MKMapRect frame = MKMapRectMake((x * adjustedTileSize) / zoomScale, (y * adjustedTileSize) / zoomScale, adjustedTileSize / zoomScale, adjustedTileSize / zoomScale);
             if (MKMapRectIntersectsRect(frame, rect)) {
-                [tiles addObject:[[MATAnimationTile alloc] initWithFrame:frame x:x y:y z:zoomLevel]];
+                [tiles addObject:[[TCCAnimationTile alloc] initWithFrame:frame x:x y:y z:zoomLevel]];
             }
         }
     }
@@ -433,29 +425,26 @@ NSString *const MATAnimatedTileOverlayErrorDomain = @"MATAnimatedTileOverlayErro
 
 - (BOOL)checkResponseForError:(NSHTTPURLResponse *)response data:(NSData *)data
 {
-    
     if (data) {
         if (response.statusCode != 200) {
             
             NSString *localizedDescription = [NSString stringWithFormat:@"Error during fetch. Image tile HTTP respsonse code %ld, URL %@", (long)response.statusCode, response.URL];
-            NSError *error = [NSError errorWithDomain:MATAnimatedTileOverlayErrorDomain code:MATAnimatingErrorBadURLResponseCode userInfo:@{ NSLocalizedDescriptionKey : localizedDescription }];
+            NSError *error = [NSError errorWithDomain:TCCAnimationTileOverlayErrorDomain code:TCCAnimationTileOverlayErrorBadURLResponseCode userInfo:@{ NSLocalizedDescriptionKey : localizedDescription }];
             [self sendErrorToDelegate:error];
             return YES;
-            
         }
     } else {
         NSString *localizedDescription = [NSString stringWithFormat:@"No image data. HTTP respsonse code %ld, URL %@", (long)response.statusCode, response.URL];
-        NSError *error = [NSError errorWithDomain:MATAnimatedTileOverlayErrorDomain code:MATAnimatingErrorNoImageData userInfo:@{ NSLocalizedDescriptionKey : localizedDescription }];
+        NSError *error = [NSError errorWithDomain:TCCAnimationTileOverlayErrorDomain code:TCCAnimationTileOverlayErrorNoImageData userInfo:@{ NSLocalizedDescriptionKey : localizedDescription }];
         [self sendErrorToDelegate:error];
         return YES;
     }
     return NO;
 }
 
-- (void)sendErrorToDelegate:(NSError *)error
-{
-    if ([self.delegate respondsToSelector:@selector(animatedTileOverlay:didHaveError:)]) {
-        [self.delegate animatedTileOverlay:self didHaveError:error];
+- (void)sendErrorToDelegate:(NSError *)error {
+    if ([self.delegate respondsToSelector:@selector(animationTileOverlay:didHaveError:)]) {
+        [self.delegate animationTileOverlay:self didHaveError:error];
     }
 }
 

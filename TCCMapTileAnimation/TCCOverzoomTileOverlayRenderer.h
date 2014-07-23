@@ -1,5 +1,5 @@
 //
-//  MKOverzoomTileOverlayRenderer.h
+//  TCCOverzoomTileOverlayRenderer.h
 //  MapTileAnimationDemo
 //
 //  Created by Matthew Sniff on 7/18/14.
@@ -8,7 +8,7 @@
 
 #import <MapKit/MapKit.h>
 
-@interface MKOverzoomTileOverlayRenderer : MKTileOverlayRenderer
+@interface TCCOverzoomTileOverlayRenderer : MKTileOverlayRenderer
 
 @property (nonatomic) NSUInteger lastZoomLevel;
 

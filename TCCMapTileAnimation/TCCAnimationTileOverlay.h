@@ -1,5 +1,5 @@
 //
-//  MATAnimatedTileOverlay.h
+//  TCCAnimationTileOverlay.h
 //  MapTileAnimationDemo
 //
 //  Created by Bruce Johnson on 6/12/14.
@@ -8,32 +8,35 @@
 
 #import <MapKit/MapKit.h>
 
-@class MATAnimationTile;
+@class TCCAnimationTile;
 
-typedef NS_ENUM(NSUInteger, MATAnimatingState) {
-	MATAnimatingStateStopped = 0,
-	MATAnimatingStateLoading = 1,
-	MATAnimatingStateAnimating = 2
+typedef NS_ENUM(NSUInteger, TCCAnimationState) {
+	TCCAnimationStateStopped = 0,
+	TCCAnimationStateLoading,
+	TCCAnimationStateAnimating
 };
 
-typedef NS_ENUM(NSUInteger, MATAnimatingErrorCode) {
-	MATAnimatingErrorInvalidZoomLevel = 1001,
-	MATAnimatingErrorBadURLResponseCode,
-	MATAnimatingErrorNoImageData
-    
+typedef NS_ENUM(NSUInteger, TCCAnimationTileOverlayError) {
+	TCCAnimationTileOverlayErrorInvalidZoomLevel = 1001,
+	TCCAnimationTileOverlayErrorBadURLResponseCode,
+	TCCAnimationTileOverlayErrorNoImageData
 };
 
-extern NSString *const MATAnimatedTileOverlayErrorDomain;
+extern NSString *const TCCAnimationTileOverlayErrorDomain;
 
-@protocol MATAnimatedTileOverlayDelegate;
+@protocol TCCAnimationTileOverlayDelegate;
 
-@interface MATAnimatedTileOverlay : NSObject <MKOverlay>
 
-//any object conforming to MATAnimatedTileOverlayDelegate protocol
-@property (weak, nonatomic) id<MATAnimatedTileOverlayDelegate>delegate;
+/**
+ A map overlay class that adheres to the @c MKOverlay protocol.
+ */
+
+@interface TCCAnimationTileOverlay : NSObject <MKOverlay>
+
+@property (weak, nonatomic) id <TCCAnimationTileOverlayDelegate> delegate;
 @property (nonatomic) NSInteger currentFrameIndex;
 @property (readonly, nonatomic) NSInteger numberOfAnimationFrames;
-@property (readonly, nonatomic) MATAnimatingState currentAnimatingState;
+@property (readonly, nonatomic) TCCAnimationState currentAnimatingState;
 @property (nonatomic) NSInteger minimumZ;
 @property (nonatomic) NSInteger maximumZ;
 
@@ -81,12 +84,32 @@ extern NSString *const MATAnimatedTileOverlayErrorDomain;
  
  Returns @c nil if a fetch operation has not executed for this tile.
  */
-- (MATAnimationTile *)tileForMapRect:(MKMapRect)mapRect zoomScale:(MKZoomScale)mapRect;
+- (TCCAnimationTile *)tileForMapRect:(MKMapRect)mapRect zoomScale:(MKZoomScale)mapRect;
 
 /**
  Returns an array of @c MATAnimationTile objects that have been fetched and cached for a given
  map rect.
  */
 - (NSArray *)cachedTilesForMapRect:(MKMapRect)rect;
+
+@end
+
+
+/**
+ @protocol Delegate protocol for TCCAnimationTileOverlay to send back when significant events occur.
+ */
+
+@protocol TCCAnimationTileOverlayDelegate <NSObject>
+
+@required
+
+- (void)animationTileOverlay:(TCCAnimationTileOverlay *)animationTileOverlay didChangeAnimationState:(TCCAnimationState)currentAnimationState;
+
+- (void)animationTileOverlay:(TCCAnimationTileOverlay *)animationTileOverlay didAnimateWithAnimationFrameIndex:(NSInteger)animationFrameIndex;
+
+@optional
+
+// Does not stop the fetching of other images, could have multiple errors
+- (void)animationTileOverlay:(TCCAnimationTileOverlay *)animationTileOverlay didHaveError:(NSError *) error;
 
 @end

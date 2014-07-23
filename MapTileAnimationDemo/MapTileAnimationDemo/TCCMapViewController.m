@@ -8,15 +8,14 @@
 
 #import "TCCMapViewController.h"
 #import "TCCTimeFrameParser.h"
-#import "MATAnimatedTileOverlayRenderer.h"
-#import "MATAnimatedTileOverlay.h"
-#import "MATAnimatedTileOverlayDelegate.h"
-#import "MKOverzoomTileOverlayRenderer.h"
+#import "TCCAnimationTileOverlayRenderer.h"
+#import "TCCAnimationTileOverlay.h"
+#import "TCCOverzoomTileOverlayRenderer.h"
 #import "MKMapView+Extras.h"
 
 #define FUTURE_RADAR_FRAMES_URI @"http://climate.com/assets/wdt-future-radar/LKG.txt?grower_apps=true"
 
-@interface TCCMapViewController () <MKMapViewDelegate, MATAnimatedTileOverlayDelegate, TCCTimeFrameParserDelegateProtocol, UIAlertViewDelegate>
+@interface TCCMapViewController () <MKMapViewDelegate, TCCAnimationTileOverlayDelegate, TCCTimeFrameParserDelegateProtocol, UIAlertViewDelegate>
 
 @property (weak, nonatomic) IBOutlet MKMapView *mapView;
 @property (weak, nonatomic) IBOutlet UILabel *timeIndexLabel;
@@ -26,8 +25,8 @@
 @property (nonatomic) MKMapRect visibleMapRect;
 @property (strong, nonatomic) TCCTimeFrameParser *timeFrameParser;
 @property (nonatomic) BOOL initialLoad;
-@property (weak, nonatomic) MATAnimatedTileOverlay *animatedTileOverlay;
-@property (strong, nonatomic) MATAnimatedTileOverlayRenderer *animatedTileRenderer;
+@property (weak, nonatomic) TCCAnimationTileOverlay *animatedTileOverlay;
+@property (strong, nonatomic) TCCAnimationTileOverlayRenderer *animatedTileRenderer;
 
 @property (nonatomic) BOOL shouldStop;
 
@@ -51,7 +50,7 @@
 	
 	[self.mapView setRegion: region animated: NO];
 	
-	self.startStopButton.tag = MATAnimatingStateStopped;
+	self.startStopButton.tag = TCCAnimationStateStopped;
     self.initialLoad = YES;
     self.visibleMapRect = self.mapView.visibleMapRect;
     
@@ -78,7 +77,7 @@
 
 - (IBAction)onHandleStartStopAction: (id)sender
 {
-	if (self.startStopButton.tag == MATAnimatingStateStopped) {
+	if (self.startStopButton.tag == TCCAnimationStateStopped) {
 		//start downloading the image tiles for the time frame indexes
 
 		[self.animatedTileOverlay fetchTilesForMapRect:self.mapView.visibleMapRect zoomScale:self.mapView.zoomScale progressHandler:^(NSUInteger currentTimeIndex, BOOL *stop) {
@@ -109,9 +108,9 @@
 				self.shouldStop = NO;
 			}
 		}];
-	} else if (self.startStopButton.tag == MATAnimatingStateLoading) {
+	} else if (self.startStopButton.tag == TCCAnimationStateLoading) {
 		self.shouldStop = YES;
-	} else if (self.startStopButton.tag == MATAnimatingStateAnimating) {
+	} else if (self.startStopButton.tag == TCCAnimationStateAnimating) {
 		[self.animatedTileOverlay pauseAnimating];
 	}
 }
@@ -128,7 +127,7 @@
         [pluckedArray addObject:templateURLs[i]];
     }
     
-	MATAnimatedTileOverlay *overlay = [[MATAnimatedTileOverlay alloc] initWithMapView:self.mapView templateURLs:pluckedArray frameDuration:0.20];
+	TCCAnimationTileOverlay *overlay = [[TCCAnimationTileOverlay alloc] initWithMapView:self.mapView templateURLs:pluckedArray frameDuration:0.20];
 	overlay.delegate = self;
 		
 	[self.mapView addOverlay:overlay level:MKOverlayLevelAboveRoads];
@@ -137,12 +136,12 @@
 
 #pragma mark MATAnimatedTileOverlayDelegate
 
-- (void)animatedTileOverlay:(MATAnimatedTileOverlay *)animatedTileOverlay didChangeAnimationState:(MATAnimatingState)currentAnimationState {
+- (void)animationTileOverlay:(TCCAnimationTileOverlay *)animationTileOverlay didChangeAnimationState:(TCCAnimationState)currentAnimationState {
    
     self.startStopButton.tag = currentAnimationState;
 
     //set titles of button to appropriate string based on currentAnimationState
-    if (currentAnimationState == MATAnimatingStateLoading) {
+    if (currentAnimationState == TCCAnimationStateLoading) {
         [self.startStopButton setTitle: @"◼︎" forState: UIControlStateNormal];
         // check if user has panned (visibleRects different)
         if(!MKMapRectEqualToRect(self.visibleMapRect, self.mapView.visibleMapRect)) {
@@ -151,33 +150,33 @@
         }
         self.visibleMapRect = self.mapView.visibleMapRect;
     }
-    else if(currentAnimationState == MATAnimatingStateStopped) {
+    else if(currentAnimationState == TCCAnimationStateStopped) {
         [self.startStopButton setTitle: @"▶︎" forState: UIControlStateNormal];
 
     }
-    else if(currentAnimationState == MATAnimatingStateAnimating) {
+    else if(currentAnimationState == TCCAnimationStateAnimating) {
         [self.startStopButton setTitle: @"❚❚" forState: UIControlStateNormal];
     }
     
 }
 
-- (void)animatedTileOverlay:(MATAnimatedTileOverlay *)animatedTileOverlay didAnimateWithAnimationFrameIndex:(NSInteger)animationFrameIndex
+- (void)animationTileOverlay:(TCCAnimationTileOverlay *)animationTileOverlay didAnimateWithAnimationFrameIndex:(NSInteger)animationFrameIndex
 {
 	[self.animatedTileRenderer setNeedsDisplayInMapRect:self.mapView.visibleMapRect
                                               zoomScale:self.mapView.zoomScale];
 	//update the slider if we are loading or animating
     self.timeIndexLabel.text = [NSString stringWithFormat: @"%lu", (unsigned long)animationFrameIndex];
- 	if (animatedTileOverlay.currentAnimatingState != MATAnimatingStateStopped) {
+ 	if (animationTileOverlay.currentAnimatingState != TCCAnimationStateStopped) {
         self.timeSlider.enabled = YES;
 		self.timeSlider.value = animationFrameIndex;
 	}
 }
 
-- (void)animatedTileOverlay:(MATAnimatedTileOverlay *)animatedTileOverlay didHaveError:(NSError *) error
+- (void)animationTileOverlay:(TCCAnimationTileOverlay *)animationTileOverlay didHaveError:(NSError *) error
 {
 	NSLog(@"%s ERROR %ld %@", __PRETTY_FUNCTION__, (long)error.code, error.localizedDescription);
 	
-	if (error.code == MATAnimatingErrorInvalidZoomLevel) {
+	if (error.code == TCCAnimationTileOverlayErrorInvalidZoomLevel) {
 		UIAlertView *alert = [[UIAlertView alloc] initWithTitle: @"Invalid Zoom Level"
 														message: error.localizedDescription
 													   delegate: self
@@ -200,13 +199,13 @@
 - (MKOverlayRenderer *)mapView:(MKMapView *)mapView rendererForOverlay:(id<MKOverlay>)overlay
 {
 
-	if ([overlay isKindOfClass: [MATAnimatedTileOverlay class]]) {
-		self.animatedTileOverlay = (MATAnimatedTileOverlay *)overlay;
-        self.animatedTileRenderer = [[MATAnimatedTileOverlayRenderer alloc] initWithOverlay:overlay];
+	if ([overlay isKindOfClass: [TCCAnimationTileOverlay class]]) {
+		self.animatedTileOverlay = (TCCAnimationTileOverlay *)overlay;
+        self.animatedTileRenderer = [[TCCAnimationTileOverlayRenderer alloc] initWithOverlay:overlay];
         return self.animatedTileRenderer;
 	}
     if ([overlay isKindOfClass: [MKTileOverlay class]]) {
-        MKOverzoomTileOverlayRenderer *renderer = [[MKOverzoomTileOverlayRenderer alloc] initWithOverlay:overlay];
+        TCCOverzoomTileOverlayRenderer *renderer = [[TCCOverzoomTileOverlayRenderer alloc] initWithOverlay:overlay];
         renderer.alpha = .75;
         return renderer;
 	}

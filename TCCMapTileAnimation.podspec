@@ -8,14 +8,14 @@
 #
 
 Pod::Spec.new do |s|
-  s.name             = "MapTileAnimation"
+  s.name             = "TCCMapTileAnimation"
   s.version          = "0.1.0"
   s.summary          = "A library for creating animated map overlays from tiles"
-  s.homepage         = "https://github.com/TheClimateCorporation/map-animated-tile-ios"
+  s.homepage         = "https://github.com/TheClimateCorporation/TCCMapTileAnimation"
   # s.screenshots     = "www.example.com/screenshots_1", "www.example.com/screenshots_2"
   s.license          = 'MIT'
   s.author           = "Richard Shin", "Bruce Johnson", "Matthew Sniff"
-  s.source           = { :git => "https://github.com/TheClimateCorporation/map-animated-tile-ios.git", :tag => s.version.to_s }
+  s.source           = { :git => "https://github.com/TheClimateCorporation/TCCMapTileAnimation.git", :tag => s.version.to_s }
   s.social_media_url = 'https://twitter.com/climatecorp'
 
   s.platform     = :ios, '7.0'
