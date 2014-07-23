@@ -9,7 +9,7 @@
 
 Pod::Spec.new do |s|
   s.name             = "TCCMapTileAnimation"
-  s.version          = "0.1.0"
+  s.version          = "0.1.1"
   s.summary          = "A library for creating animated map overlays from tiles"
   s.homepage         = "https://github.com/TheClimateCorporation/TCCMapTileAnimation"
   # s.screenshots     = "www.example.com/screenshots_1", "www.example.com/screenshots_2"
@@ -21,5 +21,5 @@ Pod::Spec.new do |s|
   s.platform     = :ios, '7.0'
   s.requires_arc = true
 
-  s.source_files = 'MapTileAnimation/MapTileAnimation/*.{h, m}'
+  s.source_files = 'TCCMapTileAnimation/*.{h, m}'
 end
