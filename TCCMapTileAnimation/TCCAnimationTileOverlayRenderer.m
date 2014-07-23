@@ -69,8 +69,8 @@
     [bezierPath stroke];
 
     // Draw the tile coordinates in the upper left of the tile
-    TCCTileCoordinate c = [TCCTileOverlayHelpers tileCoordinateForMapRect:mapRect zoomLevel:zoomScale];
-    NSString *tileCoordinates = [NSString stringWithFormat:@"(%d, %d, %d)", c.x, c.y, c.z];
+    TCCTileCoordinate c = [TCCTileOverlayHelpers tileCoordinateForMapRect:mapRect zoomLevel:zoomLevel];
+    NSString *tileCoordinates = [NSString stringWithFormat:@"(%ld, %ld, %ld)", (long)c.x, (long)c.y, (long)c.z];
     [tileCoordinates drawInRect:rect withAttributes:@{ NSFontAttributeName : [UIFont systemFontOfSize:CGRectGetHeight(rect) * .1] }];
     
     UIGraphicsPopContext();

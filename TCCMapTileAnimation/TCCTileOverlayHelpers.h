@@ -9,7 +9,7 @@
 #import <MapKit/MapKit.h>
 #import "TCCAnimationTile.h"
 
-@interface TCCTileOverlayHelpers : MKTileOverlayRenderer
+@interface TCCTileOverlayHelpers : NSObject
 
 + (NSUInteger)zoomLevelForZoomScale:(MKZoomScale)zoomScale;
 + (TCCTileCoordinate)tileCoordinateForMapRect:(MKMapRect)aMapRect zoomLevel:(NSInteger)zoomLevel;
