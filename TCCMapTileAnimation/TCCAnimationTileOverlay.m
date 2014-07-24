@@ -366,12 +366,15 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
     
     // When we are zoomed in beyond the tile set, use the tiles from the maximum z-depth,
     // but render them larger.
-    NSInteger adjustedTileSize = overZoom * self.tileSize;
+    // **Adjusted from overZoom * self.tileSize to just self.tileSize in order to render at overzoom properly
+    NSInteger adjustedTileSize = self.tileSize;
+    NSLog(@"overzoom: %ld", (long)overZoom);
 
     // Need to use the zoom level zoom scale, not the actual zoom scale from the map view!
     NSInteger zoomExponent = 20 - zoomLevel;
     zoomScale = 1/pow(2, zoomExponent);
-
+    NSLog(@"scale: %f", zoomScale);
+    
     NSInteger minX = floor((MKMapRectGetMinX(rect) * zoomScale) / adjustedTileSize);
     NSInteger maxX = ceil((MKMapRectGetMaxX(rect) * zoomScale) / adjustedTileSize);
     NSInteger minY = floor((MKMapRectGetMinY(rect) * zoomScale) / adjustedTileSize);
@@ -382,6 +385,7 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
         for (NSInteger y = minY; y <=maxY; y++) {
 			MKMapRect frame = MKMapRectMake((x * adjustedTileSize) / zoomScale, (y * adjustedTileSize) / zoomScale, adjustedTileSize / zoomScale, adjustedTileSize / zoomScale);
             if (MKMapRectIntersectsRect(frame, rect)) {
+                NSLog(@"tile: x %ld, y %ld", (long)x, (long)y);
                 TCCAnimationTile *tile = [[TCCAnimationTile alloc] initWithFrame:frame x:x y:y z:zoomLevel];
                 [tiles addObject:tile];
             }
