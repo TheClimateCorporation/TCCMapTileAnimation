@@ -80,7 +80,7 @@
 {
     UIGraphicsPushContext(context);
     
-    NSString *tileCoordinates = [NSString stringWithFormat:@"(%d, %d, %d)", x, y, z];
+    NSString *tileCoordinates = [NSString stringWithFormat:@"(%ld, %ld, %ld)", (long)x, (long)y, (long)z];
     [tileCoordinates drawInRect:rect withAttributes:@{ NSFontAttributeName : [UIFont systemFontOfSize:CGRectGetHeight(rect) * .1], NSForegroundColorAttributeName : color }];
     
     UIBezierPath *bezierPath = [UIBezierPath bezierPathWithRect:CGRectMake(rect.origin.x, rect.origin.y, rect.size.width, rect.size.height)];

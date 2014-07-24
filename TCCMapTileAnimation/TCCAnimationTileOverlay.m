@@ -23,12 +23,13 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 @property (strong, nonatomic) NSArray *templateURLs;
 @property (nonatomic) NSTimeInterval frameDuration;
 @property (strong, nonatomic) NSTimer *timer;
-@property (readwrite, nonatomic) TCCAnimationState currentAnimatingState;
+@property (readwrite, nonatomic) TCCAnimationState currentAnimationState;
 @property (strong, nonatomic) NSSet *mapTiles;
 @property (strong, nonatomic) NSMutableSet *failedMapTiles;
 @property (nonatomic) NSInteger tileSize;
 @property (weak, nonatomic) MKTileOverlay *tileOverlay;
 @property (strong, nonatomic) MKMapView *mapView;
+@property (nonatomic) BOOL cancelFlag;
 
 @end
 
@@ -60,7 +61,7 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 		_downloadQueue = [[NSOperationQueue alloc] init];
         _failedMapTiles = [NSMutableSet set];
 		
-		_currentAnimatingState = TCCAnimationStateStopped;
+		_currentAnimationState = TCCAnimationStateStopped;
 		
         // TODO: make this configurable
         self.tileSize = 256;
@@ -75,12 +76,13 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 
 #pragma mark - Custom accessors
 
-- (void)setCurrentAnimatingState:(TCCAnimationState)currentAnimatingState
+- (void)setCurrentAnimationState:(TCCAnimationState)currentAnimationState
 {
     // Set new animating state if state different than old value
-    if(currentAnimatingState != _currentAnimatingState){
-        _currentAnimatingState = currentAnimatingState;
-        [self.delegate animationTileOverlay:self didChangeAnimationState:currentAnimatingState];
+    if (currentAnimationState != _currentAnimationState){
+        TCCAnimationState previousAnimationState = _currentAnimationState;
+        _currentAnimationState = currentAnimationState;
+        [self.delegate animationTileOverlay:self didChangeFromAnimationState:previousAnimationState toAnimationState:currentAnimationState];
     }
 }
 
@@ -111,7 +113,7 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
     [self removeStaticTileOverlay];
 	self.timer = [NSTimer scheduledTimerWithTimeInterval:self.frameDuration target:self selector:@selector(updateImageTileAnimation:) userInfo:nil repeats:YES];
 	[self.timer fire];
-	self.currentAnimatingState = TCCAnimationStateAnimating;
+	self.currentAnimationState = TCCAnimationStateAnimating;
     
 }
 
@@ -121,15 +123,32 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
     [self.downloadQueue cancelAllOperations];
 	[self.fetchQueue cancelAllOperations];
 	self.timer = nil;
-	self.currentAnimatingState = TCCAnimationStateStopped;
+	self.currentAnimationState = TCCAnimationStateStopped;
     [self addStaticTileOverlay];
+}
+
+- (void)cancelLoading
+{
+    self.cancelFlag = YES;
 }
 
 - (void)fetchTilesForMapRect:(MKMapRect)mapRect
                    zoomScale:(MKZoomScale)zoomScale
-               progressHandler:(void(^)(NSUInteger currentFrameIndex, BOOL *stop))progressHandler
+               progressHandler:(void(^)(NSUInteger currentFrameIndex))progressHandler
              completionHandler:(void (^)(BOOL success, NSError *error))completionHandler
 {
+    if (self.templateURLs.count == 0) {
+        if (completionHandler) {
+            NSError *error = [NSError errorWithDomain:TCCAnimationTileOverlayErrorDomain
+                                                 code:TCCAnimationTileOverlayErrorNoFrames
+                                             userInfo:nil];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completionHandler(NO, error);
+            });
+        }
+        return;
+    }
+    
 	NSUInteger zoomLevel = [self zoomLevelForZoomScale: zoomScale];
     
     if(zoomLevel > self.maximumZ) {
@@ -139,7 +158,7 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
         zoomLevel = self.minimumZ;
     }
 
-	self.currentAnimatingState = TCCAnimationStateLoading;
+	self.currentAnimationState = TCCAnimationStateLoading;
     
 	[self.fetchQueue addOperationWithBlock:^{
 		NSSet *mapTiles = [self mapTilesInMapRect:mapRect zoomScale:zoomScale];
@@ -154,14 +173,12 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 		
 		//update the tile array with new tile objects
 		self.mapTiles = mapTiles;
-		//set and check a flag to see if the calling object has stopped tile loading
-		__block BOOL didStopFlag = NO;
 
 		for (NSInteger frameIndex = 0; frameIndex < self.numberOfAnimationFrames; frameIndex++) {
-			if (didStopFlag) {
-				NSLog(@"User Stopped");
+			if (self.cancelFlag) {
 				[self.downloadQueue cancelAllOperations];
-				self.currentAnimatingState = TCCAnimationStateStopped;
+				self.currentAnimationState = TCCAnimationStateStopped;
+                self.cancelFlag = NO;
 				break;
 			}
             
@@ -179,7 +196,7 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 			[self.downloadQueue waitUntilAllOperationsAreFinished];
             
 			dispatch_async(dispatch_get_main_queue(), ^{
-				progressHandler(frameIndex, &didStopFlag);
+				progressHandler(frameIndex);
 			});
 		}
 		[self.downloadQueue waitUntilAllOperationsAreFinished];
@@ -188,14 +205,15 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 		[self moveToFrameIndex:self.currentFrameIndex isContinuouslyMoving:YES];
 		
 		dispatch_async(dispatch_get_main_queue(), ^{
-            completionHandler(!didStopFlag, nil);
+            // TODO: is this right?
+            completionHandler(YES, nil);
 		});
 	}];
 }
 
 - (void)moveToFrameIndex:(NSInteger)frameIndex isContinuouslyMoving:(BOOL)isContinuouslyMoving
 {
-    if (self.currentAnimatingState == TCCAnimationStateAnimating) {
+    if (self.currentAnimationState == TCCAnimationStateAnimating) {
         [self pauseAnimating];
     }
     
@@ -349,7 +367,11 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
     // When we are zoomed in beyond the tile set, use the tiles from the maximum z-depth,
     // but render them larger.
     NSInteger adjustedTileSize = overZoom * self.tileSize;
-	
+
+    // Need to use the zoom level zoom scale, not the actual zoom scale from the map view!
+    NSInteger zoomExponent = 20 - zoomLevel;
+    zoomScale = 1/pow(2, zoomExponent);
+
     NSInteger minX = floor((MKMapRectGetMinX(rect) * zoomScale) / adjustedTileSize);
     NSInteger maxX = ceil((MKMapRectGetMaxX(rect) * zoomScale) / adjustedTileSize);
     NSInteger minY = floor((MKMapRectGetMinY(rect) * zoomScale) / adjustedTileSize);
@@ -436,7 +458,9 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 
 - (void)sendErrorToDelegate:(NSError *)error {
     if ([self.delegate respondsToSelector:@selector(animationTileOverlay:didHaveError:)]) {
-        [self.delegate animationTileOverlay:self didHaveError:error];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.delegate animationTileOverlay:self didHaveError:error];
+        });
     }
 }
 

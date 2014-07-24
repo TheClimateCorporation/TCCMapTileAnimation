@@ -26,7 +26,7 @@
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"(%d, %d, %d) mapRectFrame origin: (%f, %f) size: (%f, %f)", self.x, self.y, self.z, self.mapRectFrame.origin.x, self.mapRectFrame.origin.y, self.mapRectFrame.size.width, self.mapRectFrame.size.height];
+    return [NSString stringWithFormat:@"(%ld, %ld, %ld) mapRectFrame origin: (%f, %f) size: (%f, %f)", (long)self.x, (long)self.y, (long)self.z, self.mapRectFrame.origin.x, self.mapRectFrame.origin.y, self.mapRectFrame.size.width, self.mapRectFrame.size.height];
 }
 
 #pragma mark - Overridden methods
@@ -46,7 +46,7 @@
 //custom hash to identify tiles by their x/y/z (their hashCoords)
 - (NSUInteger)hash
 {
-    return [[NSString stringWithFormat:@"%d/%d/%d", self.x, self.y, self.z] hash];
+    return [[NSString stringWithFormat:@"%ld/%ld/%ld", (long)self.x, (long)self.y, (long)self.z] hash];
 }
 
 @end

@@ -10,8 +10,6 @@
 
 @interface MKMapView (Extras)
 
-- (NSUInteger)zoomLevel;
-
 - (MKZoomScale)zoomScale;
 
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate

@@ -22,11 +22,11 @@
 @property (weak, nonatomic) IBOutlet UIProgressView *downloadProgressView;
 @property (weak, nonatomic) IBOutlet UIButton *startStopButton;
 @property (weak, nonatomic) IBOutlet UISlider *timeSlider;
-@property (nonatomic) MKMapRect visibleMapRect;
 @property (strong, nonatomic) TCCTimeFrameParser *timeFrameParser;
 @property (nonatomic) BOOL initialLoad;
 @property (weak, nonatomic) TCCAnimationTileOverlay *animatedTileOverlay;
 @property (strong, nonatomic) TCCAnimationTileOverlayRenderer *animatedTileRenderer;
+@property (weak, nonatomic) UIAlertView *alertView;
 
 @property (nonatomic) BOOL shouldStop;
 
@@ -42,7 +42,18 @@
 
 	self.startStopButton.tag = TCCAnimationStateStopped;
     self.initialLoad = YES;
-    self.visibleMapRect = self.mapView.visibleMapRect;
+    self.timeSlider.enabled = NO;
+    
+    // I don't think this is really necessary... like Bruce was saying... thoughts???
+    // Set the starting  location.
+    CLLocationCoordinate2D startingLocation = {30.33, -81.52};
+//     MKCoordinateSpan span = {8.403266, 7.031250};
+       MKCoordinateSpan span = {7.0, 7.0};
+       //calling regionThatFits: is very important, this will line up the visible map rect with the screen aspect ratio
+       //which is important for calculating the number of tiles, their coordinates and map rect frame
+       MKCoordinateRegion region = [self.mapView regionThatFits: MKCoordinateRegionMake(startingLocation, span)];
+
+       [self.mapView setRegion: region animated: NO];
     
     self.timeFrameParser = [[TCCTimeFrameParser alloc] initWithURLString:FUTURE_RADAR_FRAMES_URI delegate:self];
 }
@@ -65,12 +76,12 @@
     [self.animatedTileRenderer setNeedsDisplay];
 }
 
-- (IBAction)onHandleStartStopAction: (id)sender
+- (IBAction)onHandleStartStopAction:(id)sender
 {
 	if (self.startStopButton.tag == TCCAnimationStateStopped) {
-		//start downloading the image tiles for the time frame indexes
-
-		[self.animatedTileOverlay fetchTilesForMapRect:self.mapView.visibleMapRect zoomScale:self.mapView.zoomScale progressHandler:^(NSUInteger currentTimeIndex, BOOL *stop) {
+        self.downloadProgressView.hidden = NO;
+        
+		[self.animatedTileOverlay fetchTilesForMapRect:self.mapView.visibleMapRect zoomScale:self.mapView.zoomScale progressHandler:^(NSUInteger currentTimeIndex) {
 			         
 			CGFloat progressValue = (CGFloat)currentTimeIndex / (self.animatedTileOverlay.numberOfAnimationFrames - 1);
 			[self.downloadProgressView setProgress: progressValue animated: YES];
@@ -79,14 +90,12 @@
                 self.timeSlider.enabled = NO;
                 self.timeIndexLabel.text = [NSString stringWithFormat:@"%lu", (unsigned long)currentTimeIndex];
 			}
-
-			*stop = self.shouldStop;
 		} completionHandler:^(BOOL success, NSError *error) {
 			self.downloadProgressView.progress = 0.0;
+            self.downloadProgressView.hidden = YES;
 
 			if (success) {
                 self.initialLoad = NO;
-                self.downloadProgressView.hidden = YES;
                 
 				[self.animatedTileOverlay moveToFrameIndex:self.animatedTileOverlay.currentFrameIndex
                                       isContinuouslyMoving:NO];
@@ -94,15 +103,25 @@
                                                           zoomScale: self.mapView.zoomScale];
 				[self.animatedTileOverlay startAnimating];
 			} else {
-                self.downloadProgressView.hidden = NO;
-				self.shouldStop = NO;
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self displayError:error];
+                });
 			}
 		}];
 	} else if (self.startStopButton.tag == TCCAnimationStateLoading) {
-		self.shouldStop = YES;
+        [self.animatedTileOverlay cancelLoading];
 	} else if (self.startStopButton.tag == TCCAnimationStateAnimating) {
 		[self.animatedTileOverlay pauseAnimating];
 	}
+}
+
+#pragma mark - Private methods
+
+- (void)displayError:(NSError *)error
+{
+    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Error" message:error.localizedDescription delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+    self.alertView = alertView;
+    [alertView show];
 }
 
 #pragma mark - Protocol conformance
@@ -126,28 +145,20 @@
 
 #pragma mark MATAnimatedTileOverlayDelegate
 
-- (void)animationTileOverlay:(TCCAnimationTileOverlay *)animationTileOverlay didChangeAnimationState:(TCCAnimationState)currentAnimationState {
-   
+- (void)animationTileOverlay:(TCCAnimationTileOverlay *)animationTileOverlay
+ didChangeFromAnimationState:(TCCAnimationState)previousAnimationState
+            toAnimationState:(TCCAnimationState)currentAnimationState
+{
     self.startStopButton.tag = currentAnimationState;
 
     //set titles of button to appropriate string based on currentAnimationState
     if (currentAnimationState == TCCAnimationStateLoading) {
-        [self.startStopButton setTitle: @"◼︎" forState: UIControlStateNormal];
-        // check if user has panned (visibleRects different)
-        if(!MKMapRectEqualToRect(self.visibleMapRect, self.mapView.visibleMapRect)) {
-            self.downloadProgressView.hidden = NO;
-            self.initialLoad = YES;
-        }
-        self.visibleMapRect = self.mapView.visibleMapRect;
+        [self.startStopButton setTitle:@"◼︎" forState:UIControlStateNormal];
+    } else if(currentAnimationState == TCCAnimationStateStopped) {
+        [self.startStopButton setTitle:@"▶︎" forState:UIControlStateNormal];
+    } else if(currentAnimationState == TCCAnimationStateAnimating) {
+        [self.startStopButton setTitle:@"❚❚" forState:UIControlStateNormal];
     }
-    else if(currentAnimationState == TCCAnimationStateStopped) {
-        [self.startStopButton setTitle: @"▶︎" forState: UIControlStateNormal];
-
-    }
-    else if(currentAnimationState == TCCAnimationStateAnimating) {
-        [self.startStopButton setTitle: @"❚❚" forState: UIControlStateNormal];
-    }
-    
 }
 
 - (void)animationTileOverlay:(TCCAnimationTileOverlay *)animationTileOverlay didAnimateWithAnimationFrameIndex:(NSInteger)animationFrameIndex
@@ -156,7 +167,7 @@
                                               zoomScale:self.mapView.zoomScale];
 	//update the slider if we are loading or animating
     self.timeIndexLabel.text = [NSString stringWithFormat: @"%lu", (unsigned long)animationFrameIndex];
- 	if (animationTileOverlay.currentAnimatingState != TCCAnimationStateStopped) {
+ 	if (animationTileOverlay.currentAnimationState != TCCAnimationStateStopped) {
         self.timeSlider.enabled = YES;
 		self.timeSlider.value = animationFrameIndex;
 	}
@@ -164,16 +175,11 @@
 
 - (void)animationTileOverlay:(TCCAnimationTileOverlay *)animationTileOverlay didHaveError:(NSError *) error
 {
-	NSLog(@"%s ERROR %ld %@", __PRETTY_FUNCTION__, (long)error.code, error.localizedDescription);
-	
-	if (error.code == TCCAnimationTileOverlayErrorInvalidZoomLevel) {
-		UIAlertView *alert = [[UIAlertView alloc] initWithTitle: @"Invalid Zoom Level"
-														message: error.localizedDescription
-													   delegate: self
-											  cancelButtonTitle: @"Ok"
-											  otherButtonTitles: nil, nil];
-		[alert show];
-	}
+     NSLog(@"%s ERROR %ld %@", __PRETTY_FUNCTION__, (long)error.code, error.localizedDescription);
+    
+    if (!self.alertView) {
+        [self displayError:error];
+    }
 }
 
 
@@ -181,14 +187,13 @@
 
 - (void)mapView:(MKMapView *)mapView regionWillChangeAnimated:(BOOL)animated
 {
-	if (self.startStopButton.tag != 0) {
+	if (self.animatedTileOverlay.currentAnimationState == TCCAnimationStateAnimating) {
 		[self.animatedTileOverlay pauseAnimating];
 	}
 }
 
 - (MKOverlayRenderer *)mapView:(MKMapView *)mapView rendererForOverlay:(id<MKOverlay>)overlay
 {
-
 	if ([overlay isKindOfClass: [TCCAnimationTileOverlay class]]) {
 		self.animatedTileOverlay = (TCCAnimationTileOverlay *)overlay;
         self.animatedTileRenderer = [[TCCAnimationTileOverlayRenderer alloc] initWithOverlay:overlay];

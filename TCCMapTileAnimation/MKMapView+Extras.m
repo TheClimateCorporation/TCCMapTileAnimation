@@ -76,24 +76,8 @@ double pixelSpaceYToLatitude(double pixelY) {
 
 #pragma mark - Public methods
 
-- (NSUInteger)zoomLevel
-{
-	MKCoordinateRegion region = self.region;
-	
-	double centerPixelX = longitudeToPixelSpaceX(region.center.longitude);
-	double topLeftPixelX = longitudeToPixelSpaceX(region.center.longitude - region.span.longitudeDelta / 2);
-	
-	double scaledMapWidth = (centerPixelX - topLeftPixelX) * 2;
-	CGSize mapSizeInPixels = self.bounds.size;
-	double zoomScale = scaledMapWidth / mapSizeInPixels.width;
-	double zoomExponent = log(zoomScale) / log(2);
-	double zoomLevel = 20 - zoomExponent;
-	
-	return zoomLevel;
-}
-
 - (MKZoomScale)zoomScale {
-    return (self.bounds.size.width / self.visibleMapRect.size.width) * [UIScreen mainScreen].scale;
+    return (CGRectGetWidth(self.bounds) / self.visibleMapRect.size.width) * [UIScreen mainScreen].scale;
 }
 
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(NSUInteger)zoomLevel animated:(BOOL)animated

@@ -19,7 +19,8 @@ typedef NS_ENUM(NSUInteger, TCCAnimationState) {
 typedef NS_ENUM(NSUInteger, TCCAnimationTileOverlayError) {
 	TCCAnimationTileOverlayErrorInvalidZoomLevel = 1001,
 	TCCAnimationTileOverlayErrorBadURLResponseCode,
-	TCCAnimationTileOverlayErrorNoImageData
+	TCCAnimationTileOverlayErrorNoImageData,
+    TCCAnimationTileOverlayErrorNoFrames
 };
 
 extern NSString *const TCCAnimationTileOverlayErrorDomain;
@@ -36,7 +37,7 @@ extern NSString *const TCCAnimationTileOverlayErrorDomain;
 @property (weak, nonatomic) id <TCCAnimationTileOverlayDelegate> delegate;
 @property (nonatomic) NSInteger currentFrameIndex;
 @property (readonly, nonatomic) NSInteger numberOfAnimationFrames;
-@property (readonly, nonatomic) TCCAnimationState currentAnimatingState;
+@property (readonly, nonatomic) TCCAnimationState currentAnimationState;
 @property (nonatomic) NSInteger minimumZ;
 @property (nonatomic) NSInteger maximumZ;
 
@@ -51,6 +52,8 @@ extern NSString *const TCCAnimationTileOverlayErrorDomain;
  Pauses animation at the current frame index.
  */
 - (void)pauseAnimating;
+
+- (void)cancelLoading;
 
 /**
  Moves the overlay's animated tile data to the given frame index. If it is currently animating,
@@ -75,7 +78,7 @@ extern NSString *const TCCAnimationTileOverlayErrorDomain;
  */
 - (void)fetchTilesForMapRect:(MKMapRect)mapRect
                    zoomScale:(MKZoomScale)zoomScale
-             progressHandler:(void(^)(NSUInteger currentFrameIndex, BOOL *stop))progressHandler
+             progressHandler:(void(^)(NSUInteger currentFrameIndex))progressHandler
            completionHandler:(void (^)(BOOL success, NSError *error))completionHandler;
 
 /**
@@ -103,7 +106,7 @@ extern NSString *const TCCAnimationTileOverlayErrorDomain;
 
 @required
 
-- (void)animationTileOverlay:(TCCAnimationTileOverlay *)animationTileOverlay didChangeAnimationState:(TCCAnimationState)currentAnimationState;
+- (void)animationTileOverlay:(TCCAnimationTileOverlay *)animationTileOverlay didChangeFromAnimationState:(TCCAnimationState)previousAnimationState toAnimationState:(TCCAnimationState)currentAnimationState;
 
 - (void)animationTileOverlay:(TCCAnimationTileOverlay *)animationTileOverlay didAnimateWithAnimationFrameIndex:(NSInteger)animationFrameIndex;
 
