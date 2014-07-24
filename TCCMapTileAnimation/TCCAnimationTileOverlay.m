@@ -442,6 +442,10 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 
 - (void)addStaticTileOverlay
 {
+    // Prevent index out of bounds error from crashing app when we don't have a template URL for
+    // the current timestamp
+    if (self.templateURLs.count <= self.currentFrameIndex) return;
+    
     MKTileOverlay *tileOverlay = [[MKTileOverlay alloc] initWithURLTemplate:self.templateURLs[self.currentFrameIndex]];
     tileOverlay.minimumZ = self.minimumZ;
     tileOverlay.maximumZ = self.maximumZ;

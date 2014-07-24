@@ -40,16 +40,6 @@
 {
     [super viewDidLoad];
 
-    // Set the starting  location.
-    CLLocationCoordinate2D startingLocation = {30.33, -81.52};
-//	MKCoordinateSpan span = {8.403266, 7.031250};
-	MKCoordinateSpan span = {7.0, 7.0};
-	//calling regionThatFits: is very important, this will line up the visible map rect with the screen aspect ratio
-	//which is important for calculating the number of tiles, their coordinates and map rect frame
-	MKCoordinateRegion region = [self.mapView regionThatFits: MKCoordinateRegionMake(startingLocation, span)];
-	
-	[self.mapView setRegion: region animated: NO];
-	
 	self.startStopButton.tag = TCCAnimationStateStopped;
     self.initialLoad = YES;
     self.visibleMapRect = self.mapView.visibleMapRect;
