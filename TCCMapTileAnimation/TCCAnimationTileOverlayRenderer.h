@@ -10,6 +10,7 @@
 
 @interface TCCAnimationTileOverlayRenderer : MKOverlayRenderer
 
+@property (nonatomic) MKZoomScale zoomScale;
 @property (nonatomic) BOOL drawDebugInfo;
 
 @end

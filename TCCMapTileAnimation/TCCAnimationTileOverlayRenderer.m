@@ -31,6 +31,7 @@
 
 - (BOOL)canDrawMapRect:(MKMapRect)mapRect zoomScale:(MKZoomScale)zoomScale
 {
+    self.zoomScale = zoomScale;
     // We can ALWAYS draw a tile, even if the zoom scale/level is not supported by the tile server.
     // That's because we will draw a scaled version of the minimum/maximum supported tile.
     return YES;

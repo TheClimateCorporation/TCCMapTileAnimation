@@ -81,7 +81,7 @@
 	if (self.startStopButton.tag == TCCAnimationStateStopped) {
         self.downloadProgressView.hidden = NO;
         
-		[self.animatedTileOverlay fetchTilesForMapRect:self.mapView.visibleMapRect zoomScale:self.mapView.zoomScale progressHandler:^(NSUInteger currentTimeIndex) {
+		[self.animatedTileOverlay fetchTilesForMapRect:self.mapView.visibleMapRect zoomScale:self.animatedTileRenderer.zoomScale progressHandler:^(NSUInteger currentTimeIndex) {
 			         
 			CGFloat progressValue = (CGFloat)currentTimeIndex / (self.animatedTileOverlay.numberOfAnimationFrames - 1);
 			[self.downloadProgressView setProgress: progressValue animated: YES];
