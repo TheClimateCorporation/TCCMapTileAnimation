@@ -79,11 +79,9 @@
 - (IBAction)onHandleStartStopAction:(id)sender
 {
 	if (self.startStopButton.tag == TCCAnimationStateStopped) {
-        self.downloadProgressView.hidden = NO;
-        
 		[self.animatedTileOverlay fetchTilesForMapRect:self.mapView.visibleMapRect zoomScale:self.animatedTileRenderer.zoomScale progressHandler:^(NSUInteger currentTimeIndex) {
 			         
-			CGFloat progressValue = (CGFloat)currentTimeIndex / (self.animatedTileOverlay.numberOfAnimationFrames - 1);
+			CGFloat progressValue = (CGFloat)currentTimeIndex / (self.animatedTileOverlay.numberOfAnimationFrames);
 			[self.downloadProgressView setProgress: progressValue animated: YES];
             
             if (self.initialLoad) {
@@ -91,16 +89,8 @@
                 self.timeIndexLabel.text = [NSString stringWithFormat:@"%lu", (unsigned long)currentTimeIndex];
 			}
 		} completionHandler:^(BOOL success, NSError *error) {
-			self.downloadProgressView.progress = 0.0;
-            self.downloadProgressView.hidden = YES;
-
 			if (success) {
                 self.initialLoad = NO;
-                
-				[self.animatedTileOverlay moveToFrameIndex:self.animatedTileOverlay.currentFrameIndex
-                                      isContinuouslyMoving:NO];
-				[self.animatedTileRenderer setNeedsDisplayInMapRect:self.mapView.visibleMapRect
-                                                          zoomScale: self.mapView.zoomScale];
 				[self.animatedTileOverlay startAnimating];
 			} else {
                 dispatch_async(dispatch_get_main_queue(), ^{
@@ -136,11 +126,8 @@
         [pluckedArray addObject:templateURLs[i]];
     }
     
-	TCCAnimationTileOverlay *overlay = [[TCCAnimationTileOverlay alloc] initWithMapView:self.mapView templateURLs:pluckedArray frameDuration:0.50];
+	TCCAnimationTileOverlay *overlay = [[TCCAnimationTileOverlay alloc] initWithMapView:self.mapView templateURLs:pluckedArray frameDuration:0.50 minimumZ:3 maximumZ:9 tileSize:256];
 	overlay.delegate = self;
-    overlay.minimumZ = 3;
-    overlay.maximumZ = 9;
-    overlay.tileSize = 256;
 		
 	[self.mapView addOverlay:overlay level:MKOverlayLevelAboveRoads];
 	self.timeSlider.maximumValue = pluckedArray.count - 1;
@@ -157,17 +144,20 @@
     //set titles of button to appropriate string based on currentAnimationState
     if (currentAnimationState == TCCAnimationStateLoading) {
         [self.startStopButton setTitle:@"◼︎" forState:UIControlStateNormal];
+        self.downloadProgressView.hidden = NO;
     } else if(currentAnimationState == TCCAnimationStateStopped) {
         [self.startStopButton setTitle:@"▶︎" forState:UIControlStateNormal];
-    } else if(currentAnimationState == TCCAnimationStateAnimating) {
+        self.downloadProgressView.hidden = YES;
+        self.downloadProgressView.progress = 0.0;
+    } else if (currentAnimationState == TCCAnimationStateAnimating) {
         [self.startStopButton setTitle:@"❚❚" forState:UIControlStateNormal];
+        self.downloadProgressView.hidden = YES;
     }
 }
 
 - (void)animationTileOverlay:(TCCAnimationTileOverlay *)animationTileOverlay didAnimateWithAnimationFrameIndex:(NSInteger)animationFrameIndex
 {
-	[self.animatedTileRenderer setNeedsDisplayInMapRect:self.mapView.visibleMapRect
-                                              zoomScale:self.mapView.zoomScale];
+    [self.animatedTileRenderer setNeedsDisplay];
 	//update the slider if we are loading or animating
     self.timeIndexLabel.text = [NSString stringWithFormat: @"%lu", (unsigned long)animationFrameIndex];
  	if (animationTileOverlay.currentAnimationState != TCCAnimationStateStopped) {
@@ -190,9 +180,9 @@
 
 - (void)mapView:(MKMapView *)mapView regionWillChangeAnimated:(BOOL)animated
 {
-	if (self.animatedTileOverlay.currentAnimationState == TCCAnimationStateAnimating) {
-		[self.animatedTileOverlay pauseAnimating];
-	}
+    if (self.animatedTileOverlay.currentAnimationState == TCCAnimationStateAnimating) {
+        [self.animatedTileOverlay pauseAnimating];
+    }
 }
 
 - (MKOverlayRenderer *)mapView:(MKMapView *)mapView rendererForOverlay:(id<MKOverlay>)overlay

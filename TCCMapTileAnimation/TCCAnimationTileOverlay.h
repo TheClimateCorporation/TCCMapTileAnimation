@@ -42,7 +42,7 @@ extern NSString *const TCCAnimationTileOverlayErrorDomain;
 @property (nonatomic) NSInteger maximumZ;
 @property (nonatomic) NSInteger tileSize;
 
-- (instancetype)initWithMapView:(MKMapView *)mapView templateURLs:(NSArray *)templateURLs frameDuration:(NSTimeInterval)frameDuration;
+- (instancetype)initWithMapView:(MKMapView *)mapView templateURLs:(NSArray *)templateURLs frameDuration:(NSTimeInterval)frameDuration minimumZ:(NSInteger)minimumZ maximumZ:(NSInteger)maximumZ tileSize:(NSInteger)tileSize;
 
 /**
  Begins animating the tile overlay, starting from the current frame index.

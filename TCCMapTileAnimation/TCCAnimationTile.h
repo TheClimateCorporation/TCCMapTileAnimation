@@ -39,6 +39,11 @@ typedef struct
  */
 @property (copy, nonatomic) NSArray *templateURLs;
 
+/**
+ Flag to indicate that a fetch for this tile has previously failed
+ */
+@property (nonatomic) BOOL failedToFetch;
+
 - (id)initWithFrame:(MKMapRect)frame x:(NSInteger)x y:(NSInteger)y z:(NSInteger)z;
 
 @end

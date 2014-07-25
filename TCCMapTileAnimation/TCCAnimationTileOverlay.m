@@ -18,17 +18,14 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 
 @interface TCCAnimationTileOverlay ()
 
-@property (strong, nonatomic) NSOperationQueue *fetchQueue;
 @property (strong, nonatomic) NSOperationQueue *downloadQueue;
 @property (strong, nonatomic) NSArray *templateURLs;
 @property (nonatomic) NSTimeInterval frameDuration;
 @property (strong, nonatomic) NSTimer *timer;
 @property (readwrite, nonatomic) TCCAnimationState currentAnimationState;
 @property (strong, nonatomic) NSSet *mapTiles;
-@property (strong, nonatomic) NSMutableSet *failedMapTiles;
-@property (weak, nonatomic) MKTileOverlay *tileOverlay;
+@property (strong, nonatomic) MKTileOverlay *tileOverlay;
 @property (strong, nonatomic) MKMapView *mapView;
-@property (nonatomic) BOOL cancelFlag;
 
 @end
 
@@ -38,7 +35,7 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 
 #pragma mark - Lifecycle
 
-- (instancetype)initWithMapView:(MKMapView *)mapView templateURLs:(NSArray *)templateURLs frameDuration:(NSTimeInterval)frameDuration;
+- (instancetype)initWithMapView:(MKMapView *)mapView templateURLs:(NSArray *)templateURLs frameDuration:(NSTimeInterval)frameDuration minimumZ:(NSInteger)minimumZ maximumZ:(NSInteger)maximumZ tileSize:(NSInteger)tileSize
 {
 	self = [super init];
 	if (self)
@@ -53,16 +50,16 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 		_numberOfAnimationFrames = [templateURLs count];
 		_frameDuration = frameDuration;
 		_currentFrameIndex = 0;
-		_fetchQueue = [[NSOperationQueue alloc] init];
-        // Essentially a serial queue
-		_fetchQueue.maxConcurrentOperationCount = 1;
-        // Download queue uses NSOperationQueueDefaultMaxConcurrentOperationCount by default
+        // Download queue uses 4 by default
 		_downloadQueue = [[NSOperationQueue alloc] init];
-        _failedMapTiles = [NSMutableSet set];
+        _downloadQueue.maxConcurrentOperationCount = 4;
 		
 		_currentAnimationState = TCCAnimationStateStopped;
 
         _mapView = mapView;
+        _minimumZ = minimumZ;
+        _maximumZ = maximumZ;
+        _tileSize = tileSize;
         [self addStaticTileOverlay];
 	}
 	return self;
@@ -94,10 +91,8 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 
 - (IBAction)updateImageTileAnimation:(NSTimer *)aTimer
 {
-	[self.fetchQueue addOperationWithBlock:^{
-        self.currentFrameIndex = (self.currentFrameIndex + 1) % (self.numberOfAnimationFrames - 1);
-        [self updateTilesToFrameIndex:self.currentFrameIndex];
-	}];
+    self.currentFrameIndex = (self.currentFrameIndex + 1) % (self.numberOfAnimationFrames);
+    [self updateTilesToFrameIndex:self.currentFrameIndex];
 }
 
 #pragma mark - Public
@@ -114,16 +109,16 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 - (void)pauseAnimating
 {
 	[self.timer invalidate];
-	[self.fetchQueue cancelAllOperations];
     [self.downloadQueue cancelAllOperations];
 	self.timer = nil;
 	self.currentAnimationState = TCCAnimationStateStopped;
+    if (self.tileOverlay) [self removeStaticTileOverlay];
     [self addStaticTileOverlay];
 }
 
 - (void)cancelLoading
 {
-    self.cancelFlag = YES;
+    [self pauseAnimating];
 }
 
 - (void)fetchTilesForMapRect:(MKMapRect)mapRect
@@ -141,9 +136,6 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
         return;
     }
     
-    // TODO: check if operation queue has any pending operations. If so, cancel them before
-    // queueing up more operations
-    
     self.currentAnimationState = TCCAnimationStateLoading;
     
     // Cap the zoom level of the tiles to fetch if the current zoom scale is not
@@ -154,6 +146,7 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
     
     // Generate list of tiles on the screen to fetch
     self.mapTiles = [self mapTilesInMapRect:mapRect zoomScale:zoomScale];
+    
     // Fill in map tiles with an array of template URL strings, one for each frame
     for (TCCAnimationTile *tile in self.mapTiles) {
         NSMutableArray *array = [NSMutableArray array];
@@ -162,82 +155,48 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
         }
         tile.templateURLs = [array copy];
     }
+    
+    // "Completion" done op - detects when all fetch operations have completed
+    NSBlockOperation *completionDoneOp = [NSBlockOperation blockOperationWithBlock:^{
+        [self updateTilesToFrameIndex:self.currentFrameIndex];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            completionHandler(YES, nil);
+        });
+    }];
 
+    // Initiate fetch operations for tiles for each frame
     for (NSInteger frameIndex = 0; frameIndex < self.numberOfAnimationFrames; frameIndex++) {
+        // Create "Done" operation for this animation frame -- need this to signal when
+        // all tiles for this frame have finished downloading so we can fire progress handler
+        NSBlockOperation *doneOp = [NSBlockOperation blockOperationWithBlock:^{
+            dispatch_async(dispatch_get_main_queue(), ^{
+                progressHandler(frameIndex + 1);
+            });
+        }];
+        
         // Fetch and cache the tile data
         for (TCCAnimationTile *tile in self.mapTiles) {
-            // TODO: store isFailedTile as a BOOL in TCCAnimationTile
-            BOOL isFailedTile = [self.failedMapTiles containsObject:tile];
-
-            //if tile not in failedMapTiles, tile not bad -> go and fetch the tile
-            if (!isFailedTile) {
-                [self enqueueOperationOnQueue:self.downloadQueue toFetchAndCacheTile:tile forFrameIndex:frameIndex];
-            }
+            // Create NSOperation to fetch tile
+            NSBlockOperation *fetchTileOp = [NSBlockOperation blockOperationWithBlock:^{
+                //if tile not in failedMapTiles, tile not bad -> go and fetch the tile
+                if (!tile.failedToFetch) {
+                    [self fetchAndCacheTile:tile forFrameIndex:frameIndex];
+                }
+            }];
+            
+            // Add a dependency from the "Done" operation onto this operation
+            [doneOp addDependency:fetchTileOp];
+            
+            // Queue it onto the download queue
+            [self.downloadQueue addOperation:fetchTileOp];
         }
-
-        dispatch_async(dispatch_get_main_queue(), ^{
-            progressHandler(frameIndex);
-        });
+        
+        // Queue the "Done" operation
+        [self.downloadQueue addOperation:doneOp];
+        [completionDoneOp addDependency:doneOp];
     }
-
-    // TODO: move to self.currentFrameIndex when all tiles have finished downloading
-    // set the current image to the current time index
-    [self moveToFrameIndex:self.currentFrameIndex isContinuouslyMoving:YES];
-
-    dispatch_async(dispatch_get_main_queue(), ^{
-        // TODO: is this right?
-        completionHandler(YES, nil);
-    });
     
-//	[self.fetchQueue addOperationWithBlock:^{
-//		NSSet *mapTiles = [self mapTilesInMapRect:mapRect zoomScale:zoomScale];
-//		
-//		for (TCCAnimationTile *tile in mapTiles) {
-//			NSMutableArray *array = [NSMutableArray array];
-//			for (NSUInteger timeIndex = 0; timeIndex < self.numberOfAnimationFrames; timeIndex++) {
-//				[array addObject:[self URLStringForX:tile.x Y:tile.y Z:tile.z timeIndex:timeIndex]];
-//			}
-//			tile.tileURLs = [array copy];
-//		}
-//		
-//		//update the tile array with new tile objects
-//		self.mapTiles = mapTiles;
-//
-//		for (NSInteger frameIndex = 0; frameIndex < self.numberOfAnimationFrames; frameIndex++) {
-//			if (self.cancelFlag) {
-//				[self.downloadQueue cancelAllOperations];
-//				self.currentAnimationState = TCCAnimationStateStopped;
-//                self.cancelFlag = NO;
-//				break;
-//			}
-//            
-//            // Fetch and cache the tile data
-//			for (TCCAnimationTile *tile in self.mapTiles) {
-//                BOOL isFailedTile = [self.failedMapTiles containsObject:tile];
-//                
-//                //if tile not in failedMapTiles, tile not bad -> go and fetch the tile
-//                if (!isFailedTile) {
-//                    [self enqueueOperationOnQueue:self.downloadQueue toFetchAndCacheTile:tile forFrameIndex:frameIndex];
-//                }
-//			}
-//            
-//			// Wait for all the tiles in this frame index to finish downloading before proceeding
-//			[self.downloadQueue waitUntilAllOperationsAreFinished];
-//            
-//			dispatch_async(dispatch_get_main_queue(), ^{
-//				progressHandler(frameIndex);
-//			});
-//		}
-//		[self.downloadQueue waitUntilAllOperationsAreFinished];
-//        
-//		//set the current image to the first time index
-//		[self moveToFrameIndex:self.currentFrameIndex isContinuouslyMoving:YES];
-//		
-//		dispatch_async(dispatch_get_main_queue(), ^{
-//            // TODO: is this right?
-//            completionHandler(YES, nil);
-//		});
-//	}];
+    [self.downloadQueue addOperation:completionDoneOp];
 }
 
 - (void)moveToFrameIndex:(NSInteger)frameIndex isContinuouslyMoving:(BOOL)isContinuouslyMoving
@@ -282,40 +241,36 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 
 #pragma  mark - Private
 
-
-- (void)enqueueOperationOnQueue:(NSOperationQueue *)queue toFetchAndCacheTile:(TCCAnimationTile *)tile forFrameIndex:(NSInteger)frameIndex
+- (void)fetchAndCacheTile:(TCCAnimationTile *)tile forFrameIndex:(NSInteger)frameIndex
 {
-    // TODO: do we really need to check failedMapTiles both here and in fetch?
-    //if tile not in failedMapTiles, go and fetch the tile
-    if ([self.failedMapTiles containsObject:tile]) {
-        return;
-    }
+    // TODO: Wrap this code in a subclass of NSOperation
+    //
+    // We use the semaphore to force this method to become synchronous so that
+    // we have better control over when this method call finishes. This is necessary
+    // since this is wrapped in an NSOperation, and we need to know when that
+    // operation has truly finished.
+    //
+    // Ideally, we'd subclass NSOperation to work with NSURLSession so that we can
+    // queue those up instead. For now, this is okay.
     
-	[queue addOperationWithBlock:^{
-        dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
-        
-        NSURLSession *session = [NSURLSession sharedSession];
-        NSURL *url = [NSURL URLWithString:tile.templateURLs[frameIndex]];
-        NSURLRequest *request = [[NSURLRequest alloc] initWithURL:url
-                                                      cachePolicy:NSURLRequestReturnCacheDataElseLoad
-                                                  timeoutInterval:0];
-        NSURLSessionTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-            
-            //parse URL and add to failed map tiles set
-            BOOL errorResponse = [self checkResponseForError:(NSHTTPURLResponse *)response data:data];
-            
-            //there is an error 
-            if(errorResponse) {
-                [self.failedMapTiles addObject:tile];
-            }
-            
-            dispatch_semaphore_signal(semaphore);
-        }];
-        [task resume];
+    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
 
-        // Have the thread wait until the download task is done. Timeout is 10 secs.
-        dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * 60));
-	}];
+    NSURLSession *session = [NSURLSession sharedSession];
+    NSURL *url = [NSURL URLWithString:tile.templateURLs[frameIndex]];
+    NSURLRequest *request = [[NSURLRequest alloc] initWithURL:url
+                                                  cachePolicy:NSURLRequestReturnCacheDataElseLoad
+                                              timeoutInterval:0];
+    NSURLSessionTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        if ([self checkResponseForError:(NSHTTPURLResponse *)response data:data]) {
+            tile.failedToFetch = YES;
+        }
+        
+        dispatch_semaphore_signal(semaphore);
+    }];
+    [task resume];
+    
+    // Have the thread wait until the download task is done. Timeout is 10 secs.
+    dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * 60));
 }
 
 - (void)updateTilesToFrameIndex:(NSInteger)frameIndex
@@ -326,7 +281,7 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
     // currentFrameIndex to enter a race condition. If we want to do this in the background, I think we'll
     // need to create a serial background queue.
     for (TCCAnimationTile *tile in self.mapTiles) {
-        if ([self.failedMapTiles containsObject:tile]) {
+        if (tile.failedToFetch) {
             continue;
         }
         
@@ -503,11 +458,10 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
     // the current timestamp
     if (self.templateURLs.count <= self.currentFrameIndex) return;
     
-    MKTileOverlay *tileOverlay = [[MKTileOverlay alloc] initWithURLTemplate:self.templateURLs[self.currentFrameIndex]];
-    tileOverlay.minimumZ = self.minimumZ;
-    tileOverlay.maximumZ = self.maximumZ;
-    [self.mapView addOverlay:tileOverlay];
-    self.tileOverlay = tileOverlay;
+    self.tileOverlay = [[MKTileOverlay alloc] initWithURLTemplate:self.templateURLs[self.currentFrameIndex]];
+    self.tileOverlay.minimumZ = self.minimumZ;
+    self.tileOverlay.maximumZ = self.maximumZ;
+    [self.mapView addOverlay:self.tileOverlay];
 }
 
 - (void)removeStaticTileOverlay
