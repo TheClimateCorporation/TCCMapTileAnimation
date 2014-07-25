@@ -37,7 +37,7 @@ typedef struct
  An array of @c NSString objects that represent the URL at which the tile image asset can be
  fetched. The URLs maintain the order in which the tile images should be animated.
  */
-@property (copy, nonatomic) NSArray *tileURLs;
+@property (copy, nonatomic) NSArray *templateURLs;
 
 - (id)initWithFrame:(MKMapRect)frame x:(NSInteger)x y:(NSInteger)y z:(NSInteger)z;
 

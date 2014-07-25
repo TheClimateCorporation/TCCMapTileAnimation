@@ -136,73 +136,108 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
             NSError *error = [NSError errorWithDomain:TCCAnimationTileOverlayErrorDomain
                                                  code:TCCAnimationTileOverlayErrorNoFrames
                                              userInfo:nil];
-            dispatch_async(dispatch_get_main_queue(), ^{
                 completionHandler(NO, error);
-            });
         }
         return;
     }
     
-	NSUInteger zoomLevel = [self zoomLevelForZoomScale: zoomScale];
+    // TODO: check if operation queue has any pending operations. If so, cancel them before
+    // queueing up more operations
     
-    if(zoomLevel > self.maximumZ) {
-        zoomLevel = self.maximumZ;
-    }
-    if(zoomLevel < self.minimumZ) {
-        zoomLevel = self.minimumZ;
+    self.currentAnimationState = TCCAnimationStateLoading;
+    
+    // Cap the zoom level of the tiles to fetch if the current zoom scale is not
+    // supported by the tile server
+	NSUInteger zoomLevel = [self zoomLevelForZoomScale:zoomScale];
+    zoomLevel = MIN(zoomLevel, self.maximumZ);
+    zoomLevel = MAX(zoomLevel, self.minimumZ);
+    
+    // Generate list of tiles on the screen to fetch
+    self.mapTiles = [self mapTilesInMapRect:mapRect zoomScale:zoomScale];
+    // Fill in map tiles with an array of template URL strings, one for each frame
+    for (TCCAnimationTile *tile in self.mapTiles) {
+        NSMutableArray *array = [NSMutableArray array];
+        for (NSUInteger timeIndex = 0; timeIndex < self.numberOfAnimationFrames; timeIndex++) {
+            [array addObject:[self URLStringForX:tile.x Y:tile.y Z:tile.z timeIndex:timeIndex]];
+        }
+        tile.templateURLs = [array copy];
     }
 
-	self.currentAnimationState = TCCAnimationStateLoading;
-    
-	[self.fetchQueue addOperationWithBlock:^{
-		NSSet *mapTiles = [self mapTilesInMapRect:mapRect zoomScale:zoomScale];
-		
-		for (TCCAnimationTile *tile in mapTiles) {
-			NSMutableArray *array = [NSMutableArray array];
-			for (NSUInteger timeIndex = 0; timeIndex < self.numberOfAnimationFrames; timeIndex++) {
-				[array addObject:[self URLStringForX:tile.x Y:tile.y Z:tile.z timeIndex:timeIndex]];
-			}
-			tile.tileURLs = [array copy];
-		}
-		
-		//update the tile array with new tile objects
-		self.mapTiles = mapTiles;
+    for (NSInteger frameIndex = 0; frameIndex < self.numberOfAnimationFrames; frameIndex++) {
+        // Fetch and cache the tile data
+        for (TCCAnimationTile *tile in self.mapTiles) {
+            // TODO: store isFailedTile as a BOOL in TCCAnimationTile
+            BOOL isFailedTile = [self.failedMapTiles containsObject:tile];
 
-		for (NSInteger frameIndex = 0; frameIndex < self.numberOfAnimationFrames; frameIndex++) {
-			if (self.cancelFlag) {
-				[self.downloadQueue cancelAllOperations];
-				self.currentAnimationState = TCCAnimationStateStopped;
-                self.cancelFlag = NO;
-				break;
-			}
-            
-            // Fetch and cache the tile data
-			for (TCCAnimationTile *tile in self.mapTiles) {
-                BOOL isFailedTile = [self.failedMapTiles containsObject:tile];
-                
-                //if tile not in failedMapTiles, tile not bad -> go and fetch the tile
-                if (!isFailedTile) {
-                    [self enqueueOperationOnQueue:self.downloadQueue toFetchAndCacheTile:tile forFrameIndex:frameIndex];
-                }
-			}
-            
-			// Wait for all the tiles in this frame index to finish downloading before proceeding
-			[self.downloadQueue waitUntilAllOperationsAreFinished];
-            
-			dispatch_async(dispatch_get_main_queue(), ^{
-				progressHandler(frameIndex);
-			});
-		}
-		[self.downloadQueue waitUntilAllOperationsAreFinished];
-        
-		//set the current image to the first time index
-		[self moveToFrameIndex:self.currentFrameIndex isContinuouslyMoving:YES];
-		
-		dispatch_async(dispatch_get_main_queue(), ^{
-            // TODO: is this right?
-            completionHandler(YES, nil);
-		});
-	}];
+            //if tile not in failedMapTiles, tile not bad -> go and fetch the tile
+            if (!isFailedTile) {
+                [self enqueueOperationOnQueue:self.downloadQueue toFetchAndCacheTile:tile forFrameIndex:frameIndex];
+            }
+        }
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            progressHandler(frameIndex);
+        });
+    }
+
+    // TODO: move to self.currentFrameIndex when all tiles have finished downloading
+    // set the current image to the current time index
+    [self moveToFrameIndex:self.currentFrameIndex isContinuouslyMoving:YES];
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        // TODO: is this right?
+        completionHandler(YES, nil);
+    });
+    
+//	[self.fetchQueue addOperationWithBlock:^{
+//		NSSet *mapTiles = [self mapTilesInMapRect:mapRect zoomScale:zoomScale];
+//		
+//		for (TCCAnimationTile *tile in mapTiles) {
+//			NSMutableArray *array = [NSMutableArray array];
+//			for (NSUInteger timeIndex = 0; timeIndex < self.numberOfAnimationFrames; timeIndex++) {
+//				[array addObject:[self URLStringForX:tile.x Y:tile.y Z:tile.z timeIndex:timeIndex]];
+//			}
+//			tile.tileURLs = [array copy];
+//		}
+//		
+//		//update the tile array with new tile objects
+//		self.mapTiles = mapTiles;
+//
+//		for (NSInteger frameIndex = 0; frameIndex < self.numberOfAnimationFrames; frameIndex++) {
+//			if (self.cancelFlag) {
+//				[self.downloadQueue cancelAllOperations];
+//				self.currentAnimationState = TCCAnimationStateStopped;
+//                self.cancelFlag = NO;
+//				break;
+//			}
+//            
+//            // Fetch and cache the tile data
+//			for (TCCAnimationTile *tile in self.mapTiles) {
+//                BOOL isFailedTile = [self.failedMapTiles containsObject:tile];
+//                
+//                //if tile not in failedMapTiles, tile not bad -> go and fetch the tile
+//                if (!isFailedTile) {
+//                    [self enqueueOperationOnQueue:self.downloadQueue toFetchAndCacheTile:tile forFrameIndex:frameIndex];
+//                }
+//			}
+//            
+//			// Wait for all the tiles in this frame index to finish downloading before proceeding
+//			[self.downloadQueue waitUntilAllOperationsAreFinished];
+//            
+//			dispatch_async(dispatch_get_main_queue(), ^{
+//				progressHandler(frameIndex);
+//			});
+//		}
+//		[self.downloadQueue waitUntilAllOperationsAreFinished];
+//        
+//		//set the current image to the first time index
+//		[self moveToFrameIndex:self.currentFrameIndex isContinuouslyMoving:YES];
+//		
+//		dispatch_async(dispatch_get_main_queue(), ^{
+//            // TODO: is this right?
+//            completionHandler(YES, nil);
+//		});
+//	}];
 }
 
 - (void)moveToFrameIndex:(NSInteger)frameIndex isContinuouslyMoving:(BOOL)isContinuouslyMoving
@@ -260,7 +295,7 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
         dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
         
         NSURLSession *session = [NSURLSession sharedSession];
-        NSURL *url = [NSURL URLWithString:tile.tileURLs[frameIndex]];
+        NSURL *url = [NSURL URLWithString:tile.templateURLs[frameIndex]];
         NSURLRequest *request = [[NSURLRequest alloc] initWithURL:url
                                                       cachePolicy:NSURLRequestReturnCacheDataElseLoad
                                                   timeoutInterval:0];
@@ -295,7 +330,7 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
             continue;
         }
         
-        NSURL *url = [[NSURL alloc] initWithString:tile.tileURLs[frameIndex]];
+        NSURL *url = [[NSURL alloc] initWithString:tile.templateURLs[frameIndex]];
         NSURLRequest *request = [[NSURLRequest alloc] initWithURL:url cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:1];
         NSURLResponse *response;
         NSError *error;
