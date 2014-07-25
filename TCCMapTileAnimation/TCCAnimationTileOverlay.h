@@ -40,6 +40,7 @@ extern NSString *const TCCAnimationTileOverlayErrorDomain;
 @property (readonly, nonatomic) TCCAnimationState currentAnimationState;
 @property (nonatomic) NSInteger minimumZ;
 @property (nonatomic) NSInteger maximumZ;
+@property (nonatomic) NSInteger tileSize;
 
 - (instancetype)initWithMapView:(MKMapView *)mapView templateURLs:(NSArray *)templateURLs frameDuration:(NSTimeInterval)frameDuration;
 

@@ -26,7 +26,6 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 @property (readwrite, nonatomic) TCCAnimationState currentAnimationState;
 @property (strong, nonatomic) NSSet *mapTiles;
 @property (strong, nonatomic) NSMutableSet *failedMapTiles;
-@property (nonatomic) NSInteger tileSize;
 @property (weak, nonatomic) MKTileOverlay *tileOverlay;
 @property (strong, nonatomic) MKMapView *mapView;
 @property (nonatomic) BOOL cancelFlag;
@@ -62,11 +61,6 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
         _failedMapTiles = [NSMutableSet set];
 		
 		_currentAnimationState = TCCAnimationStateStopped;
-		
-        // TODO: make this configurable
-        self.tileSize = 256;
-        self.minimumZ = 3;
-		self.maximumZ = 9;
 
         _mapView = mapView;
         [self addStaticTileOverlay];
@@ -120,8 +114,8 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 - (void)pauseAnimating
 {
 	[self.timer invalidate];
-    [self.downloadQueue cancelAllOperations];
 	[self.fetchQueue cancelAllOperations];
+    [self.downloadQueue cancelAllOperations];
 	self.timer = nil;
 	self.currentAnimationState = TCCAnimationStateStopped;
     [self addStaticTileOverlay];

@@ -136,8 +136,11 @@
         [pluckedArray addObject:templateURLs[i]];
     }
     
-	TCCAnimationTileOverlay *overlay = [[TCCAnimationTileOverlay alloc] initWithMapView:self.mapView templateURLs:pluckedArray frameDuration:0.20];
+	TCCAnimationTileOverlay *overlay = [[TCCAnimationTileOverlay alloc] initWithMapView:self.mapView templateURLs:pluckedArray frameDuration:0.50];
 	overlay.delegate = self;
+    overlay.minimumZ = 3;
+    overlay.maximumZ = 9;
+    overlay.tileSize = 256;
 		
 	[self.mapView addOverlay:overlay level:MKOverlayLevelAboveRoads];
 	self.timeSlider.maximumValue = pluckedArray.count - 1;
