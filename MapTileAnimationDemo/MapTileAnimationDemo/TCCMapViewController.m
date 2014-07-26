@@ -44,7 +44,6 @@
     self.initialLoad = YES;
     self.timeSlider.enabled = NO;
     
-    // I don't think this is really necessary... like Bruce was saying... thoughts???
     // Set the starting  location.
     CLLocationCoordinate2D startingLocation = {30.33, -81.52};
 //     MKCoordinateSpan span = {8.403266, 7.031250};
@@ -157,7 +156,7 @@
 
 - (void)animationTileOverlay:(TCCAnimationTileOverlay *)animationTileOverlay didAnimateWithAnimationFrameIndex:(NSInteger)animationFrameIndex
 {
-    [self.animatedTileRenderer setNeedsDisplay];
+    [self.animatedTileRenderer setNeedsDisplayInMapRect:self.mapView.visibleMapRect];
 	//update the slider if we are loading or animating
     self.timeIndexLabel.text = [NSString stringWithFormat: @"%lu", (unsigned long)animationFrameIndex];
  	if (animationTileOverlay.currentAnimationState != TCCAnimationStateStopped) {
@@ -183,6 +182,7 @@
     if (self.animatedTileOverlay.currentAnimationState == TCCAnimationStateAnimating) {
         [self.animatedTileOverlay pauseAnimating];
     }
+    [self.animatedTileRenderer setNeedsDisplay];
 }
 
 - (MKOverlayRenderer *)mapView:(MKMapView *)mapView rendererForOverlay:(id<MKOverlay>)overlay
