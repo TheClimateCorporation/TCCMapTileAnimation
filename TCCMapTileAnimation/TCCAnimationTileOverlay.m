@@ -8,6 +8,7 @@
 
 #import "TCCAnimationTileOverlay.h"
 #import "TCCAnimationTile.h"
+#import "TCCMapKitHelpers.h"
 
 // TODO: This should be documented as the expected format of the template URLs
 #define Z_INDEX "{z}"
@@ -29,17 +30,18 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 
 @end
 
-// TODO: Purge NSURLCache on memory warnings
-
 @implementation TCCAnimationTileOverlay
 
 #pragma mark - Lifecycle
 
-- (instancetype)initWithMapView:(MKMapView *)mapView templateURLs:(NSArray *)templateURLs frameDuration:(NSTimeInterval)frameDuration minimumZ:(NSInteger)minimumZ maximumZ:(NSInteger)maximumZ tileSize:(NSInteger)tileSize
+- (instancetype)initWithMapView:(MKMapView *)mapView
+                   templateURLs:(NSArray *)templateURLs
+                  frameDuration:(NSTimeInterval)frameDuration
+                       minimumZ:(NSInteger)minimumZ
+                       maximumZ:(NSInteger)maximumZ
+                       tileSize:(NSInteger)tileSize
 {
-	self = [super init];
-	if (self)
-	{
+	if (self = [super init]) {
         //Initialize network caching settings
         NSURLCache *URLCache = [[NSURLCache alloc] initWithMemoryCapacity:4 * 1024 * 1024
                                                              diskCapacity:32 * 1024 * 1024
@@ -50,7 +52,6 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 		_numberOfAnimationFrames = [templateURLs count];
 		_frameDuration = frameDuration;
 		_currentFrameIndex = 0;
-        // Download queue uses 4 by default
 		_downloadQueue = [[NSOperationQueue alloc] init];
         _downloadQueue.maxConcurrentOperationCount = 4;
 		
@@ -140,7 +141,7 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
     
     // Cap the zoom level of the tiles to fetch if the current zoom scale is not
     // supported by the tile server
-	NSUInteger zoomLevel = [self zoomLevelForZoomScale:zoomScale];
+	NSUInteger zoomLevel = [TCCMapKitHelpers zoomLevelForZoomScale:zoomScale];
     zoomLevel = MIN(zoomLevel, self.maximumZ);
     zoomLevel = MAX(zoomLevel, self.minimumZ);
     
@@ -165,6 +166,7 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
     }];
 
     // Initiate fetch operations for tiles for each frame
+    NSMutableArray *operations = [NSMutableArray array];
     for (NSInteger frameIndex = 0; frameIndex < self.numberOfAnimationFrames; frameIndex++) {
         // Create "Done" operation for this animation frame -- need this to signal when
         // all tiles for this frame have finished downloading so we can fire progress handler
@@ -188,15 +190,16 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
             [doneOp addDependency:fetchTileOp];
             
             // Queue it onto the download queue
-            [self.downloadQueue addOperation:fetchTileOp];
+            [operations addObject:fetchTileOp];
         }
         
         // Queue the "Done" operation
-        [self.downloadQueue addOperation:doneOp];
+        [operations addObject:doneOp];
         [completionDoneOp addDependency:doneOp];
     }
     
-    [self.downloadQueue addOperation:completionDoneOp];
+    [operations addObject:completionDoneOp];
+    [self.downloadQueue addOperations:operations waitUntilFinished:NO];
 }
 
 - (void)moveToFrameIndex:(NSInteger)frameIndex isContinuouslyMoving:(BOOL)isContinuouslyMoving
@@ -219,7 +222,8 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 
 - (TCCAnimationTile *)tileForMapRect:(MKMapRect)mapRect zoomScale:(MKZoomScale)zoomScale;
 {
-    TCCTileCoordinate coord = [self tileCoordinateForMapRect:mapRect zoomScale:zoomScale];
+    NSInteger zoomLevel = [TCCMapKitHelpers zoomLevelForZoomScale:zoomScale];
+    TCCTileCoordinate coord = [TCCMapKitHelpers tileCoordinateForMapRect:mapRect zoomLevel:zoomLevel];
     for (TCCAnimationTile *tile in self.mapTiles) {
         if (coord.x == tile.x && coord.y == tile.y && coord.z == tile.z) {
             return tile;
@@ -323,24 +327,11 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 	return returnString;
 }
 
-- (TCCTileCoordinate)tileCoordinateForMapRect:(MKMapRect)aMapRect zoomScale:(MKZoomScale)aZoomScale
-{
-	TCCTileCoordinate coord = {0, 0, 0};
-    
-	NSUInteger zoomLevel = [self zoomLevelForZoomScale: aZoomScale];
-    CGPoint mercatorPoint = [self mercatorTileOriginForMapRect: aMapRect];
-    
-	coord.x = floor(mercatorPoint.x * [self worldTileWidthForZoomLevel:zoomLevel]);;
-	coord.y = floor(mercatorPoint.y * [self worldTileWidthForZoomLevel:zoomLevel]);
-	coord.z = zoomLevel;
-	return coord;
-}
-
 // Creates a set of @c MATAnimationTile objects for a given map rect and zoom scale
 - (NSSet *)mapTilesInMapRect:(MKMapRect)rect zoomScale:(MKZoomScale)zoomScale
 {
     // Ripped from http://stackoverflow.com/a/4445576/766491
-    NSInteger zoomLevel = [self zoomLevelForZoomScale:zoomScale];
+    NSInteger zoomLevel = [TCCMapKitHelpers zoomLevelForZoomScale:zoomScale];
     NSInteger overZoom = 1;
     
     if (zoomLevel > self.maximumZ) {
@@ -352,12 +343,10 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
     // but render them larger.
     // **Adjusted from overZoom * self.tileSize to just self.tileSize in order to render at overzoom properly
     NSInteger adjustedTileSize = self.tileSize;
-    NSLog(@"overzoom: %ld", (long)overZoom);
 
     // Need to use the zoom level zoom scale, not the actual zoom scale from the map view!
     NSInteger zoomExponent = 20 - zoomLevel;
     zoomScale = 1/pow(2, zoomExponent);
-    NSLog(@"scale: %f", zoomScale);
     
     NSInteger minX = floor((MKMapRectGetMinX(rect) * zoomScale) / adjustedTileSize);
     NSInteger maxX = ceil((MKMapRectGetMaxX(rect) * zoomScale) / adjustedTileSize);
@@ -369,7 +358,6 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
         for (NSInteger y = minY; y <=maxY; y++) {
 			MKMapRect frame = MKMapRectMake((x * adjustedTileSize) / zoomScale, (y * adjustedTileSize) / zoomScale, adjustedTileSize / zoomScale, adjustedTileSize / zoomScale);
             if (MKMapRectIntersectsRect(frame, rect)) {
-                NSLog(@"tile: x %ld, y %ld", (long)x, (long)y);
                 TCCAnimationTile *tile = [[TCCAnimationTile alloc] initWithFrame:frame x:x y:y z:zoomLevel];
                 [tiles addObject:tile];
             }
@@ -378,58 +366,10 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
     return [tiles copy];
 }
 
-/*
- Determine the number of tiles wide *or tall* the world is, at the given zoomLevel.
- (In the Spherical Mercator projection, the poles are cut off so that the resulting 2D map is "square".)
- */
-- (NSUInteger)worldTileWidthForZoomLevel:(NSUInteger)zoomLevel
-{
-    return (NSUInteger)(pow(2,zoomLevel));
-}
-
-/**
- * Similar to above, but uses a MKZoomScale to determine the
- * Mercator zoomLevel. (MKZoomScale is a ratio of screen points to
- * map points.)
- */
-- (NSUInteger)zoomLevelForZoomScale:(MKZoomScale)zoomScale
-{
-    CGFloat realScale = zoomScale / [[UIScreen mainScreen] scale];
-    NSUInteger z = (NSUInteger)(log(realScale)/log(2.0)+20.0);
-	
-    z += ([[UIScreen mainScreen] scale] - 1.0);
-    return z;
-}
-
-/**
- * Given a MKMapRect, this reprojects the center of the mapRect
- * into the Mercator projection and calculates the rect's top-left point
- * (so that we can later figure out the tile coordinate).
- *
- * See http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames#Derivation_of_tile_names
- */
-- (CGPoint)mercatorTileOriginForMapRect:(MKMapRect)mapRect
-{
-    MKCoordinateRegion region = MKCoordinateRegionForMapRect(mapRect);
-    
-    // Convert lat/lon to radians
-    CGFloat x = (region.center.longitude) * (M_PI/180.0); // Convert lon to radians
-    CGFloat y = (region.center.latitude) * (M_PI/180.0); // Convert lat to radians
-    y = log(tan(y)+1.0/cos(y));
-    
-    // X and Y should actually be the top-left of the rect (the values above represent
-    // the center of the rect)
-    x = (1.0 + (x/M_PI)) / 2.0;
-    y = (1.0 - (y/M_PI)) / 2.0;
-	
-    return CGPointMake(x, y);
-}
-
 - (BOOL)checkResponseForError:(NSHTTPURLResponse *)response data:(NSData *)data
 {
     if (data) {
         if (response.statusCode != 200) {
-            
             NSString *localizedDescription = [NSString stringWithFormat:@"Error during fetch. Image tile HTTP respsonse code %ld, URL %@", (long)response.statusCode, response.URL];
             NSError *error = [NSError errorWithDomain:TCCAnimationTileOverlayErrorDomain code:TCCAnimationTileOverlayErrorBadURLResponseCode userInfo:@{ NSLocalizedDescriptionKey : localizedDescription }];
             [self sendErrorToDelegate:error];

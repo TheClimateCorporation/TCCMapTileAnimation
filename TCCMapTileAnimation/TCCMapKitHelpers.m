@@ -10,11 +10,6 @@
 
 @implementation TCCMapKitHelpers
 
-/**
- * Similar to above, but uses a MKZoomScale to determine the
- * Mercator zoomLevel. (MKZoomScale is a ratio of screen points to
- * map points.)
- */
 + (NSUInteger)zoomLevelForZoomScale:(MKZoomScale)zoomScale
 {
     CGFloat realScale = zoomScale / [[UIScreen mainScreen] scale];

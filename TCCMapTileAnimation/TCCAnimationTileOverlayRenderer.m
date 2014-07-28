@@ -31,6 +31,7 @@
 
 - (BOOL)canDrawMapRect:(MKMapRect)mapRect zoomScale:(MKZoomScale)zoomScale
 {
+    // TODO: This can be removed once we 
     self.zoomScale = zoomScale;
     // We can ALWAYS draw a tile, even if the zoom scale/level is not supported by the tile server.
     // That's because we will draw a scaled version of the minimum/maximum supported tile.
@@ -48,7 +49,6 @@
 		CGRect rect = [self rectForMapRect: mapRect];
 		UIImage *image = tile.tileImage;
 		UIGraphicsPushContext(context);
-        // TODO: make this alpha configurable
 		[image drawInRect:rect blendMode:kCGBlendModeNormal alpha:self.alpha];
 		UIGraphicsPopContext();
 	}
@@ -60,7 +60,6 @@
         overZoom = pow(2, (zoomLevel - mapOverlay.maximumZ));
         zoomLevel = mapOverlay.maximumZ;
     }
-    
     
     if (self.drawDebugInfo) {
         TCCTileCoordinate c = [TCCMapKitHelpers tileCoordinateForMapRect:mapRect zoomLevel:[TCCMapKitHelpers zoomLevelForZoomScale:zoomScale]];
