@@ -10,7 +10,11 @@
 
 @interface TCCAnimationTileOverlayRenderer : MKOverlayRenderer
 
-@property (nonatomic) MKZoomScale zoomScale;
+/**
+ Zoom level of the currently rendered overlay tiles. Value ranges from 1-20.
+ */
+@property (nonatomic) NSUInteger renderedTileZoomLevel;
+
 @property (nonatomic) BOOL drawDebugInfo;
 
 @end

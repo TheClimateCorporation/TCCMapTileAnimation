@@ -12,6 +12,7 @@
 #import "TCCMapKitHelpers.h"
 
 @interface TCCOverzoomTileOverlayRenderer ()
+@property (nonatomic) NSUInteger lastZoomLevel;
 @property (strong, nonatomic) NSMutableSet *tileSet;
 @property (strong, nonatomic) NSLock *tileSetLock;
 @end
@@ -104,7 +105,6 @@
  */
 -(void)drawMapRect:(MKMapRect)mapRect zoomScale:(MKZoomScale)zoomScale inContext:(CGContextRef)context
 {
-
     // get map overlay
     TCCAnimationTileOverlay *mapOverlay = (TCCAnimationTileOverlay *)self.overlay;
     
