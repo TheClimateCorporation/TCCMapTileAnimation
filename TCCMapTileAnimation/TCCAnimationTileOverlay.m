@@ -123,7 +123,7 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 }
 
 - (void)fetchTilesForMapRect:(MKMapRect)mapRect
-                   zoomScale:(MKZoomScale)zoomScale
+                   zoomLevel:(NSUInteger)zoomLevel
                progressHandler:(void(^)(NSUInteger currentFrameIndex))progressHandler
              completionHandler:(void (^)(BOOL success, NSError *error))completionHandler
 {
@@ -141,12 +141,11 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
     
     // Cap the zoom level of the tiles to fetch if the current zoom scale is not
     // supported by the tile server
-	NSUInteger zoomLevel = [TCCMapKitHelpers zoomLevelForZoomScale:zoomScale];
     zoomLevel = MIN(zoomLevel, self.maximumZ);
     zoomLevel = MAX(zoomLevel, self.minimumZ);
     
     // Generate list of tiles on the screen to fetch
-    self.mapTiles = [self mapTilesInMapRect:mapRect zoomScale:zoomScale];
+    self.mapTiles = [self mapTilesInMapRect:mapRect zoomLevel:zoomLevel];
     
     // Fill in map tiles with an array of template URL strings, one for each frame
     for (TCCAnimationTile *tile in self.mapTiles) {
@@ -220,9 +219,8 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
     [self updateTilesToFrameIndex:frameIndex];
 }
 
-- (TCCAnimationTile *)tileForMapRect:(MKMapRect)mapRect zoomScale:(MKZoomScale)zoomScale;
+- (TCCAnimationTile *)tileForMapRect:(MKMapRect)mapRect zoomLevel:(NSUInteger)zoomLevel;
 {
-    NSInteger zoomLevel = [TCCMapKitHelpers zoomLevelForZoomScale:zoomScale];
     TCCTileCoordinate coord = [TCCMapKitHelpers tileCoordinateForMapRect:mapRect zoomLevel:zoomLevel];
     for (TCCAnimationTile *tile in self.mapTiles) {
         if (coord.x == tile.x && coord.y == tile.y && coord.z == tile.z) {
@@ -232,11 +230,12 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 	return nil;
 }
 
-- (NSArray *)cachedTilesForMapRect:(MKMapRect)rect
+- (NSArray *)cachedTilesForMapRect:(MKMapRect)rect zoomLevel:(NSUInteger)zoomLevel
 {
     NSMutableArray *tiles = [NSMutableArray array];
     for (TCCAnimationTile *tile in self.mapTiles) {
-        if (MKMapRectIntersectsRect(rect, tile.mapRectFrame)) {
+        if (MKMapRectIntersectsRect(rect, tile.mapRectFrame) &&
+            tile.z == zoomLevel) {
             [tiles addObject:tile];
         }
     }
@@ -328,10 +327,9 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 }
 
 // Creates a set of @c MATAnimationTile objects for a given map rect and zoom scale
-- (NSSet *)mapTilesInMapRect:(MKMapRect)rect zoomScale:(MKZoomScale)zoomScale
+- (NSSet *)mapTilesInMapRect:(MKMapRect)rect zoomLevel:(NSUInteger)zoomLevel
 {
     // Ripped from http://stackoverflow.com/a/4445576/766491
-    NSInteger zoomLevel = [TCCMapKitHelpers zoomLevelForZoomScale:zoomScale];
     NSInteger overZoom = 1;
     
     if (zoomLevel > self.maximumZ) {
@@ -346,7 +344,7 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 
     // Need to use the zoom level zoom scale, not the actual zoom scale from the map view!
     NSInteger zoomExponent = 20 - zoomLevel;
-    zoomScale = 1/pow(2, zoomExponent);
+    MKZoomScale zoomScale = 1/pow(2, zoomExponent);
     
     NSInteger minX = floor((MKMapRectGetMinX(rect) * zoomScale) / adjustedTileSize);
     NSInteger maxX = ceil((MKMapRectGetMaxX(rect) * zoomScale) / adjustedTileSize);

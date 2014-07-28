@@ -70,7 +70,7 @@ extern NSString *const TCCAnimationTileOverlayErrorDomain;
  Begins fetching the tiles from the tile server.
  
  @param mapRect The current visible rect of the map view.
- @param zoomScale The current zoom scale of the map view.
+ @param zoomLevel The zoom level of the tiles to fetch.
  @param progressHandler Invoked after each frame of animation has loaded. Set the @c stop boolean
  flag if you want to cancel the fetch operation. If you want the overlay to display updated tile
  data as it loads, you can call @c moveToFrameIndex from here.
@@ -78,7 +78,7 @@ extern NSString *const TCCAnimationTileOverlayErrorDomain;
  user has not cancelled loading. @c error is not currently used...
  */
 - (void)fetchTilesForMapRect:(MKMapRect)mapRect
-                   zoomScale:(MKZoomScale)zoomScale
+                   zoomLevel:(NSUInteger)zoomLevel
              progressHandler:(void(^)(NSUInteger currentFrameIndex))progressHandler
            completionHandler:(void (^)(BOOL success, NSError *error))completionHandler;
 
@@ -88,13 +88,13 @@ extern NSString *const TCCAnimationTileOverlayErrorDomain;
  
  Returns @c nil if a fetch operation has not executed for this tile.
  */
-- (TCCAnimationTile *)tileForMapRect:(MKMapRect)mapRect zoomScale:(MKZoomScale)mapRect;
+- (TCCAnimationTile *)tileForMapRect:(MKMapRect)mapRect zoomLevel:(NSUInteger)zoomLevel;
 
 /**
  Returns an array of @c MATAnimationTile objects that have been fetched and cached for a given
  map rect.
  */
-- (NSArray *)cachedTilesForMapRect:(MKMapRect)rect;
+- (NSArray *)cachedTilesForMapRect:(MKMapRect)rect zoomLevel:(NSUInteger)zoomLevel;
 
 @end
 

@@ -31,8 +31,7 @@
 
 - (BOOL)canDrawMapRect:(MKMapRect)mapRect zoomScale:(MKZoomScale)zoomScale
 {
-    // TODO: This can be removed once we 
-    self.zoomScale = zoomScale;
+    self.renderedTileZoomLevel = [TCCMapKitHelpers zoomLevelForZoomScale:zoomScale];
     // We can ALWAYS draw a tile, even if the zoom scale/level is not supported by the tile server.
     // That's because we will draw a scaled version of the minimum/maximum supported tile.
     return YES;
@@ -44,31 +43,39 @@
 -(void)drawMapRect:(MKMapRect)mapRect zoomScale:(MKZoomScale)zoomScale inContext:(CGContextRef)context
 {
     TCCAnimationTileOverlay *mapOverlay = (TCCAnimationTileOverlay *)self.overlay;
-    TCCAnimationTile *tile = [mapOverlay tileForMapRect:mapRect zoomScale:zoomScale];
+    NSInteger zoomLevel = [TCCMapKitHelpers zoomLevelForZoomScale:zoomScale];
+    
+    if (self.drawDebugInfo) {
+        TCCTileCoordinate c = [TCCMapKitHelpers tileCoordinateForMapRect:mapRect zoomLevel:zoomLevel];
+        [TCCMapKitHelpers drawDebugInfoForX:c.x Y:c.y Z:c.z color:[UIColor blackColor] inRect:[self rectForMapRect:mapRect] context:context];
+    }
+    
+    TCCAnimationTile *tile = [mapOverlay tileForMapRect:mapRect zoomLevel:zoomLevel];
 	if (tile) {
 		CGRect rect = [self rectForMapRect: mapRect];
 		UIImage *image = tile.tileImage;
 		UIGraphicsPushContext(context);
 		[image drawInRect:rect blendMode:kCGBlendModeNormal alpha:self.alpha];
 		UIGraphicsPopContext();
+        return;
 	}
     
-    NSInteger zoomLevel = [TCCMapKitHelpers zoomLevelForZoomScale:zoomScale];
+    // If we reach this point, the TCCAnimationTileOverlay doesn't have a tile to draw for this map rect.
+    // This can happen when the tile hasn't been fetched yet (user must call fetchTiles first), failed to
+    // fetch (tile server failed), or if the map is zoomed to a level where the overlay doesn't have any
+    // tile data for that zoom level.
+    //
+    // We can't do anything about the first two cases, but in the last case, we must support "overzoom"
+    // rendering (i.e. scaled drawing) of the highest supported zoom level (i.e. maximumZ).
     NSInteger overZoom = 1;
-    
     if (zoomLevel > mapOverlay.maximumZ) {
         overZoom = pow(2, (zoomLevel - mapOverlay.maximumZ));
         zoomLevel = mapOverlay.maximumZ;
     }
     
-    if (self.drawDebugInfo) {
-        TCCTileCoordinate c = [TCCMapKitHelpers tileCoordinateForMapRect:mapRect zoomLevel:[TCCMapKitHelpers zoomLevelForZoomScale:zoomScale]];
-        [TCCMapKitHelpers drawDebugInfoForX:c.x Y:c.y Z:c.z color:[UIColor blackColor] inRect:[self rectForMapRect:mapRect] context:context];
-    }
-    
     if (overZoom == 1) return;
     
-    NSArray *tiles = [mapOverlay cachedTilesForMapRect:mapRect];
+    NSArray *tiles = [mapOverlay cachedTilesForMapRect:mapRect zoomLevel:zoomLevel];
 
     //tile drawing
     for (TCCAnimationTile *tile in tiles) {
