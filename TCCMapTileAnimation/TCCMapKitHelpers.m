@@ -22,9 +22,9 @@
 + (TCCTileCoordinate)tileCoordinateForMapRect:(MKMapRect)aMapRect zoomLevel:(NSInteger)zoomLevel
 {
     CGPoint mercatorPoint = [self mercatorTileOriginForMapRect:aMapRect];
-    NSUInteger tilex = floor(mercatorPoint.x * [self worldTileWidthForZoomLevel:zoomLevel]);
-    NSUInteger tiley = floor(mercatorPoint.y * [self worldTileWidthForZoomLevel:zoomLevel]);
-    return (TCCTileCoordinate){tilex, tiley, zoomLevel};
+    NSUInteger x = floor(mercatorPoint.x * [self worldTileWidthForZoomLevel:zoomLevel]);
+    NSUInteger y = floor(mercatorPoint.y * [self worldTileWidthForZoomLevel:zoomLevel]);
+    return (TCCTileCoordinate){x, y, zoomLevel};
 }
 
 + (MKMapRect)mapRectForTileCoordinate:(TCCTileCoordinate)coordinate
