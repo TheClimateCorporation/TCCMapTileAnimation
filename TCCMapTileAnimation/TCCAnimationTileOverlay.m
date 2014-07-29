@@ -221,9 +221,9 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 
 - (TCCAnimationTile *)tileForMapRect:(MKMapRect)mapRect zoomLevel:(NSUInteger)zoomLevel;
 {
-    TCCTileCoordinate coord = [TCCMapKitHelpers tileCoordinateForMapRect:mapRect zoomLevel:zoomLevel];
+    MKTileOverlayPath path = [TCCMapKitHelpers tilePathForMapRect:mapRect zoomLevel:zoomLevel];
     for (TCCAnimationTile *tile in self.mapTiles) {
-        if (coord.x == tile.x && coord.y == tile.y && coord.z == tile.z) {
+        if (path.x == tile.x && path.y == tile.y && path.z == tile.z) {
             return tile;
         }
     }

@@ -46,8 +46,8 @@
     NSInteger zoomLevel = [TCCMapKitHelpers zoomLevelForZoomScale:zoomScale];
     
     if (self.drawDebugInfo) {
-        TCCTileCoordinate c = [TCCMapKitHelpers tileCoordinateForMapRect:mapRect zoomLevel:zoomLevel];
-        [TCCMapKitHelpers drawDebugInfoForX:c.x Y:c.y Z:c.z color:[UIColor blackColor] inRect:[self rectForMapRect:mapRect] context:context];
+        MKTileOverlayPath path = [TCCMapKitHelpers tilePathForMapRect:mapRect zoomLevel:zoomLevel];
+        [TCCMapKitHelpers drawDebugInfoForX:path.x Y:path.y Z:path.z color:[UIColor blackColor] inRect:[self rectForMapRect:mapRect] context:context];
     }
     
     TCCAnimationTile *tile = [mapOverlay tileForMapRect:mapRect zoomLevel:zoomLevel];

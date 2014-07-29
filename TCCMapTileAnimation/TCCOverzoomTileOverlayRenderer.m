@@ -52,18 +52,11 @@
         self.lastZoomLevel = currentZoomLevel;
     }
     
-    TCCTileCoordinate coord = [TCCMapKitHelpers tileCoordinateForMapRect:mapRect zoomLevel:cappedZoomLevel];
+    MKTileOverlayPath cappedTilePath = [TCCMapKitHelpers tilePathForMapRect:mapRect zoomLevel:cappedZoomLevel];
+    MKMapRect cappedMapRect = [TCCMapKitHelpers mapRectForTilePath:cappedTilePath];
     
-    // Store path for tile in struct for MKTileOverlay
-    MKTileOverlayPath coordPaths;
-    coordPaths.x = coord.x;
-    coordPaths.y = coord.y;
-    coordPaths.z = coord.z;
-    
-    MKMapRect cappedMapRect = [TCCMapKitHelpers mapRectForTileCoordinate:coord];
-    
-    // create tile, passed x, y, and capped z
-    TCCAnimationTile *tile = [[TCCAnimationTile alloc] initWithFrame:cappedMapRect x:coordPaths.x y:coordPaths.y z:cappedZoomLevel];
+    // Create the tile we need to fetch image data for
+    TCCAnimationTile *tile = [[TCCAnimationTile alloc] initWithFrame:cappedMapRect x:cappedTilePath.x y:cappedTilePath.y z:cappedTilePath.z];
 
     // check if tile is in dictionary, if so we return YES to render it with drawMapRect
     [self.tileSetLock lock];
@@ -72,7 +65,7 @@
     
     // else, return NO and go and fetch tile data with loadTileAtPath and store in tilesDict.
     // grab main thread and call setNeedsDisplay to render tile on screen with drawMapRect
-    [mapOverlay loadTileAtPath:coordPaths result:^(NSData *tileData, NSError *error) {
+    [mapOverlay loadTileAtPath:cappedTilePath result:^(NSData *tileData, NSError *error) {
         if (tile.z != self.lastZoomLevel) return;
 
         tile.tileImage = [UIImage imageWithData:tileData];
@@ -103,15 +96,15 @@
     NSInteger cappedZoomLevel = MIN(currentZoomLevel, mapOverlay.maximumZ);
     cappedZoomLevel = MAX(currentZoomLevel, mapOverlay.minimumZ);
     
-    // Get the tile coordinate that needs to be drawn
-    TCCTileCoordinate coord = [TCCMapKitHelpers tileCoordinateForMapRect:mapRect zoomLevel:cappedZoomLevel];
+    // Get the path of the tile that needs to be drawn
+    MKTileOverlayPath cappedTilePath = [TCCMapKitHelpers tilePathForMapRect:mapRect zoomLevel:cappedZoomLevel];
     
     // Use the tile coordinate to search self.tileSet for the tile image to draw
     TCCAnimationTile *tile;
     [self.tileSetLock lock];
-    for (TCCAnimationTile *tileInd in self.tileSet) {
-        if (coord.x == tileInd.x && coord.y == tileInd.y && coord.z == tileInd.z) {
-            tile = tileInd;
+    for (TCCAnimationTile *t in self.tileSet) {
+        if (cappedTilePath.x == t.x && t.y == tile.y && t.z == tile.z) {
+            tile = t;
             break;
         }
     }

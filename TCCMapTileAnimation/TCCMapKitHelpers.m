@@ -19,23 +19,23 @@
     return z;
 }
 
-+ (TCCTileCoordinate)tileCoordinateForMapRect:(MKMapRect)aMapRect zoomLevel:(NSInteger)zoomLevel
++ (MKTileOverlayPath)tilePathForMapRect:(MKMapRect)aMapRect zoomLevel:(NSInteger)zoomLevel
 {
     CGPoint mercatorPoint = [self mercatorTileOriginForMapRect:aMapRect];
     NSUInteger x = floor(mercatorPoint.x * [self worldTileWidthForZoomLevel:zoomLevel]);
     NSUInteger y = floor(mercatorPoint.y * [self worldTileWidthForZoomLevel:zoomLevel]);
-    return (TCCTileCoordinate){x, y, zoomLevel};
+    return (MKTileOverlayPath){x, y, zoomLevel};
 }
 
-+ (MKMapRect)mapRectForTileCoordinate:(TCCTileCoordinate)coordinate
++ (MKMapRect)mapRectForTilePath:(MKTileOverlayPath)path
 {
-    CGFloat xScale = (double)coordinate.x / [self worldTileWidthForZoomLevel:coordinate.z];
-    CGFloat yScale = (double)coordinate.y / [self worldTileWidthForZoomLevel:coordinate.z];
+    CGFloat xScale = (double)path.x / [self worldTileWidthForZoomLevel:path.z];
+    CGFloat yScale = (double)path.y / [self worldTileWidthForZoomLevel:path.z];
     MKMapRect world = MKMapRectWorld;
     return MKMapRectMake(world.size.width * xScale,
                          world.size.height * yScale,
-                         world.size.width / [self worldTileWidthForZoomLevel:coordinate.z],
-                         world.size.height / [self worldTileWidthForZoomLevel:coordinate.z]);
+                         world.size.width / [self worldTileWidthForZoomLevel:path.z],
+                         world.size.height / [self worldTileWidthForZoomLevel:path.z]);
 }
 
 /*

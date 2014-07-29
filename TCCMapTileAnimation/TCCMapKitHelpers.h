@@ -13,9 +13,9 @@
 
 + (NSUInteger)zoomLevelForZoomScale:(MKZoomScale)zoomScale;
 
-+ (TCCTileCoordinate)tileCoordinateForMapRect:(MKMapRect)aMapRect zoomLevel:(NSInteger)zoomLevel;
++ (MKTileOverlayPath)tilePathForMapRect:(MKMapRect)aMapRect zoomLevel:(NSInteger)zoomLevel;
 
-+ (MKMapRect)mapRectForTileCoordinate:(TCCTileCoordinate)coordinate;
++ (MKMapRect)mapRectForTilePath:(MKTileOverlayPath)path;
 
 + (NSUInteger)worldTileWidthForZoomLevel:(NSUInteger)zoomLevel;
 

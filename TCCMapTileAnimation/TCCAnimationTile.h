@@ -9,13 +9,6 @@
 #import <UIKit/UIKit.h>
 #import <MapKit/MapKit.h>
 
-typedef struct
-{
-	NSInteger x;
-	NSInteger y;
-	NSInteger z;
-} TCCTileCoordinate;
-
 @interface TCCAnimationTile : NSObject
 
 @property (nonatomic) NSInteger x;
