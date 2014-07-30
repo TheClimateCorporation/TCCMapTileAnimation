@@ -24,8 +24,9 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 @property (nonatomic) NSTimeInterval frameDuration;
 @property (strong, nonatomic) NSTimer *timer;
 @property (readwrite, nonatomic) TCCAnimationState currentAnimationState;
-@property (strong, nonatomic) NSSet *mapTiles;
-@property (strong, nonatomic) MKTileOverlay *tileOverlay;
+@property (strong, nonatomic) NSSet *animationTiles;
+@property (strong, nonatomic) NSCache *staticTilesCache;
+@property (strong, nonatomic) NSLock *staticTilesLock;
 @property (strong, nonatomic) MKMapView *mapView;
 
 @end
@@ -39,7 +40,7 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
                   frameDuration:(NSTimeInterval)frameDuration
                        minimumZ:(NSInteger)minimumZ
                        maximumZ:(NSInteger)maximumZ
-                       tileSize:(NSInteger)tileSize
+                       tileSize:(CGSize)tileSize
 {
 	if (self = [super init]) {
         //Initialize network caching settings
@@ -58,10 +59,12 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 		_currentAnimationState = TCCAnimationStateStopped;
 
         _mapView = mapView;
-        _minimumZ = minimumZ;
-        _maximumZ = maximumZ;
-        _tileSize = tileSize;
-        [self addStaticTileOverlay];
+        self.minimumZ = minimumZ;
+        self.maximumZ = maximumZ;
+        self.tileSize = tileSize;
+        
+        _staticTilesCache = [[NSCache alloc] init];
+        _staticTilesLock = [[NSLock alloc] init];
 	}
 	return self;
 }
@@ -90,21 +93,19 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 
 #pragma mark - IBActions
 
-- (IBAction)updateImageTileAnimation:(NSTimer *)aTimer
+- (IBAction)updateAnimationTiles:(NSTimer *)aTimer
 {
     self.currentFrameIndex = (self.currentFrameIndex + 1) % (self.numberOfAnimationFrames);
-    [self updateTilesToFrameIndex:self.currentFrameIndex];
+    [self updateAnimationTilesToFrameIndex:self.currentFrameIndex];
 }
 
 #pragma mark - Public
 
 - (void)startAnimating;
 {
-    [self removeStaticTileOverlay];
-	self.timer = [NSTimer scheduledTimerWithTimeInterval:self.frameDuration target:self selector:@selector(updateImageTileAnimation:) userInfo:nil repeats:YES];
+	self.timer = [NSTimer scheduledTimerWithTimeInterval:self.frameDuration target:self selector:@selector(updateAnimationTiles:) userInfo:nil repeats:YES];
 	[self.timer fire];
 	self.currentAnimationState = TCCAnimationStateAnimating;
-    
 }
 
 - (void)pauseAnimating
@@ -113,8 +114,6 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
     [self.downloadQueue cancelAllOperations];
 	self.timer = nil;
 	self.currentAnimationState = TCCAnimationStateStopped;
-    if (self.tileOverlay) [self removeStaticTileOverlay];
-    [self addStaticTileOverlay];
 }
 
 - (void)cancelLoading
@@ -124,8 +123,8 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 
 - (void)fetchTilesForMapRect:(MKMapRect)mapRect
                    zoomLevel:(NSUInteger)zoomLevel
-               progressHandler:(void(^)(NSUInteger currentFrameIndex))progressHandler
-             completionHandler:(void (^)(BOOL success, NSError *error))completionHandler
+             progressHandler:(void(^)(NSUInteger currentFrameIndex))progressHandler
+           completionHandler:(void (^)(BOOL success, NSError *error))completionHandler
 {
     if (self.templateURLs.count == 0) {
         if (completionHandler) {
@@ -145,10 +144,10 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
     zoomLevel = MAX(zoomLevel, self.minimumZ);
     
     // Generate list of tiles on the screen to fetch
-    self.mapTiles = [self mapTilesInMapRect:mapRect zoomLevel:zoomLevel];
+    self.animationTiles = [self mapTilesInMapRect:mapRect zoomLevel:zoomLevel];
     
     // Fill in map tiles with an array of template URL strings, one for each frame
-    for (TCCAnimationTile *tile in self.mapTiles) {
+    for (TCCAnimationTile *tile in self.animationTiles) {
         NSMutableArray *array = [NSMutableArray array];
         for (NSUInteger timeIndex = 0; timeIndex < self.numberOfAnimationFrames; timeIndex++) {
             [array addObject:[self URLStringForX:tile.x Y:tile.y Z:tile.z timeIndex:timeIndex]];
@@ -158,7 +157,7 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
     
     // "Completion" done op - detects when all fetch operations have completed
     NSBlockOperation *completionDoneOp = [NSBlockOperation blockOperationWithBlock:^{
-        [self updateTilesToFrameIndex:self.currentFrameIndex];
+        [self updateAnimationTilesToFrameIndex:self.currentFrameIndex];
         dispatch_async(dispatch_get_main_queue(), ^{
             completionHandler(YES, nil);
         });
@@ -176,7 +175,7 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
         }];
         
         // Fetch and cache the tile data
-        for (TCCAnimationTile *tile in self.mapTiles) {
+        for (TCCAnimationTile *tile in self.animationTiles) {
             // Create NSOperation to fetch tile
             NSBlockOperation *fetchTileOp = [NSBlockOperation blockOperationWithBlock:^{
                 //if tile not in failedMapTiles, tile not bad -> go and fetch the tile
@@ -207,39 +206,118 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
         [self pauseAnimating];
     }
     
-    // Determine when the user has finished moving animation frames (i.e. scrubbing) to toggle
-    // the tiled overlay on and off.
-    if (!isContinuouslyMoving) {
-        [self addStaticTileOverlay];
-        return;
-    } else if (self.tileOverlay) {
-        [self removeStaticTileOverlay];
+    // If the user is scrubbing (i.e. continually moving), update the animation tiles' images to
+    // the desired frame index, since the animation tiles are the ones that are rendered. If the
+    // user has finished scrubbing, the renderer uses the static tiles to render.
+    if (isContinuouslyMoving) {
+        // Need to set the animation state to "scrubbing" to indicate that animation hasn't
+        // stopped, but that it's also not static. This is critically important to know when
+        // the overlay is using animation tiles vs when it's using static tiles.
+        self.currentAnimationState = TCCAnimationStateScrubbing;
+        [self.staticTilesCache removeAllObjects];
+        [self updateAnimationTilesToFrameIndex:frameIndex];
+    } else {
+        self.currentAnimationState = TCCAnimationStateStopped;
     }
-    
-    [self updateTilesToFrameIndex:frameIndex];
 }
 
-- (TCCAnimationTile *)tileForMapRect:(MKMapRect)mapRect zoomLevel:(NSUInteger)zoomLevel;
+- (TCCAnimationTile *)animationTileForMapRect:(MKMapRect)mapRect zoomLevel:(NSUInteger)zoomLevel
 {
     MKTileOverlayPath path = [TCCMapKitHelpers tilePathForMapRect:mapRect zoomLevel:zoomLevel];
-    for (TCCAnimationTile *tile in self.mapTiles) {
-        if (path.x == tile.x && path.y == tile.y && path.z == tile.z) {
-            return tile;
-        }
+    TCCAnimationTile *tile = [[TCCAnimationTile alloc] initWithFrame:mapRect x:path.x y:path.y z:path.z];
+    return [self.animationTiles member:tile];
+}
+
+- (TCCAnimationTile *)staticTileForMapRect:(MKMapRect)mapRect zoomLevel:(NSUInteger)zoomLevel
+{
+    MKTileOverlayPath path = [TCCMapKitHelpers tilePathForMapRect:mapRect zoomLevel:zoomLevel];
+    MKMapRect cappedMapRect = [TCCMapKitHelpers mapRectForTilePath:path];
+    
+    [self.staticTilesLock lock];
+    TCCAnimationTile *tile = [self.staticTilesCache objectForKey:[self keyForTilePath:path]];
+    [self.staticTilesLock unlock];
+
+    if (tile && tile.tileImageIndex == self.currentFrameIndex) {
+        return tile;
     }
-	return nil;
+    if (!tile) {
+        tile = [[TCCAnimationTile alloc] initWithFrame:cappedMapRect x:path.x y:path.y z:path.z];
+    }
+    tile.tileImage = nil;
+    
+    NSMutableArray *array = [NSMutableArray array];
+    for (NSUInteger timeIndex = 0; timeIndex < self.numberOfAnimationFrames; timeIndex++) {
+        [array addObject:[self URLStringForX:tile.x Y:tile.y Z:tile.z timeIndex:timeIndex]];
+    }
+    tile.templateURLs = [array copy];
+    [self.staticTilesLock lock];
+    [self.staticTilesCache setObject:tile forKey:[NSString stringWithFormat:@"%ld-%ld-%ld", tile.x, tile.y, tile.z]];
+    [self.staticTilesLock unlock];
+    return tile;
 }
 
 - (NSArray *)cachedTilesForMapRect:(MKMapRect)rect zoomLevel:(NSUInteger)zoomLevel
 {
     NSMutableArray *tiles = [NSMutableArray array];
-    for (TCCAnimationTile *tile in self.mapTiles) {
+    for (TCCAnimationTile *tile in self.animationTiles) {
         if (MKMapRectIntersectsRect(rect, tile.mapRectFrame) &&
             tile.z == zoomLevel) {
             [tiles addObject:tile];
         }
     }
     return [tiles copy];
+}
+
+- (NSArray *)cachedStaticTilesForMapRect:(MKMapRect)rect zoomLevel:(NSUInteger)zoomLevel
+{
+    NSMutableArray *tiles = [NSMutableArray array];
+    
+    [self.staticTilesLock lock];
+    
+    NSSet *tilesInMapRect = [self mapTilesInMapRect:rect zoomLevel:zoomLevel];
+    for (TCCAnimationTile *tile in tilesInMapRect) {
+        TCCAnimationTile *cachedTile = [self.staticTilesCache objectForKey:[self keyForTile:tile]];
+        if (MKMapRectIntersectsRect(rect, tile.mapRectFrame)) {
+            [tiles addObject:cachedTile];
+        }
+    }
+    
+    [self.staticTilesLock unlock];
+    return [tiles copy];
+}
+
+- (BOOL)canAnimateForMapRect:(MKMapRect)rect zoomLevel:(NSInteger)zoomLevel
+{
+    NSSet *visibleMapTiles = [self mapTilesInMapRect:rect zoomLevel:zoomLevel];
+    for (TCCAnimationTile *visibleTile in visibleMapTiles) {
+        if (![self.animationTiles containsObject:visibleTile]) {
+            return NO;
+        }
+    }
+    return YES;
+}
+
+#pragma mark Overrides
+
+- (void)loadTileAtPath:(MKTileOverlayPath)path result:(void (^)(NSData *, NSError *))result
+{
+    [self.staticTilesLock lock];
+    __block TCCAnimationTile *tile = [self.staticTilesCache objectForKey:[self keyForTilePath:path]];
+    [self.staticTilesLock unlock];
+    
+    NSURLSession *session = [NSURLSession sharedSession];
+    NSURL *url = [NSURL URLWithString:tile.templateURLs[self.currentFrameIndex]];
+    tile.tileImageIndex = self.currentFrameIndex;
+    NSURLRequest *request = [[NSURLRequest alloc] initWithURL:url
+                                                  cachePolicy:NSURLRequestReturnCacheDataElseLoad
+                                              timeoutInterval:0];
+    NSURLSessionTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        if (data && !error) {
+            tile.tileImage = [UIImage imageWithData:data];
+        }
+        if (result) result(data, error);
+    }];
+    [task resume];
 }
 
 #pragma  mark - Private
@@ -276,14 +354,14 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
     dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * 60));
 }
 
-- (void)updateTilesToFrameIndex:(NSInteger)frameIndex
+- (void)updateAnimationTilesToFrameIndex:(NSInteger)frameIndex
 {
     // RSS: Tried to have this data updating occur on a background thread, but it causes threading issues.
     // I wanted this in the background so that it doesn't block the main thread when it's loading cached
     // data. However, scrubbing quickly causes multiple calls to occur concurrently, which causes the
     // currentFrameIndex to enter a race condition. If we want to do this in the background, I think we'll
     // need to create a serial background queue.
-    for (TCCAnimationTile *tile in self.mapTiles) {
+    for (TCCAnimationTile *tile in self.animationTiles) {
         if (tile.failedToFetch) {
             continue;
         }
@@ -340,7 +418,7 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
     // When we are zoomed in beyond the tile set, use the tiles from the maximum z-depth,
     // but render them larger.
     // **Adjusted from overZoom * self.tileSize to just self.tileSize in order to render at overzoom properly
-    NSInteger adjustedTileSize = self.tileSize;
+    NSInteger adjustedTileSize = self.tileSize.width;
 
     // Need to use the zoom level zoom scale, not the actual zoom scale from the map view!
     NSInteger zoomExponent = 20 - zoomLevel;
@@ -390,22 +468,14 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
     }
 }
 
-- (void)addStaticTileOverlay
+- (NSString *)keyForTilePath:(MKTileOverlayPath)path
 {
-    // Prevent index out of bounds error from crashing app when we don't have a template URL for
-    // the current timestamp
-    if (self.templateURLs.count <= self.currentFrameIndex) return;
-    
-    self.tileOverlay = [[MKTileOverlay alloc] initWithURLTemplate:self.templateURLs[self.currentFrameIndex]];
-    self.tileOverlay.minimumZ = self.minimumZ;
-    self.tileOverlay.maximumZ = self.maximumZ;
-    [self.mapView addOverlay:self.tileOverlay];
+    return [NSString stringWithFormat:@"%ld-%ld-%ld", path.x, path.y, path.z];
 }
 
-- (void)removeStaticTileOverlay
+- (NSString *)keyForTile:(TCCAnimationTile *)tile
 {
-    [self.mapView removeOverlay:self.tileOverlay];
-    self.tileOverlay = nil;
+    return [NSString stringWithFormat:@"%ld-%ld-%ld", tile.x, tile.y, tile.z];
 }
 
 @end

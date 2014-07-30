@@ -24,7 +24,11 @@
     CGPoint mercatorPoint = [self mercatorTileOriginForMapRect:aMapRect];
     NSUInteger x = floor(mercatorPoint.x * [self worldTileWidthForZoomLevel:zoomLevel]);
     NSUInteger y = floor(mercatorPoint.y * [self worldTileWidthForZoomLevel:zoomLevel]);
-    return (MKTileOverlayPath){x, y, zoomLevel};
+    MKTileOverlayPath tilePath;
+    tilePath.x = x;
+    tilePath.y = y;
+    tilePath.z = zoomLevel;
+    return tilePath;
 }
 
 + (MKMapRect)mapRectForTilePath:(MKTileOverlayPath)path

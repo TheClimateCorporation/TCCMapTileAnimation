@@ -10,7 +10,6 @@
 #import "TCCTimeFrameParser.h"
 #import "TCCAnimationTileOverlayRenderer.h"
 #import "TCCAnimationTileOverlay.h"
-#import "TCCOverzoomTileOverlayRenderer.h"
 #import "MKMapView+Extras.h"
 
 #define FUTURE_RADAR_FRAMES_URI @"http://climate.com/assets/wdt-future-radar/LKG.txt?grower_apps=true"
@@ -41,36 +40,36 @@
     [super viewDidLoad];
 
 	self.startStopButton.tag = TCCAnimationStateStopped;
-    self.initialLoad = YES;
-    self.timeSlider.enabled = NO;
     
-    // Set the starting  location.
+    // Set the starting location.
     CLLocationCoordinate2D startingLocation = {30.33, -81.52};
-//     MKCoordinateSpan span = {8.403266, 7.031250};
-       MKCoordinateSpan span = {7.0, 7.0};
-       //calling regionThatFits: is very important, this will line up the visible map rect with the screen aspect ratio
-       //which is important for calculating the number of tiles, their coordinates and map rect frame
-       MKCoordinateRegion region = [self.mapView regionThatFits: MKCoordinateRegionMake(startingLocation, span)];
-
-       [self.mapView setRegion: region animated: NO];
+    MKCoordinateSpan span = {7.0, 7.0};
+    MKCoordinateRegion region = [self.mapView regionThatFits: MKCoordinateRegionMake(startingLocation, span)];
+    [self.mapView setRegion: region animated: NO];
     
     self.timeFrameParser = [[TCCTimeFrameParser alloc] initWithURLString:FUTURE_RADAR_FRAMES_URI delegate:self];
 }
 
 - (IBAction)onHandleTimeIndexChange:(id)sender
 {
+    // Only advance the animated overlay to the next frame if the slider no longer matches the
+    // current frame index
 	NSInteger sliderVal = floor(self.timeSlider.value);
     if (sliderVal == self.animatedTileOverlay.currentFrameIndex) return;
     
-    [self.animatedTileOverlay moveToFrameIndex:sliderVal isContinuouslyMoving:YES];
-    self.timeIndexLabel.text = [NSString stringWithFormat:@"%ld", (long)self.animatedTileOverlay.currentFrameIndex];
-    [self.animatedTileRenderer setNeedsDisplay];
+    [self moveToFrameIndex:sliderVal isContinuallyMoving:YES];
 }
 
 - (IBAction)finishedSliding:(id)sender
 {
     NSInteger sliderVal = floor(self.timeSlider.value);
-    [self.animatedTileOverlay moveToFrameIndex:(NSInteger)sliderVal isContinuouslyMoving:NO];
+    // It's very important to let the overlay know when the user has finished actively scrubbing.
+    [self moveToFrameIndex:sliderVal isContinuallyMoving:NO];
+}
+
+- (void)moveToFrameIndex:(NSInteger)frameIndex isContinuallyMoving:(BOOL)isContinuallyMoving
+{
+    [self.animatedTileOverlay moveToFrameIndex:frameIndex isContinuouslyMoving:isContinuallyMoving];
     self.timeIndexLabel.text = [NSString stringWithFormat:@"%ld", (long)self.animatedTileOverlay.currentFrameIndex];
     [self.animatedTileRenderer setNeedsDisplay];
 }
@@ -79,23 +78,16 @@
 {
 	if (self.startStopButton.tag == TCCAnimationStateStopped) {
 		[self.animatedTileOverlay fetchTilesForMapRect:self.mapView.visibleMapRect zoomLevel:self.animatedTileRenderer.renderedTileZoomLevel progressHandler:^(NSUInteger currentTimeIndex) {
-			         
-			CGFloat progressValue = (CGFloat)currentTimeIndex / (self.animatedTileOverlay.numberOfAnimationFrames);
-			[self.downloadProgressView setProgress: progressValue animated: YES];
-            
-            if (self.initialLoad) {
-                self.timeSlider.enabled = NO;
-                self.timeIndexLabel.text = [NSString stringWithFormat:@"%lu", (unsigned long)currentTimeIndex];
-			}
+			[self.downloadProgressView setProgress:(CGFloat)currentTimeIndex / self.animatedTileOverlay.numberOfAnimationFrames animated:YES];
 		} completionHandler:^(BOOL success, NSError *error) {
 			if (success) {
-                self.initialLoad = NO;
+                self.timeSlider.enabled = YES;
 				[self.animatedTileOverlay startAnimating];
-			} else {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [self displayError:error];
-                });
+                return;
 			}
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self displayError:error];
+            });
 		}];
 	} else if (self.startStopButton.tag == TCCAnimationStateLoading) {
         [self.animatedTileOverlay cancelLoading];
@@ -125,9 +117,9 @@
         [pluckedArray addObject:templateURLs[i]];
     }
     
-	TCCAnimationTileOverlay *overlay = [[TCCAnimationTileOverlay alloc] initWithMapView:self.mapView templateURLs:pluckedArray frameDuration:0.50 minimumZ:3 maximumZ:9 tileSize:256];
+	TCCAnimationTileOverlay *overlay = [[TCCAnimationTileOverlay alloc] initWithMapView:self.mapView templateURLs:pluckedArray frameDuration:0.50 minimumZ:3 maximumZ:9 tileSize:CGSizeMake(256, 256)];
 	overlay.delegate = self;
-		
+
 	[self.mapView addOverlay:overlay level:MKOverlayLevelAboveRoads];
 	self.timeSlider.maximumValue = pluckedArray.count - 1;
 }
@@ -156,32 +148,36 @@
 
 - (void)animationTileOverlay:(TCCAnimationTileOverlay *)animationTileOverlay didAnimateWithAnimationFrameIndex:(NSInteger)animationFrameIndex
 {
-    [self.animatedTileRenderer setNeedsDisplayInMapRect:self.mapView.visibleMapRect];
-	//update the slider if we are loading or animating
-    self.timeIndexLabel.text = [NSString stringWithFormat: @"%lu", (unsigned long)animationFrameIndex];
- 	if (animationTileOverlay.currentAnimationState != TCCAnimationStateStopped) {
-        self.timeSlider.enabled = YES;
+    self.timeIndexLabel.text = [NSString stringWithFormat:@"%ld", (long)animationFrameIndex];
+ 	if (animationTileOverlay.currentAnimationState == TCCAnimationStateAnimating) {
 		self.timeSlider.value = animationFrameIndex;
 	}
+    [self.animatedTileRenderer setNeedsDisplayInMapRect:self.mapView.visibleMapRect];
 }
 
 - (void)animationTileOverlay:(TCCAnimationTileOverlay *)animationTileOverlay didHaveError:(NSError *) error
 {
-     NSLog(@"%s ERROR %ld %@", __PRETTY_FUNCTION__, (long)error.code, error.localizedDescription);
-    
+    NSLog(@"%s ERROR %ld %@", __PRETTY_FUNCTION__, (long)error.code, error.localizedDescription);
+    // Only want to display one error alert view at a time
     if (!self.alertView) {
         [self displayError:error];
     }
 }
 
-
 #pragma mark MKMapViewDelegate
 
 - (void)mapView:(MKMapView *)mapView regionWillChangeAnimated:(BOOL)animated
 {
-    if (self.animatedTileOverlay.currentAnimationState == TCCAnimationStateAnimating) {
+    // We want moving/zooming/rotating the map to pause when loading or animating, since
+    // otherwise we might not have fetched the tile data necessary to display the overlay
+    // for the new region
+    if (self.animatedTileOverlay.currentAnimationState == TCCAnimationStateAnimating ||
+        self.animatedTileOverlay.currentAnimationState == TCCAnimationStateLoading) {
         [self.animatedTileOverlay pauseAnimating];
     }
+    // Disable the slider when the region changes. Only want to enable it until the
+    // tiles have finished fetching.
+    self.timeSlider.enabled = NO;
     [self.animatedTileRenderer setNeedsDisplay];
 }
 
@@ -193,12 +189,6 @@
         self.animatedTileRenderer.drawDebugInfo = YES;
         self.animatedTileRenderer.alpha = .75;
         return self.animatedTileRenderer;
-	}
-    if ([overlay isKindOfClass: [MKTileOverlay class]]) {
-        TCCOverzoomTileOverlayRenderer *renderer = [[TCCOverzoomTileOverlayRenderer alloc] initWithOverlay:overlay];
-        renderer.drawDebugInfo = YES;
-        renderer.alpha = .75;
-        return renderer;
 	}
 	return nil;
 }

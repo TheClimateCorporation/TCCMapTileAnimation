@@ -27,6 +27,11 @@
 @property (strong, nonatomic) UIImage *tileImage;
 
 /**
+ The frame index of the @c UIImage stored in the @c tileImage property.
+ */
+@property (nonatomic) NSInteger tileImageIndex;
+
+/**
  An array of @c NSString objects that represent the URL at which the tile image asset can be
  fetched. The URLs maintain the order in which the tile images should be animated.
  */

@@ -27,7 +27,6 @@
 		9B8B305C1980298D00EECFDC /* TCCAnimationTileOverlayRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B8B30541980298D00EECFDC /* TCCAnimationTileOverlayRenderer.m */; };
 		9B8B305D1980298D00EECFDC /* TCCAnimationTile.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B8B30561980298D00EECFDC /* TCCAnimationTile.m */; };
 		9B8B305E1980298D00EECFDC /* MKMapView+Extras.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B8B30581980298D00EECFDC /* MKMapView+Extras.m */; };
-		9B8B305F1980298D00EECFDC /* TCCOverzoomTileOverlayRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B8B305A1980298D00EECFDC /* TCCOverzoomTileOverlayRenderer.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -71,8 +70,6 @@
 		9B8B30561980298D00EECFDC /* TCCAnimationTile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCCAnimationTile.m; sourceTree = "<group>"; };
 		9B8B30571980298D00EECFDC /* MKMapView+Extras.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MKMapView+Extras.h"; sourceTree = "<group>"; };
 		9B8B30581980298D00EECFDC /* MKMapView+Extras.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MKMapView+Extras.m"; sourceTree = "<group>"; };
-		9B8B30591980298D00EECFDC /* TCCOverzoomTileOverlayRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCCOverzoomTileOverlayRenderer.h; sourceTree = "<group>"; };
-		9B8B305A1980298D00EECFDC /* TCCOverzoomTileOverlayRenderer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCCOverzoomTileOverlayRenderer.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -164,8 +161,6 @@
 			children = (
 				9B8B30501980298D00EECFDC /* TCCAnimationTileOverlay.h */,
 				9B8B30511980298D00EECFDC /* TCCAnimationTileOverlay.m */,
-				9B8B30591980298D00EECFDC /* TCCOverzoomTileOverlayRenderer.h */,
-				9B8B305A1980298D00EECFDC /* TCCOverzoomTileOverlayRenderer.m */,
 				9B8B30531980298D00EECFDC /* TCCAnimationTileOverlayRenderer.h */,
 				9B8B30541980298D00EECFDC /* TCCAnimationTileOverlayRenderer.m */,
 				9B8B30551980298D00EECFDC /* TCCAnimationTile.h */,
@@ -280,7 +275,6 @@
 				9B8B305E1980298D00EECFDC /* MKMapView+Extras.m in Sources */,
 				9B8B305D1980298D00EECFDC /* TCCAnimationTile.m in Sources */,
 				9B8B305B1980298D00EECFDC /* TCCAnimationTileOverlay.m in Sources */,
-				9B8B305F1980298D00EECFDC /* TCCOverzoomTileOverlayRenderer.m in Sources */,
 				9B49BC0119490AAE00094005 /* TCCTimeFrameParser.m in Sources */,
 				9B49BBD119490A5700094005 /* main.m in Sources */,
 				9B49BC0019490AAE00094005 /* TCCMapViewController.m in Sources */,

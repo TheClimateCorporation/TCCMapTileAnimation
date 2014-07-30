@@ -13,7 +13,8 @@
 typedef NS_ENUM(NSUInteger, TCCAnimationState) {
 	TCCAnimationStateStopped = 0,
 	TCCAnimationStateLoading,
-	TCCAnimationStateAnimating
+	TCCAnimationStateAnimating,
+    TCCAnimationStateScrubbing
 };
 
 typedef NS_ENUM(NSUInteger, TCCAnimationTileOverlayError) {
@@ -32,17 +33,14 @@ extern NSString *const TCCAnimationTileOverlayErrorDomain;
  A map overlay class that adheres to the @c MKOverlay protocol.
  */
 
-@interface TCCAnimationTileOverlay : NSObject <MKOverlay>
+@interface TCCAnimationTileOverlay : MKTileOverlay <MKOverlay>
 
 @property (weak, nonatomic) id <TCCAnimationTileOverlayDelegate> delegate;
 @property (nonatomic) NSInteger currentFrameIndex;
 @property (readonly, nonatomic) NSInteger numberOfAnimationFrames;
 @property (readonly, nonatomic) TCCAnimationState currentAnimationState;
-@property (nonatomic) NSInteger minimumZ;
-@property (nonatomic) NSInteger maximumZ;
-@property (nonatomic) NSInteger tileSize;
 
-- (instancetype)initWithMapView:(MKMapView *)mapView templateURLs:(NSArray *)templateURLs frameDuration:(NSTimeInterval)frameDuration minimumZ:(NSInteger)minimumZ maximumZ:(NSInteger)maximumZ tileSize:(NSInteger)tileSize;
+- (instancetype)initWithMapView:(MKMapView *)mapView templateURLs:(NSArray *)templateURLs frameDuration:(NSTimeInterval)frameDuration minimumZ:(NSInteger)minimumZ maximumZ:(NSInteger)maximumZ tileSize:(CGSize)tileSize;
 
 /**
  Begins animating the tile overlay, starting from the current frame index.
@@ -54,6 +52,10 @@ extern NSString *const TCCAnimationTileOverlayErrorDomain;
  */
 - (void)pauseAnimating;
 
+/**
+ Cancels any pending tile loading operations caused by @c 
+ fetchTileForMapRect:zoomLevel:progressHandler:completionBlock:.
+ */
 - (void)cancelLoading;
 
 /**
@@ -65,6 +67,12 @@ extern NSString *const TCCAnimationTileOverlayErrorDomain;
  through the animation frames. Passing @c YES suppresses the switch to using the @c MKTileOverlay.
  */
 - (void)moveToFrameIndex:(NSInteger)frameIndex isContinuouslyMoving:(BOOL)isContinuouslyMoving;
+
+/**
+ Returns @c YES if the overlay has valid tile data ready to be animated for the current map
+ rect and zoom level.
+ */
+- (BOOL)canAnimateForMapRect:(MKMapRect)rect zoomLevel:(NSInteger)zoomLevel;
 
 /**
  Begins fetching the tiles from the tile server.
@@ -86,15 +94,34 @@ extern NSString *const TCCAnimationTileOverlayErrorDomain;
  For a given map rect that corresponds to the area of a tile, this returns the @c MATAnimationTile
  object that contains the tile image data.
  
- Returns @c nil if a fetch operation has not executed for this tile.
+ Returns @c nil if a fetch operation has not executed for this map
+ rect and zoom level.
  */
-- (TCCAnimationTile *)tileForMapRect:(MKMapRect)mapRect zoomLevel:(NSUInteger)zoomLevel;
+- (TCCAnimationTile *)animationTileForMapRect:(MKMapRect)mapRect zoomLevel:(NSUInteger)zoomLevel;
 
 /**
- Returns an array of @c MATAnimationTile objects that have been fetched and cached for a given
- map rect.
+ Returns a tile object for a given map rect and zoom level. Guaranteed
+ not to be @c nil.The tile may have its @c tileImage property already set
+ to a valid tile image if the tile has been retrieved previously, but
+ this is not guaranteed, so please check the @c tileImage property for
+ @c nil before using.
+ */
+- (TCCAnimationTile *)staticTileForMapRect:(MKMapRect)mapRect zoomLevel:(NSUInteger)zoomLevel;
+
+/**
+ Returns an array of @c TCCAnimationTile objects that have been fetched and cached for a given
+ map rect. Should only be used to retrieve a collection of map tiles for
+ use by the renderer to render overzoomed tiles.
  */
 - (NSArray *)cachedTilesForMapRect:(MKMapRect)rect zoomLevel:(NSUInteger)zoomLevel;
+
+/**
+ Returns an array of @c TCCAnimationTile objects that have already
+ been fetched and cached for a given map rect. Should only be used
+ to retrieve a collection of map tiles for use by the renderer to 
+ render overzoomed tiles.
+ */
+- (NSArray *)cachedStaticTilesForMapRect:(MKMapRect)rect zoomLevel:(NSUInteger)zoomLevel;
 
 @end
 

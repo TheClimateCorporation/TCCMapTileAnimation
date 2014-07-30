@@ -11,14 +11,17 @@
 #import "TCCAnimationTile.h"
 #import "TCCMapKitHelpers.h"
 
+@interface TCCAnimationTileOverlayRenderer ()
+@property (readwrite, nonatomic) NSUInteger renderedTileZoomLevel;
+@end
+
 @implementation TCCAnimationTileOverlayRenderer
 
 #pragma mark - Lifecycle
 
-- (id) initWithOverlay:(id<MKOverlay>)overlay
+- (id)initWithOverlay:(id<MKOverlay>)overlay
 {
-	self = [super initWithOverlay:overlay];
-	if (self)
+	if (self = [super initWithOverlay:overlay])
 	{
         if (![overlay isKindOfClass:[TCCAnimationTileOverlay class]]) {
             [NSException raise:@"Unsupported overlay type" format:@"Must be MATAnimatedTileOverlay"];
@@ -32,8 +35,28 @@
 - (BOOL)canDrawMapRect:(MKMapRect)mapRect zoomScale:(MKZoomScale)zoomScale
 {
     self.renderedTileZoomLevel = [TCCMapKitHelpers zoomLevelForZoomScale:zoomScale];
-    // We can ALWAYS draw a tile, even if the zoom scale/level is not supported by the tile server.
-    // That's because we will draw a scaled version of the minimum/maximum supported tile.
+    
+    TCCAnimationTileOverlay *animationOverlay = (TCCAnimationTileOverlay *)self.overlay;
+    
+    // Render static tiles if we're stopped. Uses the MKTileOverlay method loadTileAtPath:result:
+    // to load and render tile images asynchronously and on demand.
+    if (animationOverlay.currentAnimationState == TCCAnimationStateStopped) {
+        NSUInteger cappedZoomLevel = MIN([TCCMapKitHelpers zoomLevelForZoomScale:zoomScale], animationOverlay.maximumZ);
+        TCCAnimationTile *tile = [animationOverlay staticTileForMapRect:mapRect zoomLevel:cappedZoomLevel];
+        
+        // Draw the image if we have it, otherwise load the tile data. Returning NO will make sure that
+        // drawRect doesn't get called immediately until setNeedsDisplayInMapRect:zoomScale: gets called
+        // when the tile has finished loading
+        if (tile.tileImage) {
+            return YES;
+        }
+        MKTileOverlayPath tilePath = [TCCMapKitHelpers tilePathForMapRect:mapRect zoomLevel:cappedZoomLevel];
+        [animationOverlay loadTileAtPath:tilePath result:^(NSData *tileData, NSError *error) {
+            if (!error) [self setNeedsDisplayInMapRect:mapRect zoomScale:zoomScale];
+        }];
+        return NO;
+    }
+    
     return YES;
 }
 
@@ -50,8 +73,19 @@
         [TCCMapKitHelpers drawDebugInfoForX:path.x Y:path.y Z:path.z color:[UIColor blackColor] inRect:[self rectForMapRect:mapRect] context:context];
     }
     
-    TCCAnimationTile *tile = [mapOverlay tileForMapRect:mapRect zoomLevel:zoomLevel];
-	if (tile) {
+    TCCAnimationTile *tile;
+    NSUInteger cappedZoomLevel = MIN(zoomLevel, mapOverlay.maximumZ);
+    // There are two different methods for getting tiles from the overlay, depending on whether the overlay
+    // is currently animating or of it's static. This is because the tiles are stored in different data
+    // structures depending on whether it's currently animating or if it's static.
+    if (mapOverlay.currentAnimationState == TCCAnimationStateStopped) {
+        tile = [mapOverlay staticTileForMapRect:mapRect zoomLevel:cappedZoomLevel];
+    } else {
+        tile = [mapOverlay animationTileForMapRect:mapRect zoomLevel:zoomLevel];
+    }
+    
+    // If we have a tile that matches the current zoom level of the map, we can render it immediately.
+	if (tile && zoomLevel == cappedZoomLevel) {
 		CGRect rect = [self rectForMapRect: mapRect];
 		UIImage *image = tile.tileImage;
 		UIGraphicsPushContext(context);
@@ -70,14 +104,18 @@
     NSInteger overZoom = 1;
     if (zoomLevel > mapOverlay.maximumZ) {
         overZoom = pow(2, (zoomLevel - mapOverlay.maximumZ));
-        zoomLevel = mapOverlay.maximumZ;
     }
     
-    if (overZoom == 1) return;
-    
-    NSArray *tiles = [mapOverlay cachedTilesForMapRect:mapRect zoomLevel:zoomLevel];
+    // There are two different methods for getting tiles from the overlay, depending on whether the overlay
+    // is currently animating or of it's static. This is because the tiles are stored in different data
+    // structures depending on whether it's currently animating or if it's static.
+    NSArray *tiles;
+    if (mapOverlay.currentAnimationState == TCCAnimationStateStopped) {
+        tiles = [mapOverlay cachedStaticTilesForMapRect:mapRect zoomLevel:cappedZoomLevel];
+    } else {
+        tiles = [mapOverlay cachedTilesForMapRect:mapRect zoomLevel:cappedZoomLevel];
+    }
 
-    //tile drawing
     for (TCCAnimationTile *tile in tiles) {
         // For each image tile, draw it in its corresponding MKMapRect frame
         CGRect rect = [self rectForMapRect:tile.mapRectFrame];
