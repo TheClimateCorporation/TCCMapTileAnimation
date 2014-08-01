@@ -27,6 +27,7 @@
 		9B8B305C1980298D00EECFDC /* TCCAnimationTileOverlayRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B8B30541980298D00EECFDC /* TCCAnimationTileOverlayRenderer.m */; };
 		9B8B305D1980298D00EECFDC /* TCCAnimationTile.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B8B30561980298D00EECFDC /* TCCAnimationTile.m */; };
 		9B8B305E1980298D00EECFDC /* MKMapView+Extras.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B8B30581980298D00EECFDC /* MKMapView+Extras.m */; };
+		9BCEB605198C248B00D2B9F2 /* TCCTileFetchOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BCEB604198C248B00D2B9F2 /* TCCTileFetchOperation.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -70,6 +71,8 @@
 		9B8B30561980298D00EECFDC /* TCCAnimationTile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCCAnimationTile.m; sourceTree = "<group>"; };
 		9B8B30571980298D00EECFDC /* MKMapView+Extras.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MKMapView+Extras.h"; sourceTree = "<group>"; };
 		9B8B30581980298D00EECFDC /* MKMapView+Extras.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MKMapView+Extras.m"; sourceTree = "<group>"; };
+		9BCEB603198C248B00D2B9F2 /* TCCTileFetchOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCCTileFetchOperation.h; sourceTree = "<group>"; };
+		9BCEB604198C248B00D2B9F2 /* TCCTileFetchOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCCTileFetchOperation.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -169,6 +172,8 @@
 				9B8B30581980298D00EECFDC /* MKMapView+Extras.m */,
 				8D2262DD19805EB10051CD47 /* TCCMapKitHelpers.h */,
 				8D2262DE19805EB10051CD47 /* TCCMapKitHelpers.m */,
+				9BCEB603198C248B00D2B9F2 /* TCCTileFetchOperation.h */,
+				9BCEB604198C248B00D2B9F2 /* TCCTileFetchOperation.m */,
 			);
 			name = TCCMapTileAnimation;
 			path = ../TCCMapTileAnimation;
@@ -273,6 +278,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9B8B305E1980298D00EECFDC /* MKMapView+Extras.m in Sources */,
+				9BCEB605198C248B00D2B9F2 /* TCCTileFetchOperation.m in Sources */,
 				9B8B305D1980298D00EECFDC /* TCCAnimationTile.m in Sources */,
 				9B8B305B1980298D00EECFDC /* TCCAnimationTileOverlay.m in Sources */,
 				9B49BC0119490AAE00094005 /* TCCTimeFrameParser.m in Sources */,

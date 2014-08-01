@@ -84,7 +84,7 @@
     
     UIBezierPath *bezierPath = [UIBezierPath bezierPathWithRect:CGRectMake(rect.origin.x, rect.origin.y, rect.size.width, rect.size.height)];
     [color setStroke];
-    // TODO: Should be divided by the tile size
+    // This makes an assumption that the tile size is 256 to draw a 1-point line.
     bezierPath.lineWidth = CGRectGetHeight(rect) / 256;
     [bezierPath stroke];
     

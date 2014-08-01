@@ -9,8 +9,8 @@
 #import "TCCAnimationTileOverlay.h"
 #import "TCCAnimationTile.h"
 #import "TCCMapKitHelpers.h"
+#import "TCCTileFetchOperation.h"
 
-// TODO: This should be documented as the expected format of the template URLs
 #define Z_INDEX "{z}"
 #define X_INDEX "{x}"
 #define Y_INDEX "{y}"
@@ -174,18 +174,11 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
         // Fetch and cache the tile data
         for (TCCAnimationTile *tile in self.animationTiles) {
             // Create NSOperation to fetch tile
-            NSBlockOperation *fetchTileOp = [NSBlockOperation blockOperationWithBlock:^{
-                //if tile not in failedMapTiles, tile not bad -> go and fetch the tile
-                if (!tile.failedToFetch) {
-                    [self fetchAndCacheTile:tile forFrameIndex:frameIndex];
-                }
-            }];
-            
+            TCCTileFetchOperation *fetchOp = [[TCCTileFetchOperation alloc] initWithTile:tile frameIndex:frameIndex];
             // Add a dependency from the "Done" operation onto this operation
-            [doneOp addDependency:fetchTileOp];
-            
+            [doneOp addDependency:fetchOp];
             // Queue it onto the download queue
-            [operations addObject:fetchTileOp];
+            [operations addObject:fetchOp];
         }
         
         // Queue the "Done" operation
@@ -320,38 +313,6 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 }
 
 #pragma  mark - Private
-
-- (void)fetchAndCacheTile:(TCCAnimationTile *)tile forFrameIndex:(NSInteger)frameIndex
-{
-    // TODO: Wrap this code in a subclass of NSOperation
-    //
-    // We use the semaphore to force this method to become synchronous so that
-    // we have better control over when this method call finishes. This is necessary
-    // since this is wrapped in an NSOperation, and we need to know when that
-    // operation has truly finished.
-    //
-    // Ideally, we'd subclass NSOperation to work with NSURLSession so that we can
-    // queue those up instead. For now, this is okay.
-    
-    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
-
-    NSURLSession *session = [NSURLSession sharedSession];
-    NSURL *url = [NSURL URLWithString:tile.templateURLs[frameIndex]];
-    NSURLRequest *request = [[NSURLRequest alloc] initWithURL:url
-                                                  cachePolicy:NSURLRequestReturnCacheDataElseLoad
-                                              timeoutInterval:0];
-    NSURLSessionTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-        if ([self checkResponseForError:(NSHTTPURLResponse *)response data:data]) {
-            tile.failedToFetch = YES;
-        }
-        
-        dispatch_semaphore_signal(semaphore);
-    }];
-    [task resume];
-    
-    // Have the thread wait until the download task is done. Timeout is 10 secs.
-    dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * 60));
-}
 
 - (void)updateAnimationTilesToFrameIndex:(NSInteger)frameIndex
 {
