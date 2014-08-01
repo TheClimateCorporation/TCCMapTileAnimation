@@ -32,15 +32,39 @@ extern NSString *const TCCAnimationTileOverlayErrorDomain;
 /**
  A map overlay class that adheres to the @c MKOverlay protocol.
  */
-
 @interface TCCAnimationTileOverlay : MKTileOverlay <MKOverlay>
-
+/**
+ The delegate for this overlay.
+ */
 @property (weak, nonatomic) id <TCCAnimationTileOverlayDelegate> delegate;
+/**
+ The current frame's index, from 0 to N-1, where N is the total number of frames.
+ */
 @property (nonatomic) NSInteger currentFrameIndex;
+/**
+ The total number of frames.
+ */
 @property (readonly, nonatomic) NSInteger numberOfAnimationFrames;
+/**
+ The current animation state of the overlay
+ */
 @property (readonly, nonatomic) TCCAnimationState currentAnimationState;
 
-- (instancetype)initWithMapView:(MKMapView *)mapView templateURLs:(NSArray *)templateURLs frameDuration:(NSTimeInterval)frameDuration minimumZ:(NSInteger)minimumZ maximumZ:(NSInteger)maximumZ tileSize:(CGSize)tileSize;
+/**
+ Designated initializer.
+ @param templateURLs An array of @c NSString objects, one for each frame of animation. The strings
+ are template URLs to the tile and should have @c {x}, @c {y}, and @c {z} to indicate the x, y, and
+ z coordinates for the tile.
+ @param frameDuration The number of seconds to display each frame of animation
+ @param minimumZ The minimum zoom level of tiles supported by the tile server.
+ @param maximumZ The maximum zoom level of tiles supported by the tile server.
+ @param tileSize The @c CGSize that represents the size of the tile images from the tile server.
+ */
+- (instancetype)initWithTemplateURLs:(NSArray *)templateURLs
+                       frameDuration:(NSTimeInterval)frameDuration
+                            minimumZ:(NSInteger)minimumZ
+                            maximumZ:(NSInteger)maximumZ
+                            tileSize:(CGSize)tileSize;
 
 /**
  Begins animating the tile overlay, starting from the current frame index.
@@ -140,7 +164,6 @@ extern NSString *const TCCAnimationTileOverlayErrorDomain;
 
 @optional
 
-// Does not stop the fetching of other images, could have multiple errors
 - (void)animationTileOverlay:(TCCAnimationTileOverlay *)animationTileOverlay didHaveError:(NSError *) error;
 
 @end

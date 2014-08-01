@@ -59,9 +59,9 @@
                     </view>
                     <connections>
                         <outlet property="downloadProgressView" destination="WjH-ln-t63" id="hze-ov-jOX"/>
+                        <outlet property="frameIndexLabel" destination="Znf-mz-Av0" id="tun-oj-qeg"/>
                         <outlet property="mapView" destination="ac8-nG-8th" id="BJX-ov-euC"/>
                         <outlet property="startStopButton" destination="nfb-E5-mle" id="WIx-lf-9Y6"/>
-                        <outlet property="timeIndexLabel" destination="Znf-mz-Av0" id="svH-7d-o3K"/>
                         <outlet property="timeSlider" destination="Gnq-s2-qfm" id="6zo-ld-YXE"/>
                     </connections>
                 </viewController>

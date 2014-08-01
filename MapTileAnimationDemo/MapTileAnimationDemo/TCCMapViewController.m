@@ -17,17 +17,14 @@
 @interface TCCMapViewController () <MKMapViewDelegate, TCCAnimationTileOverlayDelegate, TCCTimeFrameParserDelegateProtocol, UIAlertViewDelegate>
 
 @property (weak, nonatomic) IBOutlet MKMapView *mapView;
-@property (weak, nonatomic) IBOutlet UILabel *timeIndexLabel;
+@property (weak, nonatomic) IBOutlet UILabel *frameIndexLabel;
 @property (weak, nonatomic) IBOutlet UIProgressView *downloadProgressView;
 @property (weak, nonatomic) IBOutlet UIButton *startStopButton;
 @property (weak, nonatomic) IBOutlet UISlider *timeSlider;
 @property (strong, nonatomic) TCCTimeFrameParser *timeFrameParser;
-@property (nonatomic) BOOL initialLoad;
-@property (weak, nonatomic) TCCAnimationTileOverlay *animatedTileOverlay;
+@property (strong, nonatomic) TCCAnimationTileOverlay *animatedTileOverlay;
 @property (strong, nonatomic) TCCAnimationTileOverlayRenderer *animatedTileRenderer;
 @property (weak, nonatomic) UIAlertView *alertView;
-
-@property (nonatomic) BOOL shouldStop;
 
 @end
 
@@ -39,16 +36,18 @@
 {
     [super viewDidLoad];
 
-	self.startStopButton.tag = TCCAnimationStateStopped;
-    
     // Set the starting location.
     CLLocationCoordinate2D startingLocation = {30.33, -81.52};
     MKCoordinateSpan span = {7.0, 7.0};
     MKCoordinateRegion region = [self.mapView regionThatFits: MKCoordinateRegionMake(startingLocation, span)];
-    [self.mapView setRegion: region animated: NO];
+    [self.mapView setRegion:region animated:NO];
     
+    // The time frame parser performs a network fetch to create a list of template URLs, one for each
+    // frame of animation.
     self.timeFrameParser = [[TCCTimeFrameParser alloc] initWithURLString:FUTURE_RADAR_FRAMES_URI delegate:self];
 }
+
+#pragma mark - IBActions
 
 - (IBAction)onHandleTimeIndexChange:(id)sender
 {
@@ -70,14 +69,16 @@
 - (void)moveToFrameIndex:(NSInteger)frameIndex isContinuallyMoving:(BOOL)isContinuallyMoving
 {
     [self.animatedTileOverlay moveToFrameIndex:frameIndex isContinuouslyMoving:isContinuallyMoving];
-    self.timeIndexLabel.text = [NSString stringWithFormat:@"%ld", (long)self.animatedTileOverlay.currentFrameIndex];
+    self.frameIndexLabel.text = [NSString stringWithFormat:@"%ld", (long)self.animatedTileOverlay.currentFrameIndex];
     [self.animatedTileRenderer setNeedsDisplay];
 }
 
 - (IBAction)onHandleStartStopAction:(id)sender
 {
-	if (self.startStopButton.tag == TCCAnimationStateStopped) {
+	if (self.animatedTileOverlay.currentAnimationState == TCCAnimationStateStopped) {
+        // Fetch tiles and start animating when loading has finished.
 		[self.animatedTileOverlay fetchTilesForMapRect:self.mapView.visibleMapRect zoomLevel:self.animatedTileRenderer.renderedTileZoomLevel progressHandler:^(NSUInteger currentTimeIndex) {
+            // Show the loading progress
 			[self.downloadProgressView setProgress:(CGFloat)currentTimeIndex / self.animatedTileOverlay.numberOfAnimationFrames animated:YES];
 		} completionHandler:^(BOOL success, NSError *error) {
 			if (success) {
@@ -89,9 +90,9 @@
                 [self displayError:error];
             });
 		}];
-	} else if (self.startStopButton.tag == TCCAnimationStateLoading) {
+	} else if (self.animatedTileOverlay.currentAnimationState == TCCAnimationStateLoading) {
         [self.animatedTileOverlay cancelLoading];
-	} else if (self.startStopButton.tag == TCCAnimationStateAnimating) {
+	} else if (self.animatedTileOverlay.currentAnimationState == TCCAnimationStateAnimating) {
 		[self.animatedTileOverlay pauseAnimating];
 	}
 }
@@ -111,16 +112,20 @@
 
 - (void)didLoadTimeStampData;
 {
+    // Only use a subset of the available template URLs
 	NSArray *templateURLs = self.timeFrameParser.templateFrameTimeURLs;
     NSMutableArray *pluckedArray = [[NSMutableArray alloc] init];
     for (int i = 0; i < templateURLs.count; i+=3) {
         [pluckedArray addObject:templateURLs[i]];
     }
     
-	TCCAnimationTileOverlay *overlay = [[TCCAnimationTileOverlay alloc] initWithMapView:self.mapView templateURLs:pluckedArray frameDuration:0.50 minimumZ:3 maximumZ:9 tileSize:CGSizeMake(256, 256)];
-	overlay.delegate = self;
-
-	[self.mapView addOverlay:overlay level:MKOverlayLevelAboveRoads];
+    // Setting up the overlay's maximumZ caps the zoom level of the tiles that get fetched.
+    // If the user zooms closer in than this level, then tiles from the maximumZ level are
+    // fetched and scaled up for rendering.
+	self.animatedTileOverlay = [[TCCAnimationTileOverlay alloc] initWithTemplateURLs:pluckedArray frameDuration:0.50 minimumZ:3 maximumZ:9 tileSize:CGSizeMake(256, 256)];
+	self.animatedTileOverlay.delegate = self;
+	[self.mapView addOverlay:self.animatedTileOverlay level:MKOverlayLevelAboveRoads];
+    
 	self.timeSlider.maximumValue = pluckedArray.count - 1;
 }
 
@@ -130,8 +135,6 @@
  didChangeFromAnimationState:(TCCAnimationState)previousAnimationState
             toAnimationState:(TCCAnimationState)currentAnimationState
 {
-    self.startStopButton.tag = currentAnimationState;
-
     //set titles of button to appropriate string based on currentAnimationState
     if (currentAnimationState == TCCAnimationStateLoading) {
         [self.startStopButton setTitle:@"◼︎" forState:UIControlStateNormal];
@@ -148,11 +151,14 @@
 
 - (void)animationTileOverlay:(TCCAnimationTileOverlay *)animationTileOverlay didAnimateWithAnimationFrameIndex:(NSInteger)animationFrameIndex
 {
-    self.timeIndexLabel.text = [NSString stringWithFormat:@"%ld", (long)animationFrameIndex];
+    // When the animation overlay animates to a new frame, it's the responsibility of the delegate
+    // to call setNeedsDisplay
+    [self.animatedTileRenderer setNeedsDisplayInMapRect:self.mapView.visibleMapRect];
+    
+    self.frameIndexLabel.text = [NSString stringWithFormat:@"%ld", (long)animationFrameIndex];
  	if (animationTileOverlay.currentAnimationState == TCCAnimationStateAnimating) {
 		self.timeSlider.value = animationFrameIndex;
 	}
-    [self.animatedTileRenderer setNeedsDisplayInMapRect:self.mapView.visibleMapRect];
 }
 
 - (void)animationTileOverlay:(TCCAnimationTileOverlay *)animationTileOverlay didHaveError:(NSError *) error
@@ -168,9 +174,9 @@
 
 - (void)mapView:(MKMapView *)mapView regionWillChangeAnimated:(BOOL)animated
 {
-    // We want moving/zooming/rotating the map to pause when loading or animating, since
+    // When the user moves/zooms/rotates the map, it should pause loading or animating, since
     // otherwise we might not have fetched the tile data necessary to display the overlay
-    // for the new region
+    // for the new region.
     if (self.animatedTileOverlay.currentAnimationState == TCCAnimationStateAnimating ||
         self.animatedTileOverlay.currentAnimationState == TCCAnimationStateLoading) {
         [self.animatedTileOverlay pauseAnimating];
@@ -183,8 +189,7 @@
 
 - (MKOverlayRenderer *)mapView:(MKMapView *)mapView rendererForOverlay:(id<MKOverlay>)overlay
 {
-	if ([overlay isKindOfClass: [TCCAnimationTileOverlay class]]) {
-		self.animatedTileOverlay = (TCCAnimationTileOverlay *)overlay;
+	if ([overlay isKindOfClass:[TCCAnimationTileOverlay class]]) {
         self.animatedTileRenderer = [[TCCAnimationTileOverlayRenderer alloc] initWithOverlay:overlay];
         self.animatedTileRenderer.drawDebugInfo = YES;
         self.animatedTileRenderer.alpha = .75;

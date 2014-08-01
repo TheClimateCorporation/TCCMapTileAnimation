@@ -27,7 +27,6 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 @property (strong, nonatomic) NSSet *animationTiles;
 @property (strong, nonatomic) NSCache *staticTilesCache;
 @property (strong, nonatomic) NSLock *staticTilesLock;
-@property (strong, nonatomic) MKMapView *mapView;
 
 @end
 
@@ -35,12 +34,11 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 
 #pragma mark - Lifecycle
 
-- (instancetype)initWithMapView:(MKMapView *)mapView
-                   templateURLs:(NSArray *)templateURLs
-                  frameDuration:(NSTimeInterval)frameDuration
-                       minimumZ:(NSInteger)minimumZ
-                       maximumZ:(NSInteger)maximumZ
-                       tileSize:(CGSize)tileSize
+- (instancetype)initWithTemplateURLs:(NSArray *)templateURLs
+                       frameDuration:(NSTimeInterval)frameDuration
+                            minimumZ:(NSInteger)minimumZ
+                            maximumZ:(NSInteger)maximumZ
+                            tileSize:(CGSize)tileSize
 {
 	if (self = [super init]) {
         //Initialize network caching settings
@@ -58,7 +56,6 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 		
 		_currentAnimationState = TCCAnimationStateStopped;
 
-        _mapView = mapView;
         self.minimumZ = minimumZ;
         self.maximumZ = maximumZ;
         self.tileSize = tileSize;
@@ -210,12 +207,14 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
     // the desired frame index, since the animation tiles are the ones that are rendered. If the
     // user has finished scrubbing, the renderer uses the static tiles to render.
     if (isContinuouslyMoving) {
-        // Need to set the animation state to "scrubbing" to indicate that animation hasn't
-        // stopped, but that it's also not static. This is critically important to know when
-        // the overlay is using animation tiles vs when it's using static tiles.
+        // Need to set the animation state to "scrubbing" to indicate that when we update the
+        // tiles to the next frame index, it's not because we're animating, it's because we're
+        // scrubbing.
         self.currentAnimationState = TCCAnimationStateScrubbing;
-        [self.staticTilesCache removeAllObjects];
         [self updateAnimationTilesToFrameIndex:frameIndex];
+        // We're actively scrubbing, so there's a good chance that the static tiles in the cache
+        // will not be used.
+        [self.staticTilesCache removeAllObjects];
     } else {
         self.currentAnimationState = TCCAnimationStateStopped;
     }
@@ -380,9 +379,11 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
     }
     
     self.currentFrameIndex = frameIndex;
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.delegate animationTileOverlay:self didAnimateWithAnimationFrameIndex:self.currentFrameIndex];
-    });
+    if (self.currentAnimationState == TCCAnimationStateAnimating) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.delegate animationTileOverlay:self didAnimateWithAnimationFrameIndex:self.currentFrameIndex];
+        });
+    }
 }
 
 /*
