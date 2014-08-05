@@ -48,7 +48,9 @@
                                 <rect key="frame" x="283" y="990" width="211" height="31"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <connections>
-                                    <action selector="onHandleTimeIndexChange:" destination="BYZ-38-t0r" eventType="valueChanged" id="exK-p6-QpX"/>
+                                    <action selector="finishedSliding:" destination="BYZ-38-t0r" eventType="touchUpOutside" id="73R-dZ-Map"/>
+                                    <action selector="finishedSliding:" destination="BYZ-38-t0r" eventType="touchUpInside" id="tap-V7-W1d"/>
+                                    <action selector="onSliderValueChange:" destination="BYZ-38-t0r" eventType="valueChanged" id="gqG-cH-XwA"/>
                                 </connections>
                             </slider>
                         </subviews>

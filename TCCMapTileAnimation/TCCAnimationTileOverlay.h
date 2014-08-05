@@ -83,12 +83,20 @@ extern NSString *const TCCAnimationTileOverlayErrorDomain;
 - (void)cancelLoading;
 
 /**
- Moves the overlay's animated tile data to the given frame index. If it is currently animating,
- it pauses animation. Throws exception if out of bounds.
+ Moves the overlay's animated tile data to the given frame index, and calls the delegate method
+ @c animationTileOverlay:didAnimateWithAnimationFrameIndex: afterwards.
  
- @param frameIndex The animation frame index to move to
+ If it is currently animating, it pauses animation. If @c isContinuouslyMoving is @c YES, it
+ sets the current animation state to @c TCCAnimationStateScrubbing. This is because the animation
+ renderer uses two different method of retrieving tiles based on whether the current animation state
+ of the overlay is stopped (uses static tiles with async loadTileAtPath) or scrubbing/animating
+ (uses cached animation tiles synchronously). If we don't set this to scrubbing and let it
+ be stopped, the rendering has a noticeable flicker due to the async nature of loading tiles.
+ 
+ @param frameIndex The animation frame index to move to. Throws exception if out of bounds.
  @param isContinuouslyMoving A boolean flag to indicate whether the user is currently scrubbing
- through the animation frames. Passing @c YES suppresses the switch to using the @c MKTileOverlay.
+ through the animation frames. Passing @c YES changes the overlay to animation state
+ @c TCCAnimationStateScrubbing.
  */
 - (void)moveToFrameIndex:(NSInteger)frameIndex isContinuouslyMoving:(BOOL)isContinuouslyMoving;
 

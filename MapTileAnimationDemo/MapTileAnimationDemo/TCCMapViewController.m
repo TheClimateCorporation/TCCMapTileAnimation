@@ -49,28 +49,21 @@
 
 #pragma mark - IBActions
 
-- (IBAction)onHandleTimeIndexChange:(id)sender
+- (IBAction)onSliderValueChange:(id)sender
 {
     // Only advance the animated overlay to the next frame if the slider no longer matches the
     // current frame index
 	NSInteger sliderVal = floor(self.timeSlider.value);
     if (sliderVal == self.animatedTileOverlay.currentFrameIndex) return;
     
-    [self moveToFrameIndex:sliderVal isContinuallyMoving:YES];
+    [self.animatedTileOverlay moveToFrameIndex:sliderVal isContinuouslyMoving:YES];
 }
 
 - (IBAction)finishedSliding:(id)sender
 {
     NSInteger sliderVal = floor(self.timeSlider.value);
     // It's very important to let the overlay know when the user has finished actively scrubbing.
-    [self moveToFrameIndex:sliderVal isContinuallyMoving:NO];
-}
-
-- (void)moveToFrameIndex:(NSInteger)frameIndex isContinuallyMoving:(BOOL)isContinuallyMoving
-{
-    [self.animatedTileOverlay moveToFrameIndex:frameIndex isContinuouslyMoving:isContinuallyMoving];
-    self.frameIndexLabel.text = [NSString stringWithFormat:@"%ld", (long)self.animatedTileOverlay.currentFrameIndex];
-    [self.animatedTileRenderer setNeedsDisplay];
+    [self.animatedTileOverlay moveToFrameIndex:sliderVal isContinuouslyMoving:NO];
 }
 
 - (IBAction)onHandleStartStopAction:(id)sender
@@ -129,7 +122,7 @@
 	self.timeSlider.maximumValue = pluckedArray.count - 1;
 }
 
-#pragma mark MATAnimatedTileOverlayDelegate
+#pragma mark TCCAnimationTileOverlayDelegate
 
 - (void)animationTileOverlay:(TCCAnimationTileOverlay *)animationTileOverlay
  didChangeFromAnimationState:(TCCAnimationState)previousAnimationState
@@ -184,7 +177,6 @@
     // Disable the slider when the region changes. Only want to enable it until the
     // tiles have finished fetching.
     self.timeSlider.enabled = NO;
-    [self.animatedTileRenderer setNeedsDisplay];
 }
 
 - (MKOverlayRenderer *)mapView:(MKMapView *)mapView rendererForOverlay:(id<MKOverlay>)overlay

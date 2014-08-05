@@ -49,7 +49,7 @@
                                 <connections>
                                     <action selector="finishedSliding:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="RDZ-pR-a4n"/>
                                     <action selector="finishedSliding:" destination="vXZ-lx-hvc" eventType="touchUpOutside" id="dVN-6l-JdE"/>
-                                    <action selector="onHandleTimeIndexChange:" destination="vXZ-lx-hvc" eventType="valueChanged" id="J4z-rv-beN"/>
+                                    <action selector="onSliderValueChange:" destination="vXZ-lx-hvc" eventType="valueChanged" id="EQR-cS-xq2"/>
                                 </connections>
                             </slider>
                         </subviews>

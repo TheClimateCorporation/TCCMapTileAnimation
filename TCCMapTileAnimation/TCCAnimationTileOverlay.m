@@ -100,17 +100,19 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 
 - (void)startAnimating;
 {
+    // Have to set the current animation state first before firing the timer because the timer depends on
+    // the animation state to be animating, otherwise the playback skips one frame of animation.
+	self.currentAnimationState = TCCAnimationStateAnimating;
 	self.timer = [NSTimer scheduledTimerWithTimeInterval:self.frameDuration target:self selector:@selector(updateAnimationTiles:) userInfo:nil repeats:YES];
 	[self.timer fire];
-	self.currentAnimationState = TCCAnimationStateAnimating;
 }
 
 - (void)pauseAnimating
 {
+	self.currentAnimationState = TCCAnimationStateStopped;
 	[self.timer invalidate];
     [self.downloadQueue cancelAllOperations];
 	self.timer = nil;
-	self.currentAnimationState = TCCAnimationStateStopped;
 }
 
 - (void)cancelLoading
@@ -162,6 +164,7 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 
     // Initiate fetch operations for tiles for each frame
     NSMutableArray *operations = [NSMutableArray array];
+    NSOperation *previousDoneOp;
     for (NSInteger frameIndex = 0; frameIndex < self.numberOfAnimationFrames; frameIndex++) {
         // Create "Done" operation for this animation frame -- need this to signal when
         // all tiles for this frame have finished downloading so we can fire progress handler
@@ -184,6 +187,13 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
         // Queue the "Done" operation
         [operations addObject:doneOp];
         [completionDoneOp addDependency:doneOp];
+        
+        // The "Done" operations for each frame should also have a dependency on the previous done op.
+        // This prevents the case where the loading progress can go from 2 to 4 back to 3 then to 5, etc.
+        if (previousDoneOp) {
+            [doneOp addDependency:previousDoneOp];
+        }
+        previousDoneOp = doneOp;
     }
     
     [operations addObject:completionDoneOp];
@@ -200,14 +210,18 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
     // the desired frame index, since the animation tiles are the ones that are rendered. If the
     // user has finished scrubbing, the renderer uses the static tiles to render.
     if (isContinuouslyMoving) {
-        // Need to set the animation state to "scrubbing" to indicate that when we update the
-        // tiles to the next frame index, it's not because we're animating, it's because we're
-        // scrubbing.
+        // Need to set the animation state to "scrubbing". This is because the animation renderer
+        // uses two different method of retrieving tiles based on whether the current animation state
+        // of the overlay is stopped (uses static tiles with async loadTileAtPath) or scrubbing/animating
+        // (uses cached animation tiles synchronously). If we don't set this to scrubbing and let it
+        // be stopped, the rendering has a noticeable flicker due to the async nature of loading tiles.
         self.currentAnimationState = TCCAnimationStateScrubbing;
         [self updateAnimationTilesToFrameIndex:frameIndex];
         // We're actively scrubbing, so there's a good chance that the static tiles in the cache
         // will not be used.
         [self.staticTilesCache removeAllObjects];
+        
+        [self.delegate animationTileOverlay:self didAnimateWithAnimationFrameIndex:self.currentFrameIndex];
     } else {
         self.currentAnimationState = TCCAnimationStateStopped;
     }
