@@ -257,7 +257,7 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
     }
     tile.templateURLs = [array copy];
     [self.staticTilesLock lock];
-    [self.staticTilesCache setObject:tile forKey:[NSString stringWithFormat:@"%ld-%ld-%ld", tile.x, tile.y, tile.z]];
+    [self.staticTilesCache setObject:tile forKey:[NSString stringWithFormat:@"%ld-%ld-%ld", (long)tile.x, (long)tile.y, (long)tile.z]];
     [self.staticTilesLock unlock];
     return tile;
 }
@@ -446,12 +446,12 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 
 - (NSString *)keyForTilePath:(MKTileOverlayPath)path
 {
-    return [NSString stringWithFormat:@"%ld-%ld-%ld", path.x, path.y, path.z];
+    return [NSString stringWithFormat:@"%ld-%ld-%ld", (long)path.x, (long)path.y, (long)path.z];
 }
 
 - (NSString *)keyForTile:(TCCAnimationTile *)tile
 {
-    return [NSString stringWithFormat:@"%ld-%ld-%ld", tile.x, tile.y, tile.z];
+    return [NSString stringWithFormat:@"%ld-%ld-%ld", (long)tile.x, (long)tile.y, (long)tile.z];
 }
 
 @end
