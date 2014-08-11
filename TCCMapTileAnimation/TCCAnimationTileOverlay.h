@@ -119,7 +119,7 @@ extern NSString *const TCCAnimationTileOverlayErrorDomain;
  */
 - (void)fetchTilesForMapRect:(MKMapRect)mapRect
                    zoomLevel:(NSUInteger)zoomLevel
-             progressHandler:(void(^)(NSUInteger currentFrameIndex))progressHandler
+             progressHandler:(void(^)(NSUInteger loadedFrameIndex))progressHandler
            completionHandler:(void (^)(BOOL success, NSError *error))completionHandler;
 
 /**

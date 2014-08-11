@@ -170,7 +170,7 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
         // all tiles for this frame have finished downloading so we can fire progress handler
         NSBlockOperation *doneOp = [NSBlockOperation blockOperationWithBlock:^{
             dispatch_async(dispatch_get_main_queue(), ^{
-                progressHandler(frameIndex + 1);
+                progressHandler(frameIndex);
             });
         }];
         

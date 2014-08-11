@@ -70,9 +70,9 @@
 {
 	if (self.animatedTileOverlay.currentAnimationState == TCCAnimationStateStopped) {
         // Fetch tiles and start animating when loading has finished.
-		[self.animatedTileOverlay fetchTilesForMapRect:self.mapView.visibleMapRect zoomLevel:self.animatedTileRenderer.renderedTileZoomLevel progressHandler:^(NSUInteger currentTimeIndex) {
+		[self.animatedTileOverlay fetchTilesForMapRect:self.mapView.visibleMapRect zoomLevel:self.animatedTileRenderer.renderedTileZoomLevel progressHandler:^(NSUInteger loadedFrameIndex) {
             // Show the loading progress
-			[self.downloadProgressView setProgress:(CGFloat)currentTimeIndex / self.animatedTileOverlay.numberOfAnimationFrames animated:YES];
+			[self.downloadProgressView setProgress:((float)loadedFrameIndex + 1) / self.animatedTileOverlay.numberOfAnimationFrames animated:YES];
 		} completionHandler:^(BOOL success, NSError *error) {
 			if (success) {
                 self.timeSlider.enabled = YES;
