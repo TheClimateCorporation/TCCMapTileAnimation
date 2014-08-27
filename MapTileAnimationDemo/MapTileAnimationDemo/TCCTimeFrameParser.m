@@ -8,8 +8,8 @@
 
 #import "TCCTimeFrameParser.h"
 
-#define TIMEFRAME_TEMPLATE_STRING @"http://climate.com/assets/wdt-future-radar/%@/%@/{z}/{x}/{y}.png"
-#define TIMEFRAME_URI @"http://climate.com/assets/wdt-future-radar/%@/%@"
+#define TIMEFRAME_TEMPLATE_STRING @"http://climate.com/assets/future-radar/%@/%@/{z}/{x}/{y}.png"
+#define TIMEFRAME_URI @"http://climate.com/assets/future-radar/%@/%@"
 
 @interface TCCTimeFrameParser ()
 

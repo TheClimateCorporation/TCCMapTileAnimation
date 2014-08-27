@@ -26,7 +26,6 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 @property (readwrite, nonatomic) TCCAnimationState currentAnimationState;
 @property (strong, nonatomic) NSSet *animationTiles;
 @property (strong, nonatomic) NSCache *staticTilesCache;
-@property (strong, nonatomic) NSLock *staticTilesLock;
 
 @end
 
@@ -61,7 +60,6 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
         self.tileSize = tileSize;
         
         _staticTilesCache = [[NSCache alloc] init];
-        _staticTilesLock = [[NSLock alloc] init];
 	}
 	return self;
 }
@@ -239,9 +237,7 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
     MKTileOverlayPath path = [TCCMapKitHelpers tilePathForMapRect:mapRect zoomLevel:zoomLevel];
     MKMapRect cappedMapRect = [TCCMapKitHelpers mapRectForTilePath:path];
     
-    [self.staticTilesLock lock];
     TCCAnimationTile *tile = [self.staticTilesCache objectForKey:[self keyForTilePath:path]];
-    [self.staticTilesLock unlock];
 
     if (tile && tile.tileImageIndex == self.currentFrameIndex) {
         return tile;
@@ -256,9 +252,9 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
         [array addObject:[self URLStringForX:tile.x Y:tile.y Z:tile.z timeIndex:timeIndex]];
     }
     tile.templateURLs = [array copy];
-    [self.staticTilesLock lock];
+    
     [self.staticTilesCache setObject:tile forKey:[NSString stringWithFormat:@"%ld-%ld-%ld", (long)tile.x, (long)tile.y, (long)tile.z]];
-    [self.staticTilesLock unlock];
+    
     return tile;
 }
 
@@ -278,8 +274,6 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 {
     NSMutableArray *tiles = [NSMutableArray array];
     
-    [self.staticTilesLock lock];
-    
     NSSet *tilesInMapRect = [self mapTilesInMapRect:rect zoomLevel:zoomLevel];
     for (TCCAnimationTile *tile in tilesInMapRect) {
         TCCAnimationTile *cachedTile = [self.staticTilesCache objectForKey:[self keyForTile:tile]];
@@ -288,7 +282,6 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
         }
     }
     
-    [self.staticTilesLock unlock];
     return [tiles copy];
 }
 
@@ -307,9 +300,7 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 
 - (void)loadTileAtPath:(MKTileOverlayPath)path result:(void (^)(NSData *, NSError *))result
 {
-    [self.staticTilesLock lock];
     __block TCCAnimationTile *tile = [self.staticTilesCache objectForKey:[self keyForTilePath:path]];
-    [self.staticTilesLock unlock];
     
     NSURLSession *session = [NSURLSession sharedSession];
     NSURL *url = [NSURL URLWithString:tile.templateURLs[self.currentFrameIndex]];

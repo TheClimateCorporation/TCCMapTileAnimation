@@ -12,7 +12,7 @@
 #import "TCCAnimationTileOverlay.h"
 #import "MKMapView+Extras.h"
 
-#define FUTURE_RADAR_FRAMES_URI @"http://climate.com/assets/wdt-future-radar/LKG.txt?grower_apps=true"
+#define FUTURE_RADAR_FRAMES_URI @"http://climate.com/assets/future-radar/LKG.txt?grower_apps=true"
 
 @interface TCCMapViewController () <MKMapViewDelegate, TCCAnimationTileOverlayDelegate, TCCTimeFrameParserDelegateProtocol, UIAlertViewDelegate>
 
@@ -184,7 +184,7 @@
 	if ([overlay isKindOfClass:[TCCAnimationTileOverlay class]]) {
         self.animatedTileRenderer = [[TCCAnimationTileOverlayRenderer alloc] initWithOverlay:overlay];
         self.animatedTileRenderer.drawDebugInfo = YES;
-        self.animatedTileRenderer.alpha = .75;
+        self.animatedTileRenderer.alpha = 1;
         return self.animatedTileRenderer;
 	}
 	return nil;
