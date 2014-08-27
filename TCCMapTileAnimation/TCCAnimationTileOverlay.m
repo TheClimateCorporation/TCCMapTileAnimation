@@ -20,7 +20,6 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 @interface TCCAnimationTileOverlay ()
 
 @property (strong, nonatomic) NSOperationQueue *downloadQueue;
-@property (strong, nonatomic) NSArray *templateURLs;
 @property (nonatomic) NSTimeInterval frameDuration;
 @property (strong, nonatomic) NSTimer *timer;
 @property (readwrite, nonatomic) TCCAnimationState currentAnimationState;
@@ -74,6 +73,14 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
         _currentAnimationState = currentAnimationState;
         [self.delegate animationTileOverlay:self didChangeFromAnimationState:previousAnimationState toAnimationState:currentAnimationState];
     }
+}
+
+// Allows users to mutate the template URLs of the animation overlay.
+- (void)setTemplateURLs:(NSArray *)templateURLs
+{
+    [self pauseAnimating];
+    _templateURLs = templateURLs;
+    _numberOfAnimationFrames = [_templateURLs count];
 }
 
 #pragma mark MKOverlay

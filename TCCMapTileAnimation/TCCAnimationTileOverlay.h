@@ -49,6 +49,10 @@ extern NSString *const TCCAnimationTileOverlayErrorDomain;
  The current animation state of the overlay
  */
 @property (readonly, nonatomic) TCCAnimationState currentAnimationState;
+/**
+ Array of @c NSString objects
+ */
+@property (strong, nonatomic) NSArray *templateURLs;
 
 /**
  Designated initializer.
