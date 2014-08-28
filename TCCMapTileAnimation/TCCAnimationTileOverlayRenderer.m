@@ -26,11 +26,29 @@
         if (![overlay isKindOfClass:[TCCAnimationTileOverlay class]]) {
             [NSException raise:@"Unsupported overlay type" format:@"Must be MATAnimatedTileOverlay"];
         }
+        TCCAnimationTileOverlay *animationOverlay = overlay;
+        [animationOverlay addObserver:self forKeyPath:@"currentAnimationState" options:0 context:NULL];
 	}
 	return self;
 }
 
+- (void)dealloc {
+    [(TCCAnimationTileOverlay *)self.overlay removeObserver:self forKeyPath:@"currentAnimationState"];
+}
+
 #pragma mark - Public methods
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+{
+    if ([keyPath isEqualToString:@"currentAnimationState"]) {
+        TCCAnimationTileOverlay *animationOverlay = self.overlay;
+        if (animationOverlay.currentAnimationState == TCCAnimationStateStopped) {
+            [self setNeedsDisplay];
+        }
+    } else {
+        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+    }
+}
 
 - (BOOL)canDrawMapRect:(MKMapRect)mapRect zoomScale:(MKZoomScale)zoomScale
 {
@@ -115,7 +133,7 @@
     } else {
         tiles = [mapOverlay cachedTilesForMapRect:mapRect zoomLevel:cappedZoomLevel];
     }
-
+    
     for (TCCAnimationTile *tile in tiles) {
         // For each image tile, draw it in its corresponding MKMapRect frame
         CGRect rect = [self rectForMapRect:tile.mapRectFrame];

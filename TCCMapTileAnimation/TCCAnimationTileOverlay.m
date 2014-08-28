@@ -284,6 +284,10 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
     NSSet *tilesInMapRect = [self mapTilesInMapRect:rect zoomLevel:zoomLevel];
     for (TCCAnimationTile *tile in tilesInMapRect) {
         TCCAnimationTile *cachedTile = [self.staticTilesCache objectForKey:[self keyForTile:tile]];
+        // The cache should always contain a tile, but in the event of an unexpected cache miss (i.e.
+        // the app cleared the cache right before we needed it, which it shouldn't do), we opt to not
+        // return the tile since inserting nil would cause a crash
+        if (!cachedTile) continue;
         if (MKMapRectIntersectsRect(rect, tile.mapRectFrame)) {
             [tiles addObject:cachedTile];
         }
