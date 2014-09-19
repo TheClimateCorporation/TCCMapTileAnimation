@@ -19,6 +19,9 @@
 
 @implementation TCCTileFetchOperation
 
+@synthesize finished = _finished;
+@synthesize executing = _executing;
+
 - (instancetype)initWithTile:(TCCAnimationTile *)tile frameIndex:(NSUInteger)frameIndex {
     if (self = [super init]) {
         _tile = tile;
