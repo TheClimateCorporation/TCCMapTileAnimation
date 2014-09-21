@@ -25,6 +25,7 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 @property (readwrite, nonatomic) TCCAnimationState currentAnimationState;
 @property (strong, nonatomic) NSSet *animationTiles;
 @property (strong, nonatomic) NSCache *staticTilesCache;
+@property (strong, nonatomic) NSURLSession *session;
 
 @end
 
@@ -39,11 +40,13 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
                             tileSize:(CGSize)tileSize
 {
 	if (self = [super init]) {
-        //Initialize network caching settings
+        //Initialize network settings
         NSURLCache *URLCache = [[NSURLCache alloc] initWithMemoryCapacity:4 * 1024 * 1024
                                                              diskCapacity:32 * 1024 * 1024
                                                                  diskPath:nil];
-        [NSURLCache setSharedURLCache:URLCache];
+        NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+        configuration.URLCache = URLCache;
+        _session = [NSURLSession sessionWithConfiguration:configuration];
         
 		_templateURLs = templateURLs;
 		_numberOfAnimationFrames = [templateURLs count];
@@ -183,6 +186,8 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
         for (TCCAnimationTile *tile in self.animationTiles) {
             // Create NSOperation to fetch tile
             TCCTileFetchOperation *fetchOp = [[TCCTileFetchOperation alloc] initWithTile:tile frameIndex:frameIndex];
+            fetchOp.session = self.session;
+            
             // Add a dependency from the "Done" operation onto this operation
             [doneOp addDependency:fetchOp];
             // Queue it onto the download queue
@@ -313,13 +318,12 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 {
     __block TCCAnimationTile *tile = [self.staticTilesCache objectForKey:[self keyForTilePath:path]];
     
-    NSURLSession *session = [NSURLSession sharedSession];
     NSURL *url = [NSURL URLWithString:tile.templateURLs[self.currentFrameIndex]];
     tile.tileImageIndex = self.currentFrameIndex;
     NSURLRequest *request = [[NSURLRequest alloc] initWithURL:url
                                                   cachePolicy:NSURLRequestReturnCacheDataElseLoad
                                               timeoutInterval:0];
-    NSURLSessionTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+    NSURLSessionTask *task = [self.session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         if (data && !error) {
             tile.tileImage = [UIImage imageWithData:data];
         }

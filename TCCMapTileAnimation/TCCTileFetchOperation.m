@@ -31,6 +31,8 @@
     return self;
 }
 
+#pragma mark - Custom accessors
+
 - (BOOL)isFinished {
     return self.finished;
 }
@@ -42,6 +44,15 @@
 - (BOOL)isConcurrent {
     return YES;
 }
+
+- (NSURLSession *)session {
+    if (!_session) {
+        _session = [NSURLSession sharedSession];
+    }
+    return _session;
+}
+
+#pragma mark - Public methods
 
 - (void)start
 {
@@ -59,11 +70,10 @@
     [self didChangeValueForKey:@"isExecuting"];
     
     // If the operation is not canceled, begin executing the task.
-    NSURLSession *session = [NSURLSession sharedSession];
     NSURLRequest *request = [[NSURLRequest alloc] initWithURL:self.tileURL
                                                   cachePolicy:NSURLRequestReturnCacheDataElseLoad
                                               timeoutInterval:5];
-    NSURLSessionTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+    NSURLSessionTask *task = [self.session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         NSHTTPURLResponse *HTTPResponse = (NSHTTPURLResponse *)response;
         if ((data && HTTPResponse.statusCode != 200) || !data) {
             self.tile.failedToFetch = YES;
