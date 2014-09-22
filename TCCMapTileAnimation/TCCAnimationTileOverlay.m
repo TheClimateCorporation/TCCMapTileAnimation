@@ -336,29 +336,26 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 
 - (void)updateAnimationTilesToFrameIndex:(NSInteger)frameIndex
 {
-    // RSS: Tried to have this data updating occur on a background thread, but it causes threading issues.
-    // I wanted this in the background so that it doesn't block the main thread when it's loading cached
-    // data. However, scrubbing quickly causes multiple calls to occur concurrently, which causes the
-    // currentFrameIndex to enter a race condition. If we want to do this in the background, I think we'll
-    // need to create a serial background queue.
+    // The tiles in self.animationTiles need tileImage to be updated to the frameIndex.
+    // TCCTileFetchOperation does this for us. We want to block until all tiles have
+    // been updated. In theory, the NSURLCache used by NSURLSession should already have
+    // all the necessary tile image data from fetchTilesForMapRect:
+    NSMutableArray *operations = [NSMutableArray array];
     for (TCCAnimationTile *tile in self.animationTiles) {
         if (tile.failedToFetch) {
             continue;
         }
         
-        NSURL *url = [[NSURL alloc] initWithString:tile.templateURLs[frameIndex]];
-        NSURLRequest *request = [[NSURLRequest alloc] initWithURL:url cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:1];
-        NSURLResponse *response;
-        NSError *error;
-        NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-
-        BOOL errorOccurred = [self checkResponseForError:(NSHTTPURLResponse *)response data:data];
-        
-        if (!errorOccurred) {
-            tile.tileImage = [UIImage imageWithData:data];
-        }
+        TCCTileFetchOperation *fetchOp = [[TCCTileFetchOperation alloc] initWithTile:tile frameIndex:frameIndex];
+        fetchOp.session = self.session;
+        fetchOp.completionHandler = ^(UIImage *tileImage) {
+            tile.tileImage = tileImage;
+            tile.failedToFetch = tileImage == nil;
+        };
+        [operations addObject:fetchOp];
     }
-    
+    [self.downloadQueue addOperations:operations waitUntilFinished:YES];
+
     self.currentFrameIndex = frameIndex;
     if (self.currentAnimationState == TCCAnimationStateAnimating) {
         dispatch_async(dispatch_get_main_queue(), ^{

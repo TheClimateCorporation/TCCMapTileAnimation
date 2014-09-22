@@ -12,6 +12,9 @@
 
 @interface TCCTileFetchOperation : NSOperation
 
+/**
+ Designated initializer.
+ */
 - (instancetype)initWithTile:(TCCAnimationTile *)tile frameIndex:(NSUInteger)frameIndex;
 
 /**
@@ -19,5 +22,10 @@
  the @c sharedSession singleton.
  */
 @property (strong, nonatomic) NSURLSession *session;
+
+/**
+ Returns image if fetch was successful, @c nil otherwise.
+ */
+@property (copy, nonatomic) void (^completionHandler)(UIImage *image);
 
 @end
