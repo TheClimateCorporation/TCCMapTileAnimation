@@ -18,9 +18,6 @@
 		9B49BBD819490A5700094005 /* Main_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9B49BBD619490A5700094005 /* Main_iPhone.storyboard */; };
 		9B49BBDB19490A5700094005 /* Main_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9B49BBD919490A5700094005 /* Main_iPad.storyboard */; };
 		9B49BBE019490A5700094005 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9B49BBDF19490A5700094005 /* Images.xcassets */; };
-		9B49BBE719490A5700094005 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9B49BBE619490A5700094005 /* XCTest.framework */; };
-		9B49BBE819490A5700094005 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9B49BBC419490A5700094005 /* Foundation.framework */; };
-		9B49BBE919490A5700094005 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9B49BBC819490A5700094005 /* UIKit.framework */; };
 		9B49BC0019490AAE00094005 /* TCCMapViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B49BBFD19490AAE00094005 /* TCCMapViewController.m */; };
 		9B49BC0119490AAE00094005 /* TCCTimeFrameParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B49BBFF19490AAE00094005 /* TCCTimeFrameParser.m */; };
 		9B8B305B1980298D00EECFDC /* TCCAnimationTileOverlay.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B8B30511980298D00EECFDC /* TCCAnimationTileOverlay.m */; };
@@ -29,16 +26,6 @@
 		9B8B305E1980298D00EECFDC /* MKMapView+Extras.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B8B30581980298D00EECFDC /* MKMapView+Extras.m */; };
 		9BCEB605198C248B00D2B9F2 /* TCCTileFetchOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BCEB604198C248B00D2B9F2 /* TCCTileFetchOperation.m */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		9B49BBEA19490A5700094005 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 9B49BBB919490A5700094005 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 9B49BBC019490A5700094005;
-			remoteInfo = MapTileAnimationDemo;
-		};
-/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		3269A4F1194911C2003F1AE3 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
@@ -57,7 +44,6 @@
 		9B49BBD719490A5700094005 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPhone.storyboard; sourceTree = "<group>"; };
 		9B49BBDA19490A5700094005 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPad.storyboard; sourceTree = "<group>"; };
 		9B49BBDF19490A5700094005 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		9B49BBE519490A5700094005 /* MapTileAnimationDemoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MapTileAnimationDemoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9B49BBE619490A5700094005 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		9B49BBFC19490AAE00094005 /* TCCMapViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCCMapViewController.h; sourceTree = "<group>"; };
 		9B49BBFD19490AAE00094005 /* TCCMapViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCCMapViewController.m; sourceTree = "<group>"; };
@@ -87,16 +73,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		9B49BBE219490A5700094005 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				9B49BBE719490A5700094005 /* XCTest.framework in Frameworks */,
-				9B49BBE919490A5700094005 /* UIKit.framework in Frameworks */,
-				9B49BBE819490A5700094005 /* Foundation.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -114,7 +90,6 @@
 			isa = PBXGroup;
 			children = (
 				9B49BBC119490A5700094005 /* MapTileAnimationDemo.app */,
-				9B49BBE519490A5700094005 /* MapTileAnimationDemoTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -199,24 +174,6 @@
 			productReference = 9B49BBC119490A5700094005 /* MapTileAnimationDemo.app */;
 			productType = "com.apple.product-type.application";
 		};
-		9B49BBE419490A5700094005 /* MapTileAnimationDemoTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 9B49BBF919490A5700094005 /* Build configuration list for PBXNativeTarget "MapTileAnimationDemoTests" */;
-			buildPhases = (
-				9B49BBE119490A5700094005 /* Sources */,
-				9B49BBE219490A5700094005 /* Frameworks */,
-				9B49BBE319490A5700094005 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				9B49BBEB19490A5700094005 /* PBXTargetDependency */,
-			);
-			name = MapTileAnimationDemoTests;
-			productName = MapTileAnimationDemoTests;
-			productReference = 9B49BBE519490A5700094005 /* MapTileAnimationDemoTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -226,11 +183,6 @@
 				CLASSPREFIX = TCC;
 				LastUpgradeCheck = 0510;
 				ORGANIZATIONNAME = "The Climate Corporation";
-				TargetAttributes = {
-					9B49BBE419490A5700094005 = {
-						TestTargetID = 9B49BBC019490A5700094005;
-					};
-				};
 			};
 			buildConfigurationList = 9B49BBBC19490A5700094005 /* Build configuration list for PBXProject "MapTileAnimationDemo" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -246,7 +198,6 @@
 			projectRoot = "";
 			targets = (
 				9B49BBC019490A5700094005 /* MapTileAnimationDemo */,
-				9B49BBE419490A5700094005 /* MapTileAnimationDemoTests */,
 			);
 		};
 /* End PBXProject section */
@@ -260,13 +211,6 @@
 				9B49BBE019490A5700094005 /* Images.xcassets in Resources */,
 				9B49BBD819490A5700094005 /* Main_iPhone.storyboard in Resources */,
 				9B49BBCF19490A5700094005 /* InfoPlist.strings in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		9B49BBE319490A5700094005 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -290,22 +234,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		9B49BBE119490A5700094005 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		9B49BBEB19490A5700094005 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 9B49BBC019490A5700094005 /* MapTileAnimationDemo */;
-			targetProxy = 9B49BBEA19490A5700094005 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		9B49BBCD19490A5700094005 /* InfoPlist.strings */ = {
@@ -435,46 +364,6 @@
 			};
 			name = Release;
 		};
-		9B49BBFA19490A5700094005 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/MapTileAnimationDemo.app/MapTileAnimationDemo";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
-				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "MapTileAnimationDemo/MapTileAnimationDemo-Prefix.pch";
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = "MapTileAnimationDemoTests/MapTileAnimationDemoTests-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUNDLE_LOADER)";
-				WRAPPER_EXTENSION = xctest;
-			};
-			name = Debug;
-		};
-		9B49BBFB19490A5700094005 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/MapTileAnimationDemo.app/MapTileAnimationDemo";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
-				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "MapTileAnimationDemo/MapTileAnimationDemo-Prefix.pch";
-				INFOPLIST_FILE = "MapTileAnimationDemoTests/MapTileAnimationDemoTests-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUNDLE_LOADER)";
-				WRAPPER_EXTENSION = xctest;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -492,15 +381,6 @@
 			buildConfigurations = (
 				9B49BBF719490A5700094005 /* Debug */,
 				9B49BBF819490A5700094005 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		9B49BBF919490A5700094005 /* Build configuration list for PBXNativeTarget "MapTileAnimationDemoTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				9B49BBFA19490A5700094005 /* Debug */,
-				9B49BBFB19490A5700094005 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

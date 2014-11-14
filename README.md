@@ -19,6 +19,19 @@ If you use Cocoapods, add `pod 'TCCMapTileAnimation'` to your Podfile, then run 
 
 You can also manually add the `.m` and `.h` files in the `TCCMapTileAnimation` directory to your project, or create a static library from those files and add the library to your project.
 
+### Prerequisites ###
+
+TCCMapTileAnimation uses NSURLCache to quickly look up and render overlay tiles that have already been fetched from the network. This must be set up explicitly by your app, ideally in `application:didFinishLaunchingWithOptions`.
+
+	- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+	    NSURLCache *cache = [[NSURLCache alloc] initWithMemoryCapacity:4 * 1024 * 1024
+	                                                      diskCapacity:20 * 1024 * 1024
+	                                                          diskPath:nil];
+	    [NSURLCache setSharedURLCache:cache];
+	    
+	    ...
+	}
+
 ### Creating the overlay ###
 
 	NSArray *templateURLs = @[@"http://url.to/first_frame/{z}/{x}/{y}", @"http://url.to/second_frame/{z}/{x}/{y}"];
