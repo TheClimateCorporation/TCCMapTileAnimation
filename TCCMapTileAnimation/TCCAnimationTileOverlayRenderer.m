@@ -139,13 +139,17 @@
         CGRect rect = [self rectForMapRect:tile.mapRectFrame];
         if (!MKMapRectIntersectsRect(mapRect, tile.mapRectFrame)) continue;
         
+        // Make sure there's image data for us to draw
+        UIImage *tileImage = tile.tileImage;
+        if (!tileImage) continue;
+        
         CGContextSaveGState(context);
         CGContextTranslateCTM(context, CGRectGetMinX(rect), CGRectGetMinY(rect));
         // OverZoom mode - 1 when using tiles as is, 2, 4, 8 etc when overzoomed.
         CGContextScaleCTM(context, overZoom/zoomScale, overZoom/zoomScale);
-        CGContextTranslateCTM(context, 0, tile.tileImage.size.height);
+        CGContextTranslateCTM(context, 0, tileImage.size.height);
         CGContextScaleCTM(context, 1, -1);
-        CGContextDrawImage(context, CGRectMake(0, 0, tile.tileImage.size.width, tile.tileImage.size.height), [tile.tileImage CGImage]);
+        CGContextDrawImage(context, CGRectMake(0, 0, tileImage.size.width, tileImage.size.height), [tileImage CGImage]);
         CGContextRestoreGState(context);
         
         if (self.drawDebugInfo) {
