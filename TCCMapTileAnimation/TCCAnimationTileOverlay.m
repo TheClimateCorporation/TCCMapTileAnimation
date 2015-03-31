@@ -186,7 +186,6 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
         for (TCCAnimationTile *tile in self.animationTiles) {
             // Create NSOperation to fetch tile
             TCCTileFetchOperation *fetchOp = [[TCCTileFetchOperation alloc] initWithTile:tile frameIndex:frameIndex];
-            fetchOp.session = self.session;
             
             // Add a dependency from the "Done" operation onto this operation
             [doneOp addDependency:fetchOp];
@@ -347,10 +346,10 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
         }
         
         TCCTileFetchOperation *fetchOp = [[TCCTileFetchOperation alloc] initWithTile:tile frameIndex:frameIndex];
-        fetchOp.session = self.session;
-        fetchOp.completionHandler = ^(UIImage *tileImage) {
-            tile.tileImage = tileImage;
-            tile.failedToFetch = tileImage == nil;
+        __weak TCCTileFetchOperation *weakOp = fetchOp;
+        fetchOp.completionBlock = ^{
+            tile.tileImage = weakOp.tileImage;
+            tile.failedToFetch = tile.tileImage == nil;
         };
         [operations addObject:fetchOp];
     }

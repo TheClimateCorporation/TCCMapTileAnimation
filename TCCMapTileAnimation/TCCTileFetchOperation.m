@@ -45,70 +45,53 @@
     return YES;
 }
 
-- (NSURLSession *)session {
-    if (!_session) {
-        _session = [NSURLSession sharedSession];
-    }
-    return _session;
-}
-
 #pragma mark - Public methods
 
 - (void)start
 {
-    // Always check for cancellation before launching the task.
-    if ([self isCancelled]) {
-        // Must move the operation to the finished state if it is canceled.
+    @try {
+        // Always check for cancellation before launching the task.
+        if ([self isCancelled]) {
+            // Must move the operation to the finished state if it is canceled.
+            [self willChangeValueForKey:@"isFinished"];
+            self.finished = YES;
+            [self didChangeValueForKey:@"isFinished"];
+            return;
+        }
+        
+        [self willChangeValueForKey:@"isExecuting"];
+        self.executing = YES;
+        [self didChangeValueForKey:@"isExecuting"];
+        
+        // If the operation is not canceled, begin executing the task.
+        NSURLRequest *request = [[NSURLRequest alloc] initWithURL:self.tileURL
+                                                      cachePolicy:NSURLRequestReturnCacheDataElseLoad
+                                                  timeoutInterval:5];
+        
+        NSError *error;
+        NSURLResponse *response;
+        NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+        
+        if ([self isCancelled]) return;
+        
+        NSHTTPURLResponse *HTTPResponse = (NSHTTPURLResponse *)response;
+        
+        BOOL success = data && HTTPResponse.statusCode == 200;
+        if (success) {
+            self.tileImage = [UIImage imageWithData:data];
+        }
+        
         [self willChangeValueForKey:@"isFinished"];
+        [self willChangeValueForKey:@"isExecuting"];
+        
+        self.executing = NO;
         self.finished = YES;
+        
         [self didChangeValueForKey:@"isFinished"];
-        return;
+        [self didChangeValueForKey:@"isExecuting"];
     }
-    
-    [self willChangeValueForKey:@"isExecuting"];
-    self.executing = YES;
-    [self didChangeValueForKey:@"isExecuting"];
-    
-    // If the operation is not canceled, begin executing the task.
-    NSURLRequest *request = [[NSURLRequest alloc] initWithURL:self.tileURL
-                                                  cachePolicy:NSURLRequestReturnCacheDataElseLoad
-                                              timeoutInterval:5];
-    //    NSURLSessionDataTask *task = [self.session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-    //        [self willChangeValueForKey:@"isFinished"];
-    //        [self willChangeValueForKey:@"isExecuting"];
-    //
-    //        self.executing = NO;
-    //        self.finished = YES;
-    //
-    //        [self didChangeValueForKey:@"isFinished"];
-    //        [self didChangeValueForKey:@"isExecuting"];
-    //
-    //        NSHTTPURLResponse *HTTPResponse = (NSHTTPURLResponse *)response;
-    //
-    //        BOOL success = data && HTTPResponse.statusCode == 200;
-    //        if (self.completionHandler) {
-    //            self.completionHandler(success ? [UIImage imageWithData:data] : nil);
-    //        }
-    //    }];
-    //    [task resume];
-    
-    NSError *error;
-    NSURLResponse *response;
-    NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-    [self willChangeValueForKey:@"isFinished"];
-    [self willChangeValueForKey:@"isExecuting"];
-    
-    self.executing = NO;
-    self.finished = YES;
-    
-    [self didChangeValueForKey:@"isFinished"];
-    [self didChangeValueForKey:@"isExecuting"];
-    
-    NSHTTPURLResponse *HTTPResponse = (NSHTTPURLResponse *)response;
-    
-    BOOL success = data && HTTPResponse.statusCode == 200;
-    if (self.completionHandler) {
-        self.completionHandler(success ? [UIImage imageWithData:data] : nil);
+    @catch(NSException *exception) {
+        // Suppress exception - do not rethrow
     }
 }
 
