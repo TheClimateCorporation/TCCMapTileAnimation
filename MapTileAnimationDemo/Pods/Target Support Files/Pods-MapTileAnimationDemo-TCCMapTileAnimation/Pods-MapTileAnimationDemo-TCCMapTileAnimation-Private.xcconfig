@@ -1,5 +1,6 @@
 #include "Pods-MapTileAnimationDemo-TCCMapTileAnimation.xcconfig"
 GCC_PREPROCESSOR_DEFINITIONS = $(inherited) COCOAPODS=1
-HEADER_SEARCH_PATHS = "${PODS_ROOT}/Headers/Build" "${PODS_ROOT}/Headers/Build/TCCMapTileAnimation" "${PODS_ROOT}/Headers/Public" "${PODS_ROOT}/Headers/Public/TCCMapTileAnimation"
+HEADER_SEARCH_PATHS = "${PODS_ROOT}/Headers/Private" "${PODS_ROOT}/Headers/Private/TCCMapTileAnimation" "${PODS_ROOT}/Headers/Public" "${PODS_ROOT}/Headers/Public/TCCMapTileAnimation"
 OTHER_LDFLAGS = ${PODS_MAPTILEANIMATIONDEMO_TCCMAPTILEANIMATION_OTHER_LDFLAGS} -ObjC
 PODS_ROOT = ${SRCROOT}
+SKIP_INSTALL = YES

@@ -10,7 +10,6 @@
 #import "TCCTimeFrameParser.h"
 #import "TCCAnimationTileOverlayRenderer.h"
 #import "TCCAnimationTileOverlay.h"
-#import "MKMapView+Extras.h"
 
 #define FUTURE_RADAR_FRAMES_URI @"http://climate.com/assets/future-radar/LKG.txt?grower_apps=true"
 
