@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		3269A4F2194911C2003F1AE3 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3269A4F1194911C2003F1AE3 /* MapKit.framework */; };
-		8D2262DF19805EB10051CD47 /* TCCMapKitHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 8D2262DE19805EB10051CD47 /* TCCMapKitHelpers.m */; };
+		45AF429585B80FCAB67C884A /* libPods-MapTileAnimationDemo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CDF8E1BCF52A9C58F3539AEA /* libPods-MapTileAnimationDemo.a */; };
 		9B49BBC519490A5700094005 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9B49BBC419490A5700094005 /* Foundation.framework */; };
 		9B49BBC719490A5700094005 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9B49BBC619490A5700094005 /* CoreGraphics.framework */; };
 		9B49BBC919490A5700094005 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9B49BBC819490A5700094005 /* UIKit.framework */; };
@@ -20,17 +20,10 @@
 		9B49BBE019490A5700094005 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9B49BBDF19490A5700094005 /* Images.xcassets */; };
 		9B49BC0019490AAE00094005 /* TCCMapViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B49BBFD19490AAE00094005 /* TCCMapViewController.m */; };
 		9B49BC0119490AAE00094005 /* TCCTimeFrameParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B49BBFF19490AAE00094005 /* TCCTimeFrameParser.m */; };
-		9B8B305B1980298D00EECFDC /* TCCAnimationTileOverlay.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B8B30511980298D00EECFDC /* TCCAnimationTileOverlay.m */; };
-		9B8B305C1980298D00EECFDC /* TCCAnimationTileOverlayRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B8B30541980298D00EECFDC /* TCCAnimationTileOverlayRenderer.m */; };
-		9B8B305D1980298D00EECFDC /* TCCAnimationTile.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B8B30561980298D00EECFDC /* TCCAnimationTile.m */; };
-		9B8B305E1980298D00EECFDC /* MKMapView+Extras.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B8B30581980298D00EECFDC /* MKMapView+Extras.m */; };
-		9BCEB605198C248B00D2B9F2 /* TCCTileFetchOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BCEB604198C248B00D2B9F2 /* TCCTileFetchOperation.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		3269A4F1194911C2003F1AE3 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
-		8D2262DD19805EB10051CD47 /* TCCMapKitHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCCMapKitHelpers.h; sourceTree = "<group>"; };
-		8D2262DE19805EB10051CD47 /* TCCMapKitHelpers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCCMapKitHelpers.m; sourceTree = "<group>"; };
 		9B49BBC119490A5700094005 /* MapTileAnimationDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MapTileAnimationDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9B49BBC419490A5700094005 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		9B49BBC619490A5700094005 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -49,16 +42,9 @@
 		9B49BBFD19490AAE00094005 /* TCCMapViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCCMapViewController.m; sourceTree = "<group>"; };
 		9B49BBFE19490AAE00094005 /* TCCTimeFrameParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCCTimeFrameParser.h; sourceTree = "<group>"; };
 		9B49BBFF19490AAE00094005 /* TCCTimeFrameParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCCTimeFrameParser.m; sourceTree = "<group>"; };
-		9B8B30501980298D00EECFDC /* TCCAnimationTileOverlay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCCAnimationTileOverlay.h; sourceTree = "<group>"; };
-		9B8B30511980298D00EECFDC /* TCCAnimationTileOverlay.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCCAnimationTileOverlay.m; sourceTree = "<group>"; };
-		9B8B30531980298D00EECFDC /* TCCAnimationTileOverlayRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCCAnimationTileOverlayRenderer.h; sourceTree = "<group>"; };
-		9B8B30541980298D00EECFDC /* TCCAnimationTileOverlayRenderer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCCAnimationTileOverlayRenderer.m; sourceTree = "<group>"; };
-		9B8B30551980298D00EECFDC /* TCCAnimationTile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCCAnimationTile.h; sourceTree = "<group>"; };
-		9B8B30561980298D00EECFDC /* TCCAnimationTile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCCAnimationTile.m; sourceTree = "<group>"; };
-		9B8B30571980298D00EECFDC /* MKMapView+Extras.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MKMapView+Extras.h"; sourceTree = "<group>"; };
-		9B8B30581980298D00EECFDC /* MKMapView+Extras.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MKMapView+Extras.m"; sourceTree = "<group>"; };
-		9BCEB603198C248B00D2B9F2 /* TCCTileFetchOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCCTileFetchOperation.h; sourceTree = "<group>"; };
-		9BCEB604198C248B00D2B9F2 /* TCCTileFetchOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCCTileFetchOperation.m; sourceTree = "<group>"; };
+		AB4B16A4DA69B2A6187FF2E1 /* Pods-MapTileAnimationDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MapTileAnimationDemo.release.xcconfig"; path = "Pods/Target Support Files/Pods-MapTileAnimationDemo/Pods-MapTileAnimationDemo.release.xcconfig"; sourceTree = "<group>"; };
+		BEB23AB0ED13086226CA3462 /* Pods-MapTileAnimationDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MapTileAnimationDemo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-MapTileAnimationDemo/Pods-MapTileAnimationDemo.debug.xcconfig"; sourceTree = "<group>"; };
+		CDF8E1BCF52A9C58F3539AEA /* libPods-MapTileAnimationDemo.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-MapTileAnimationDemo.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,6 +56,7 @@
 				9B49BBC719490A5700094005 /* CoreGraphics.framework in Frameworks */,
 				9B49BBC919490A5700094005 /* UIKit.framework in Frameworks */,
 				9B49BBC519490A5700094005 /* Foundation.framework in Frameworks */,
+				45AF429585B80FCAB67C884A /* libPods-MapTileAnimationDemo.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -80,9 +67,9 @@
 			isa = PBXGroup;
 			children = (
 				9B49BBCA19490A5700094005 /* MapTileAnimationDemo */,
-				9B8B304E1980298D00EECFDC /* TCCMapTileAnimation */,
 				9B49BBC319490A5700094005 /* Frameworks */,
 				9B49BBC219490A5700094005 /* Products */,
+				D0D58A8C15E39283CBBE0CC5 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -102,6 +89,7 @@
 				9B49BBC619490A5700094005 /* CoreGraphics.framework */,
 				9B49BBC819490A5700094005 /* UIKit.framework */,
 				9B49BBE619490A5700094005 /* XCTest.framework */,
+				CDF8E1BCF52A9C58F3539AEA /* libPods-MapTileAnimationDemo.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -134,24 +122,13 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		9B8B304E1980298D00EECFDC /* TCCMapTileAnimation */ = {
+		D0D58A8C15E39283CBBE0CC5 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				9B8B30501980298D00EECFDC /* TCCAnimationTileOverlay.h */,
-				9B8B30511980298D00EECFDC /* TCCAnimationTileOverlay.m */,
-				9B8B30531980298D00EECFDC /* TCCAnimationTileOverlayRenderer.h */,
-				9B8B30541980298D00EECFDC /* TCCAnimationTileOverlayRenderer.m */,
-				9B8B30551980298D00EECFDC /* TCCAnimationTile.h */,
-				9B8B30561980298D00EECFDC /* TCCAnimationTile.m */,
-				9B8B30571980298D00EECFDC /* MKMapView+Extras.h */,
-				9B8B30581980298D00EECFDC /* MKMapView+Extras.m */,
-				8D2262DD19805EB10051CD47 /* TCCMapKitHelpers.h */,
-				8D2262DE19805EB10051CD47 /* TCCMapKitHelpers.m */,
-				9BCEB603198C248B00D2B9F2 /* TCCTileFetchOperation.h */,
-				9BCEB604198C248B00D2B9F2 /* TCCTileFetchOperation.m */,
+				BEB23AB0ED13086226CA3462 /* Pods-MapTileAnimationDemo.debug.xcconfig */,
+				AB4B16A4DA69B2A6187FF2E1 /* Pods-MapTileAnimationDemo.release.xcconfig */,
 			);
-			name = TCCMapTileAnimation;
-			path = ../TCCMapTileAnimation;
+			name = Pods;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -161,9 +138,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 9B49BBF619490A5700094005 /* Build configuration list for PBXNativeTarget "MapTileAnimationDemo" */;
 			buildPhases = (
+				3B0AE75CBB4BB57DB764AD7B /* Check Pods Manifest.lock */,
 				9B49BBBD19490A5700094005 /* Sources */,
 				9B49BBBE19490A5700094005 /* Frameworks */,
 				9B49BBBF19490A5700094005 /* Resources */,
+				E11600DEAEC98CB078D380B8 /* Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -216,20 +195,47 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		3B0AE75CBB4BB57DB764AD7B /* Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		E11600DEAEC98CB078D380B8 /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-MapTileAnimationDemo/Pods-MapTileAnimationDemo-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		9B49BBBD19490A5700094005 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9B8B305E1980298D00EECFDC /* MKMapView+Extras.m in Sources */,
-				9BCEB605198C248B00D2B9F2 /* TCCTileFetchOperation.m in Sources */,
-				9B8B305D1980298D00EECFDC /* TCCAnimationTile.m in Sources */,
-				9B8B305B1980298D00EECFDC /* TCCAnimationTileOverlay.m in Sources */,
 				9B49BC0119490AAE00094005 /* TCCTimeFrameParser.m in Sources */,
 				9B49BBD119490A5700094005 /* main.m in Sources */,
 				9B49BC0019490AAE00094005 /* TCCMapViewController.m in Sources */,
-				8D2262DF19805EB10051CD47 /* TCCMapKitHelpers.m in Sources */,
-				9B8B305C1980298D00EECFDC /* TCCAnimationTileOverlayRenderer.m in Sources */,
 				9B49BBD519490A5700094005 /* TCCAppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -338,6 +344,7 @@
 		};
 		9B49BBF719490A5700094005 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = BEB23AB0ED13086226CA3462 /* Pods-MapTileAnimationDemo.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
@@ -352,6 +359,7 @@
 		};
 		9B49BBF819490A5700094005 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = AB4B16A4DA69B2A6187FF2E1 /* Pods-MapTileAnimationDemo.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;

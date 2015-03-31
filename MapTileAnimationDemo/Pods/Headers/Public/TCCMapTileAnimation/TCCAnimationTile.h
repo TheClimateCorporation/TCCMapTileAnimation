@@ -1,0 +1,1 @@
+../../../../../TCCMapTileAnimation/TCCAnimationTile.h
