@@ -39,7 +39,7 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
                             maximumZ:(NSInteger)maximumZ
                             tileSize:(CGSize)tileSize
 {
-	if (self = [super init]) {
+    if (self = [super init]) {
         //Initialize network settings
         NSURLCache *URLCache = [[NSURLCache alloc] initWithMemoryCapacity:4 * 1024 * 1024
                                                              diskCapacity:32 * 1024 * 1024
@@ -48,22 +48,25 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
         configuration.URLCache = URLCache;
         _session = [NSURLSession sessionWithConfiguration:configuration];
         
-		_templateURLs = templateURLs;
-		_numberOfAnimationFrames = [templateURLs count];
-		_frameDuration = frameDuration;
-		_currentFrameIndex = 0;
-		_downloadQueue = [[NSOperationQueue alloc] init];
+        _templateURLs = templateURLs;
+        _numberOfAnimationFrames = [templateURLs count];
+        _frameDuration = frameDuration;
+        _currentFrameIndex = 0;
+        _downloadQueue = [[NSOperationQueue alloc] init];
         _downloadQueue.maxConcurrentOperationCount = 4;
-		
-		_currentAnimationState = TCCAnimationStateStopped;
-
+        if ([_downloadQueue respondsToSelector:@selector(setQualityOfService:)]) {
+            _downloadQueue.qualityOfService = NSOperationQualityOfServiceUserInitiated;
+        }
+        
+        _currentAnimationState = TCCAnimationStateStopped;
+        
         self.minimumZ = minimumZ;
         self.maximumZ = maximumZ;
         self.tileSize = tileSize;
         
         _staticTilesCache = [[NSCache alloc] init];
-	}
-	return self;
+    }
+    return self;
 }
 
 #pragma mark - Custom accessors
@@ -117,10 +120,10 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 
 - (void)pauseAnimating
 {
-	self.currentAnimationState = TCCAnimationStateStopped;
-	[self.timer invalidate];
+    self.currentAnimationState = TCCAnimationStateStopped;
+    [self.timer invalidate];
     [self.downloadQueue cancelAllOperations];
-	self.timer = nil;
+    self.timer = nil;
 }
 
 - (void)cancelLoading
