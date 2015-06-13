@@ -51,10 +51,7 @@
 {
     @try {
         // Always check for cancellation before launching the task.
-        if ([self isCancelled]) {
-            self.finished = YES;
-            return;
-        }
+        if ([self isCancelled]) return;
         
         self.executing = YES;
         
@@ -67,10 +64,7 @@
         NSURLResponse *response;
         NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
         
-        if ([self isCancelled]) {
-            self.executing = NO;
-            self.finished = YES;
-        };
+        if ([self isCancelled]) return;
         
         NSHTTPURLResponse *HTTPResponse = (NSHTTPURLResponse *)response;
         
@@ -85,6 +79,16 @@
     @catch(NSException *exception) {
         // Suppress exception - do not rethrow
     }
+}
+
+// Override cancel to ensure that the finished/executing status flags are set
+// when this operation is cancelled
+- (void)cancel
+{
+    [super cancel];
+    
+    self.isFinished = YES;
+    self.isExecuting = NO;
 }
 
 @end
