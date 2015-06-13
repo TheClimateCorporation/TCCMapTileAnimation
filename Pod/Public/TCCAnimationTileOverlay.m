@@ -150,8 +150,7 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
     
     // Cap the zoom level of the tiles to fetch if the current zoom scale is not
     // supported by the tile server
-    zoomLevel = MIN(zoomLevel, self.maximumZ);
-    zoomLevel = MAX(zoomLevel, self.minimumZ);
+    zoomLevel = MAX(MIN(zoomLevel, self.maximumZ), self.minimumZ);
     
     // Generate list of tiles on the screen to fetch
     self.animationTiles = [self mapTilesInMapRect:mapRect zoomLevel:zoomLevel];
