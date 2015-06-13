@@ -87,8 +87,8 @@
 {
     [super cancel];
     
-    self.isFinished = YES;
-    self.isExecuting = NO;
+    self.finished = YES;
+    self.executing = NO;
 }
 
 @end
