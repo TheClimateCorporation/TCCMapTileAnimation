@@ -7,238 +7,238 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		00DD0748D8BD482FFB97E035 /* TCCTileFetchOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 824B0021FB63FD18AA124D2C /* TCCTileFetchOperation.m */; };
-		23D331342C3217BAD6559ED5 /* TCCAnimationTileOverlay.h in Headers */ = {isa = PBXBuildFile; fileRef = 4084932F7FB080A2E6F9872E /* TCCAnimationTileOverlay.h */; };
-		2B1477F59C59A8809104DC3E /* TCCAnimationTile.h in Headers */ = {isa = PBXBuildFile; fileRef = 16D756AA3B1CAE69FD1F0F1C /* TCCAnimationTile.h */; };
-		31F91114B31BC721DD8925E4 /* MKMapView+Extras.m in Sources */ = {isa = PBXBuildFile; fileRef = 4A2CCAD023BD0D86740AD405 /* MKMapView+Extras.m */; };
-		3295326E5467B8B8910B344E /* TCCMapKitHelpers.h in Headers */ = {isa = PBXBuildFile; fileRef = AFFA5612672BEF6C69D3B07B /* TCCMapKitHelpers.h */; };
-		466F1193299A8C07907EC4B0 /* TCCMapKitHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 28C756AD05D48EC5BDCEA176 /* TCCMapKitHelpers.m */; };
-		53EEC1A1A29A45F6A860E660 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F3F806F4F42179618DFE5EB /* Foundation.framework */; };
-		59372C4B21C72F2C2975C1CF /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22E99B7DAA166F3B59C9EA2B /* MapKit.framework */; };
-		6996B8CBC9F0B86030D9366C /* TCCTileFetchOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 61043BD9E47FB3ED4452BCE7 /* TCCTileFetchOperation.h */; };
-		88731D4D6B316F1110B89F64 /* Pods-MapTileAnimationDemo-TCCMapTileAnimation-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 03DDA0A3F74A01F93E4EB282 /* Pods-MapTileAnimationDemo-TCCMapTileAnimation-dummy.m */; };
-		99158C7E721ABF7B91595EE6 /* TCCAnimationTileOverlayRenderer.h in Headers */ = {isa = PBXBuildFile; fileRef = 15E69E4796045ECAE96CB460 /* TCCAnimationTileOverlayRenderer.h */; };
-		9A6F07C88E3F03C3D0772BF4 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F3F806F4F42179618DFE5EB /* Foundation.framework */; };
-		A254F91CA5B13FF9F15F51AA /* TCCAnimationTileOverlayRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C67DE8534B80157149C9658 /* TCCAnimationTileOverlayRenderer.m */; };
-		A669A384A31BEBACC3EF02B4 /* TCCAnimationTile.m in Sources */ = {isa = PBXBuildFile; fileRef = 1CECFB07630EA42ACA4F1980 /* TCCAnimationTile.m */; };
-		A9781BD58CB0679D040C6DA0 /* TCCAnimationTileOverlay.m in Sources */ = {isa = PBXBuildFile; fileRef = 14FFE2208AA1035CF24F845B /* TCCAnimationTileOverlay.m */; };
-		BF82FCBBC5FCAD62F29B08BA /* Pods-MapTileAnimationDemo-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 178E1E1A1C1DD81EB18BC0BF /* Pods-MapTileAnimationDemo-dummy.m */; };
-		E2B8D95907D5D04477C30587 /* MKMapView+Extras.h in Headers */ = {isa = PBXBuildFile; fileRef = 293D9F79CD2FD830C116A847 /* MKMapView+Extras.h */; };
+		0C5F3BF31AECAE0B1C634BC8 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F834B7CBC846A0DD44F220B5 /* MapKit.framework */; };
+		2578122C9B8AC560795F5767 /* TCCAnimationTileOverlay.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B52F90380F97541030A5B80 /* TCCAnimationTileOverlay.m */; };
+		2791462384DE7F11629EB22C /* TCCAnimationTile.m in Sources */ = {isa = PBXBuildFile; fileRef = 367537F65A731901A584FC30 /* TCCAnimationTile.m */; };
+		2F4C289B9826C1314AF7D9E6 /* MKMapView+Extras.h in Headers */ = {isa = PBXBuildFile; fileRef = 18A6F7D80472C5D118528239 /* MKMapView+Extras.h */; };
+		418281484F3C06C38F2B81CD /* MKMapView+Extras.m in Sources */ = {isa = PBXBuildFile; fileRef = 9446D3A17BFB94903C47E769 /* MKMapView+Extras.m */; };
+		6B080307014B2DC034137BD5 /* Pods-MapTileAnimationDemo-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 43969C3CF02D38EC96208158 /* Pods-MapTileAnimationDemo-dummy.m */; };
+		6B93B107B39B63F0FF034516 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D630596EE59CBBB726A62C2 /* Foundation.framework */; };
+		6FC5D800565028AE4CE69B18 /* TCCAnimationTileOverlayRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = D5139429769F1265403D9E8B /* TCCAnimationTileOverlayRenderer.m */; };
+		76FF64E3DABCD2A5EDAFB28E /* TCCTileFetchOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = E5BCC88880683309DC91117C /* TCCTileFetchOperation.h */; };
+		805546CD0E5AA6DEDA339D0F /* TCCMapKitHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = DAE8237CC62558869ED01BC6 /* TCCMapKitHelpers.m */; };
+		9A645582ADAF20BEF4232DFF /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D630596EE59CBBB726A62C2 /* Foundation.framework */; };
+		A0A8DAE266B2A7A9E74CFFEE /* TCCTileFetchOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = AD3F32CCFC7F7E2E9C2A37B7 /* TCCTileFetchOperation.m */; };
+		A1134E99FA4B85700A6E807E /* TCCAnimationTile.h in Headers */ = {isa = PBXBuildFile; fileRef = AD4532BFF8A95E4C90FABDD1 /* TCCAnimationTile.h */; };
+		B1C04FDD122C383581DDE775 /* Pods-MapTileAnimationDemo-TCCMapTileAnimation-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 121455B58292220EC1B4A3A0 /* Pods-MapTileAnimationDemo-TCCMapTileAnimation-dummy.m */; };
+		E12C50FEBA9067537A08B5DF /* TCCMapKitHelpers.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B290E5BEC620C8E2588E46C /* TCCMapKitHelpers.h */; };
+		F28C4F32C1139D504A5E0BE9 /* TCCAnimationTileOverlayRenderer.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C2B5E22A59EB8A63B8E8507 /* TCCAnimationTileOverlayRenderer.h */; };
+		F6613F5CE75365C62AC880E4 /* TCCAnimationTileOverlay.h in Headers */ = {isa = PBXBuildFile; fileRef = F3F0CE0D862E31566C48B27E /* TCCAnimationTileOverlay.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		A28781FFCFBB842A1ABA0AD8 /* PBXContainerItemProxy */ = {
+		814DDB005535C385383635C8 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 45171C664DDF1C283E28732C /* Project object */;
+			containerPortal = EFB85C218670975861A59189 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = AA94C666A268C7EFE1AC203D;
+			remoteGlobalIDString = 8D89D316EBE3155F79C8ED31;
 			remoteInfo = "Pods-MapTileAnimationDemo-TCCMapTileAnimation";
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		03DDA0A3F74A01F93E4EB282 /* Pods-MapTileAnimationDemo-TCCMapTileAnimation-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-MapTileAnimationDemo-TCCMapTileAnimation-dummy.m"; sourceTree = "<group>"; };
-		14FFE2208AA1035CF24F845B /* TCCAnimationTileOverlay.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = TCCAnimationTileOverlay.m; sourceTree = "<group>"; };
-		15E69E4796045ECAE96CB460 /* TCCAnimationTileOverlayRenderer.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = TCCAnimationTileOverlayRenderer.h; sourceTree = "<group>"; };
-		16D756AA3B1CAE69FD1F0F1C /* TCCAnimationTile.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = TCCAnimationTile.h; sourceTree = "<group>"; };
-		178E1E1A1C1DD81EB18BC0BF /* Pods-MapTileAnimationDemo-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-MapTileAnimationDemo-dummy.m"; sourceTree = "<group>"; };
-		1CECFB07630EA42ACA4F1980 /* TCCAnimationTile.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = TCCAnimationTile.m; sourceTree = "<group>"; };
-		22E99B7DAA166F3B59C9EA2B /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk/System/Library/Frameworks/MapKit.framework; sourceTree = DEVELOPER_DIR; };
-		28C756AD05D48EC5BDCEA176 /* TCCMapKitHelpers.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = TCCMapKitHelpers.m; sourceTree = "<group>"; };
-		293D9F79CD2FD830C116A847 /* MKMapView+Extras.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "MKMapView+Extras.h"; sourceTree = "<group>"; };
-		33142A3840BFF4D84C01B7B7 /* Pods-MapTileAnimationDemo-TCCMapTileAnimation.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-MapTileAnimationDemo-TCCMapTileAnimation.xcconfig"; sourceTree = "<group>"; };
-		3CA05E8CE5FB0F37C1009475 /* Pods-MapTileAnimationDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-MapTileAnimationDemo.release.xcconfig"; sourceTree = "<group>"; };
-		4084932F7FB080A2E6F9872E /* TCCAnimationTileOverlay.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = TCCAnimationTileOverlay.h; sourceTree = "<group>"; };
-		4A2CCAD023BD0D86740AD405 /* MKMapView+Extras.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "MKMapView+Extras.m"; sourceTree = "<group>"; };
-		557C233EB15872E4E9E69E7F /* libPods-MapTileAnimationDemo.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-MapTileAnimationDemo.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		562BA4B4D84E39F6FB68459D /* Podfile */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
-		61043BD9E47FB3ED4452BCE7 /* TCCTileFetchOperation.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = TCCTileFetchOperation.h; sourceTree = "<group>"; };
-		6829EFF94C147971D4FB66B2 /* Pods-MapTileAnimationDemo-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-MapTileAnimationDemo-acknowledgements.plist"; sourceTree = "<group>"; };
-		6F3F806F4F42179618DFE5EB /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
-		7C67DE8534B80157149C9658 /* TCCAnimationTileOverlayRenderer.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = TCCAnimationTileOverlayRenderer.m; sourceTree = "<group>"; };
-		824B0021FB63FD18AA124D2C /* TCCTileFetchOperation.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = TCCTileFetchOperation.m; sourceTree = "<group>"; };
-		8BCE979BD12F1B9674FD0681 /* libPods-MapTileAnimationDemo-TCCMapTileAnimation.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-MapTileAnimationDemo-TCCMapTileAnimation.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		AFFA5612672BEF6C69D3B07B /* TCCMapKitHelpers.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = TCCMapKitHelpers.h; sourceTree = "<group>"; };
-		B6D4B0F5068601A9593EF771 /* Pods-MapTileAnimationDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-MapTileAnimationDemo.debug.xcconfig"; sourceTree = "<group>"; };
-		BAAAE4D39F960C0A34AD3189 /* Pods-MapTileAnimationDemo-TCCMapTileAnimation-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-MapTileAnimationDemo-TCCMapTileAnimation-prefix.pch"; sourceTree = "<group>"; };
-		C3E5FA477A02B91900252F0B /* Pods-MapTileAnimationDemo-TCCMapTileAnimation-Private.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-MapTileAnimationDemo-TCCMapTileAnimation-Private.xcconfig"; sourceTree = "<group>"; };
-		D4C656BE959803C8066F9C51 /* Pods-MapTileAnimationDemo-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-MapTileAnimationDemo-acknowledgements.markdown"; sourceTree = "<group>"; };
-		E61962346D1856BAA8B964BF /* Pods-MapTileAnimationDemo-environment.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-MapTileAnimationDemo-environment.h"; sourceTree = "<group>"; };
-		ECDF717D25A07B8855649610 /* Pods-MapTileAnimationDemo-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-MapTileAnimationDemo-resources.sh"; sourceTree = "<group>"; };
+		121455B58292220EC1B4A3A0 /* Pods-MapTileAnimationDemo-TCCMapTileAnimation-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-MapTileAnimationDemo-TCCMapTileAnimation-dummy.m"; sourceTree = "<group>"; };
+		18A6F7D80472C5D118528239 /* MKMapView+Extras.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "MKMapView+Extras.h"; sourceTree = "<group>"; };
+		1E8E683C58772717879E744B /* Pods-MapTileAnimationDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-MapTileAnimationDemo.debug.xcconfig"; sourceTree = "<group>"; };
+		367537F65A731901A584FC30 /* TCCAnimationTile.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = TCCAnimationTile.m; sourceTree = "<group>"; };
+		43969C3CF02D38EC96208158 /* Pods-MapTileAnimationDemo-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-MapTileAnimationDemo-dummy.m"; sourceTree = "<group>"; };
+		4A82E3022044BCB0A0C58B1B /* Podfile */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		4B290E5BEC620C8E2588E46C /* TCCMapKitHelpers.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = TCCMapKitHelpers.h; sourceTree = "<group>"; };
+		5B52F90380F97541030A5B80 /* TCCAnimationTileOverlay.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = TCCAnimationTileOverlay.m; sourceTree = "<group>"; };
+		6C2B5E22A59EB8A63B8E8507 /* TCCAnimationTileOverlayRenderer.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = TCCAnimationTileOverlayRenderer.h; sourceTree = "<group>"; };
+		72E863135F4539D051698071 /* libPods-MapTileAnimationDemo-TCCMapTileAnimation.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-MapTileAnimationDemo-TCCMapTileAnimation.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		74FE8A664760B1D6A3EE61D6 /* Pods-MapTileAnimationDemo-TCCMapTileAnimation-Private.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-MapTileAnimationDemo-TCCMapTileAnimation-Private.xcconfig"; sourceTree = "<group>"; };
+		8B5862FE0785346845AD4AB2 /* libPods-MapTileAnimationDemo.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-MapTileAnimationDemo.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		8CD850D929D5BB702DFA70D2 /* Pods-MapTileAnimationDemo-TCCMapTileAnimation-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-MapTileAnimationDemo-TCCMapTileAnimation-prefix.pch"; sourceTree = "<group>"; };
+		9446D3A17BFB94903C47E769 /* MKMapView+Extras.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "MKMapView+Extras.m"; sourceTree = "<group>"; };
+		9BF4685DE1352BB34FACD16B /* Pods-MapTileAnimationDemo-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-MapTileAnimationDemo-acknowledgements.markdown"; sourceTree = "<group>"; };
+		9D630596EE59CBBB726A62C2 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.3.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		AD3F32CCFC7F7E2E9C2A37B7 /* TCCTileFetchOperation.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = TCCTileFetchOperation.m; sourceTree = "<group>"; };
+		AD4532BFF8A95E4C90FABDD1 /* TCCAnimationTile.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = TCCAnimationTile.h; sourceTree = "<group>"; };
+		C3530C41BD53461750AEAE94 /* Pods-MapTileAnimationDemo-environment.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-MapTileAnimationDemo-environment.h"; sourceTree = "<group>"; };
+		C7CFD19E9DBC0631EC1562C4 /* Pods-MapTileAnimationDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-MapTileAnimationDemo.release.xcconfig"; sourceTree = "<group>"; };
+		D5139429769F1265403D9E8B /* TCCAnimationTileOverlayRenderer.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = TCCAnimationTileOverlayRenderer.m; sourceTree = "<group>"; };
+		DAE8237CC62558869ED01BC6 /* TCCMapKitHelpers.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = TCCMapKitHelpers.m; sourceTree = "<group>"; };
+		E5BCC88880683309DC91117C /* TCCTileFetchOperation.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = TCCTileFetchOperation.h; sourceTree = "<group>"; };
+		ECB5CBAA072126CCAA552468 /* Pods-MapTileAnimationDemo-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-MapTileAnimationDemo-resources.sh"; sourceTree = "<group>"; };
+		EE0722530C6DBC7AD381FCCE /* Pods-MapTileAnimationDemo-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-MapTileAnimationDemo-acknowledgements.plist"; sourceTree = "<group>"; };
+		F3F0CE0D862E31566C48B27E /* TCCAnimationTileOverlay.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = TCCAnimationTileOverlay.h; sourceTree = "<group>"; };
+		F834B7CBC846A0DD44F220B5 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.3.sdk/System/Library/Frameworks/MapKit.framework; sourceTree = DEVELOPER_DIR; };
+		FD5D6B2644F1AD0A377E7889 /* Pods-MapTileAnimationDemo-TCCMapTileAnimation.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-MapTileAnimationDemo-TCCMapTileAnimation.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		0B2DA9342C491EC669CB99D7 /* Frameworks */ = {
+		1C8055457537DED44BD497D6 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				53EEC1A1A29A45F6A860E660 /* Foundation.framework in Frameworks */,
+				6B93B107B39B63F0FF034516 /* Foundation.framework in Frameworks */,
+				0C5F3BF31AECAE0B1C634BC8 /* MapKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		7E106B83DDBBE09DC3C7B162 /* Frameworks */ = {
+		3FEBD33AAB98010F1605EE38 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9A6F07C88E3F03C3D0772BF4 /* Foundation.framework in Frameworks */,
-				59372C4B21C72F2C2975C1CF /* MapKit.framework in Frameworks */,
+				9A645582ADAF20BEF4232DFF /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		09102752B92B502935CA078F = {
+		09469C0D6B29BAC9EE16276F /* Public */ = {
 			isa = PBXGroup;
 			children = (
-				562BA4B4D84E39F6FB68459D /* Podfile */,
-				A03304BF1ECDB8B86D56185A /* Development Pods */,
-				16B0AB2ADCCD5070A9609CC0 /* Frameworks */,
-				ACAFBEF9DCCD2C3380C4E496 /* Products */,
-				808909D6FDF661BEF90B1D82 /* Targets Support Files */,
-			);
-			sourceTree = "<group>";
-		};
-		16B0AB2ADCCD5070A9609CC0 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				45134408E150B43A25EC3A7F /* iOS */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		35A80615CD9A189A9B840E39 /* TCCMapTileAnimation */ = {
-			isa = PBXGroup;
-			children = (
-				CEF4B44908E12D3C423B28D1 /* Pod */,
-				F77D70709822543CBFC1E7D9 /* Support Files */,
-			);
-			name = TCCMapTileAnimation;
-			path = ../..;
-			sourceTree = "<group>";
-		};
-		45134408E150B43A25EC3A7F /* iOS */ = {
-			isa = PBXGroup;
-			children = (
-				6F3F806F4F42179618DFE5EB /* Foundation.framework */,
-				22E99B7DAA166F3B59C9EA2B /* MapKit.framework */,
-			);
-			name = iOS;
-			sourceTree = "<group>";
-		};
-		5F71EF8B730CC03DCB198457 /* Public */ = {
-			isa = PBXGroup;
-			children = (
-				4084932F7FB080A2E6F9872E /* TCCAnimationTileOverlay.h */,
-				14FFE2208AA1035CF24F845B /* TCCAnimationTileOverlay.m */,
-				15E69E4796045ECAE96CB460 /* TCCAnimationTileOverlayRenderer.h */,
-				7C67DE8534B80157149C9658 /* TCCAnimationTileOverlayRenderer.m */,
+				F3F0CE0D862E31566C48B27E /* TCCAnimationTileOverlay.h */,
+				5B52F90380F97541030A5B80 /* TCCAnimationTileOverlay.m */,
+				6C2B5E22A59EB8A63B8E8507 /* TCCAnimationTileOverlayRenderer.h */,
+				D5139429769F1265403D9E8B /* TCCAnimationTileOverlayRenderer.m */,
 			);
 			path = Public;
 			sourceTree = "<group>";
 		};
-		68CE3418D3768E67FC447964 /* Private */ = {
+		2FA9EF2A7FEDD73D31D52566 /* Private */ = {
 			isa = PBXGroup;
 			children = (
-				293D9F79CD2FD830C116A847 /* MKMapView+Extras.h */,
-				4A2CCAD023BD0D86740AD405 /* MKMapView+Extras.m */,
-				16D756AA3B1CAE69FD1F0F1C /* TCCAnimationTile.h */,
-				1CECFB07630EA42ACA4F1980 /* TCCAnimationTile.m */,
-				AFFA5612672BEF6C69D3B07B /* TCCMapKitHelpers.h */,
-				28C756AD05D48EC5BDCEA176 /* TCCMapKitHelpers.m */,
-				61043BD9E47FB3ED4452BCE7 /* TCCTileFetchOperation.h */,
-				824B0021FB63FD18AA124D2C /* TCCTileFetchOperation.m */,
+				18A6F7D80472C5D118528239 /* MKMapView+Extras.h */,
+				9446D3A17BFB94903C47E769 /* MKMapView+Extras.m */,
+				AD4532BFF8A95E4C90FABDD1 /* TCCAnimationTile.h */,
+				367537F65A731901A584FC30 /* TCCAnimationTile.m */,
+				4B290E5BEC620C8E2588E46C /* TCCMapKitHelpers.h */,
+				DAE8237CC62558869ED01BC6 /* TCCMapKitHelpers.m */,
+				E5BCC88880683309DC91117C /* TCCTileFetchOperation.h */,
+				AD3F32CCFC7F7E2E9C2A37B7 /* TCCTileFetchOperation.m */,
 			);
 			path = Private;
 			sourceTree = "<group>";
 		};
-		70677480F6FCBDC58C9161CC /* Pods-MapTileAnimationDemo */ = {
+		518EA0AA6D9841183489D12D /* iOS */ = {
 			isa = PBXGroup;
 			children = (
-				D4C656BE959803C8066F9C51 /* Pods-MapTileAnimationDemo-acknowledgements.markdown */,
-				6829EFF94C147971D4FB66B2 /* Pods-MapTileAnimationDemo-acknowledgements.plist */,
-				178E1E1A1C1DD81EB18BC0BF /* Pods-MapTileAnimationDemo-dummy.m */,
-				E61962346D1856BAA8B964BF /* Pods-MapTileAnimationDemo-environment.h */,
-				ECDF717D25A07B8855649610 /* Pods-MapTileAnimationDemo-resources.sh */,
-				B6D4B0F5068601A9593EF771 /* Pods-MapTileAnimationDemo.debug.xcconfig */,
-				3CA05E8CE5FB0F37C1009475 /* Pods-MapTileAnimationDemo.release.xcconfig */,
+				9D630596EE59CBBB726A62C2 /* Foundation.framework */,
+				F834B7CBC846A0DD44F220B5 /* MapKit.framework */,
 			);
-			name = "Pods-MapTileAnimationDemo";
-			path = "Target Support Files/Pods-MapTileAnimationDemo";
+			name = iOS;
 			sourceTree = "<group>";
 		};
-		808909D6FDF661BEF90B1D82 /* Targets Support Files */ = {
+		6BE13CA1CAED2F68665515DC /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				70677480F6FCBDC58C9161CC /* Pods-MapTileAnimationDemo */,
-			);
-			name = "Targets Support Files";
-			sourceTree = "<group>";
-		};
-		A03304BF1ECDB8B86D56185A /* Development Pods */ = {
-			isa = PBXGroup;
-			children = (
-				35A80615CD9A189A9B840E39 /* TCCMapTileAnimation */,
-			);
-			name = "Development Pods";
-			sourceTree = "<group>";
-		};
-		ACAFBEF9DCCD2C3380C4E496 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				557C233EB15872E4E9E69E7F /* libPods-MapTileAnimationDemo.a */,
-				8BCE979BD12F1B9674FD0681 /* libPods-MapTileAnimationDemo-TCCMapTileAnimation.a */,
+				8B5862FE0785346845AD4AB2 /* libPods-MapTileAnimationDemo.a */,
+				72E863135F4539D051698071 /* libPods-MapTileAnimationDemo-TCCMapTileAnimation.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		CEF4B44908E12D3C423B28D1 /* Pod */ = {
+		7CF099A1851EF334E88579BB /* Support Files */ = {
 			isa = PBXGroup;
 			children = (
-				68CE3418D3768E67FC447964 /* Private */,
-				5F71EF8B730CC03DCB198457 /* Public */,
-			);
-			path = Pod;
-			sourceTree = "<group>";
-		};
-		F77D70709822543CBFC1E7D9 /* Support Files */ = {
-			isa = PBXGroup;
-			children = (
-				33142A3840BFF4D84C01B7B7 /* Pods-MapTileAnimationDemo-TCCMapTileAnimation.xcconfig */,
-				C3E5FA477A02B91900252F0B /* Pods-MapTileAnimationDemo-TCCMapTileAnimation-Private.xcconfig */,
-				03DDA0A3F74A01F93E4EB282 /* Pods-MapTileAnimationDemo-TCCMapTileAnimation-dummy.m */,
-				BAAAE4D39F960C0A34AD3189 /* Pods-MapTileAnimationDemo-TCCMapTileAnimation-prefix.pch */,
+				FD5D6B2644F1AD0A377E7889 /* Pods-MapTileAnimationDemo-TCCMapTileAnimation.xcconfig */,
+				74FE8A664760B1D6A3EE61D6 /* Pods-MapTileAnimationDemo-TCCMapTileAnimation-Private.xcconfig */,
+				121455B58292220EC1B4A3A0 /* Pods-MapTileAnimationDemo-TCCMapTileAnimation-dummy.m */,
+				8CD850D929D5BB702DFA70D2 /* Pods-MapTileAnimationDemo-TCCMapTileAnimation-prefix.pch */,
 			);
 			name = "Support Files";
 			path = "MapTileAnimationDemo/Pods/Target Support Files/Pods-MapTileAnimationDemo-TCCMapTileAnimation";
 			sourceTree = "<group>";
 		};
+		837BF186D42242F88B1E2585 /* Pod */ = {
+			isa = PBXGroup;
+			children = (
+				2FA9EF2A7FEDD73D31D52566 /* Private */,
+				09469C0D6B29BAC9EE16276F /* Public */,
+			);
+			path = Pod;
+			sourceTree = "<group>";
+		};
+		A79BB60817C8B898E968A0D8 = {
+			isa = PBXGroup;
+			children = (
+				4A82E3022044BCB0A0C58B1B /* Podfile */,
+				EFA72641B9658AB2B155D75C /* Development Pods */,
+				E794F673C7EC63B5B8768598 /* Frameworks */,
+				6BE13CA1CAED2F68665515DC /* Products */,
+				CED45E0C0F7436732AAAB137 /* Targets Support Files */,
+			);
+			sourceTree = "<group>";
+		};
+		CED45E0C0F7436732AAAB137 /* Targets Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				EA2EF8BE5659683613475AF6 /* Pods-MapTileAnimationDemo */,
+			);
+			name = "Targets Support Files";
+			sourceTree = "<group>";
+		};
+		E42D03B74EF2E592CF08A774 /* TCCMapTileAnimation */ = {
+			isa = PBXGroup;
+			children = (
+				837BF186D42242F88B1E2585 /* Pod */,
+				7CF099A1851EF334E88579BB /* Support Files */,
+			);
+			name = TCCMapTileAnimation;
+			path = ../..;
+			sourceTree = "<group>";
+		};
+		E794F673C7EC63B5B8768598 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				518EA0AA6D9841183489D12D /* iOS */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		EA2EF8BE5659683613475AF6 /* Pods-MapTileAnimationDemo */ = {
+			isa = PBXGroup;
+			children = (
+				9BF4685DE1352BB34FACD16B /* Pods-MapTileAnimationDemo-acknowledgements.markdown */,
+				EE0722530C6DBC7AD381FCCE /* Pods-MapTileAnimationDemo-acknowledgements.plist */,
+				43969C3CF02D38EC96208158 /* Pods-MapTileAnimationDemo-dummy.m */,
+				C3530C41BD53461750AEAE94 /* Pods-MapTileAnimationDemo-environment.h */,
+				ECB5CBAA072126CCAA552468 /* Pods-MapTileAnimationDemo-resources.sh */,
+				1E8E683C58772717879E744B /* Pods-MapTileAnimationDemo.debug.xcconfig */,
+				C7CFD19E9DBC0631EC1562C4 /* Pods-MapTileAnimationDemo.release.xcconfig */,
+			);
+			name = "Pods-MapTileAnimationDemo";
+			path = "Target Support Files/Pods-MapTileAnimationDemo";
+			sourceTree = "<group>";
+		};
+		EFA72641B9658AB2B155D75C /* Development Pods */ = {
+			isa = PBXGroup;
+			children = (
+				E42D03B74EF2E592CF08A774 /* TCCMapTileAnimation */,
+			);
+			name = "Development Pods";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
-		225DFE48165393A4BD05B995 /* Headers */ = {
+		03C5593ABB4FF7D3D450F8C0 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E2B8D95907D5D04477C30587 /* MKMapView+Extras.h in Headers */,
-				2B1477F59C59A8809104DC3E /* TCCAnimationTile.h in Headers */,
-				23D331342C3217BAD6559ED5 /* TCCAnimationTileOverlay.h in Headers */,
-				99158C7E721ABF7B91595EE6 /* TCCAnimationTileOverlayRenderer.h in Headers */,
-				3295326E5467B8B8910B344E /* TCCMapKitHelpers.h in Headers */,
-				6996B8CBC9F0B86030D9366C /* TCCTileFetchOperation.h in Headers */,
+				2F4C289B9826C1314AF7D9E6 /* MKMapView+Extras.h in Headers */,
+				A1134E99FA4B85700A6E807E /* TCCAnimationTile.h in Headers */,
+				F6613F5CE75365C62AC880E4 /* TCCAnimationTileOverlay.h in Headers */,
+				F28C4F32C1139D504A5E0BE9 /* TCCAnimationTileOverlayRenderer.h in Headers */,
+				E12C50FEBA9067537A08B5DF /* TCCMapKitHelpers.h in Headers */,
+				76FF64E3DABCD2A5EDAFB28E /* TCCTileFetchOperation.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		AA94C666A268C7EFE1AC203D /* Pods-MapTileAnimationDemo-TCCMapTileAnimation */ = {
+		8D89D316EBE3155F79C8ED31 /* Pods-MapTileAnimationDemo-TCCMapTileAnimation */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = C137B3A5FD598DB2270592DB /* Build configuration list for PBXNativeTarget "Pods-MapTileAnimationDemo-TCCMapTileAnimation" */;
+			buildConfigurationList = 93FF54C7AC680A799537FCC7 /* Build configuration list for PBXNativeTarget "Pods-MapTileAnimationDemo-TCCMapTileAnimation" */;
 			buildPhases = (
-				DF260AF1D38035DB055BA631 /* Sources */,
-				7E106B83DDBBE09DC3C7B162 /* Frameworks */,
-				225DFE48165393A4BD05B995 /* Headers */,
+				6A06C1D488657397E64AE522 /* Sources */,
+				1C8055457537DED44BD497D6 /* Frameworks */,
+				03C5593ABB4FF7D3D450F8C0 /* Headers */,
 			);
 			buildRules = (
 			);
@@ -246,156 +246,90 @@
 			);
 			name = "Pods-MapTileAnimationDemo-TCCMapTileAnimation";
 			productName = "Pods-MapTileAnimationDemo-TCCMapTileAnimation";
-			productReference = 8BCE979BD12F1B9674FD0681 /* libPods-MapTileAnimationDemo-TCCMapTileAnimation.a */;
+			productReference = 72E863135F4539D051698071 /* libPods-MapTileAnimationDemo-TCCMapTileAnimation.a */;
 			productType = "com.apple.product-type.library.static";
 		};
-		FA6B3F1E5EA68704407516A2 /* Pods-MapTileAnimationDemo */ = {
+		93FFD35F7546911720640C34 /* Pods-MapTileAnimationDemo */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = FF17A7FBC7E6770EFD3608FB /* Build configuration list for PBXNativeTarget "Pods-MapTileAnimationDemo" */;
+			buildConfigurationList = A1753530435E1A06873905CB /* Build configuration list for PBXNativeTarget "Pods-MapTileAnimationDemo" */;
 			buildPhases = (
-				4C0DC0328B597419FCE2373D /* Sources */,
-				0B2DA9342C491EC669CB99D7 /* Frameworks */,
+				7E2CC9087B1CE584EA139ABB /* Sources */,
+				3FEBD33AAB98010F1605EE38 /* Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				986A078CB405109C7F26424F /* PBXTargetDependency */,
+				2312891789C51F84EB643127 /* PBXTargetDependency */,
 			);
 			name = "Pods-MapTileAnimationDemo";
 			productName = "Pods-MapTileAnimationDemo";
-			productReference = 557C233EB15872E4E9E69E7F /* libPods-MapTileAnimationDemo.a */;
+			productReference = 8B5862FE0785346845AD4AB2 /* libPods-MapTileAnimationDemo.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		45171C664DDF1C283E28732C /* Project object */ = {
+		EFB85C218670975861A59189 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0510;
+				LastUpgradeCheck = 0640;
 			};
-			buildConfigurationList = 449BC7CA0C03DE02626ABDBE /* Build configuration list for PBXProject "Pods" */;
+			buildConfigurationList = 6ABEC79C8E2E11C3CBF3E216 /* Build configuration list for PBXProject "Pods" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 			);
-			mainGroup = 09102752B92B502935CA078F;
-			productRefGroup = ACAFBEF9DCCD2C3380C4E496 /* Products */;
+			mainGroup = A79BB60817C8B898E968A0D8;
+			productRefGroup = 6BE13CA1CAED2F68665515DC /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				FA6B3F1E5EA68704407516A2 /* Pods-MapTileAnimationDemo */,
-				AA94C666A268C7EFE1AC203D /* Pods-MapTileAnimationDemo-TCCMapTileAnimation */,
+				93FFD35F7546911720640C34 /* Pods-MapTileAnimationDemo */,
+				8D89D316EBE3155F79C8ED31 /* Pods-MapTileAnimationDemo-TCCMapTileAnimation */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
-		4C0DC0328B597419FCE2373D /* Sources */ = {
+		6A06C1D488657397E64AE522 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BF82FCBBC5FCAD62F29B08BA /* Pods-MapTileAnimationDemo-dummy.m in Sources */,
+				418281484F3C06C38F2B81CD /* MKMapView+Extras.m in Sources */,
+				B1C04FDD122C383581DDE775 /* Pods-MapTileAnimationDemo-TCCMapTileAnimation-dummy.m in Sources */,
+				2791462384DE7F11629EB22C /* TCCAnimationTile.m in Sources */,
+				2578122C9B8AC560795F5767 /* TCCAnimationTileOverlay.m in Sources */,
+				6FC5D800565028AE4CE69B18 /* TCCAnimationTileOverlayRenderer.m in Sources */,
+				805546CD0E5AA6DEDA339D0F /* TCCMapKitHelpers.m in Sources */,
+				A0A8DAE266B2A7A9E74CFFEE /* TCCTileFetchOperation.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		DF260AF1D38035DB055BA631 /* Sources */ = {
+		7E2CC9087B1CE584EA139ABB /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				31F91114B31BC721DD8925E4 /* MKMapView+Extras.m in Sources */,
-				88731D4D6B316F1110B89F64 /* Pods-MapTileAnimationDemo-TCCMapTileAnimation-dummy.m in Sources */,
-				A669A384A31BEBACC3EF02B4 /* TCCAnimationTile.m in Sources */,
-				A9781BD58CB0679D040C6DA0 /* TCCAnimationTileOverlay.m in Sources */,
-				A254F91CA5B13FF9F15F51AA /* TCCAnimationTileOverlayRenderer.m in Sources */,
-				466F1193299A8C07907EC4B0 /* TCCMapKitHelpers.m in Sources */,
-				00DD0748D8BD482FFB97E035 /* TCCTileFetchOperation.m in Sources */,
+				6B080307014B2DC034137BD5 /* Pods-MapTileAnimationDemo-dummy.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		986A078CB405109C7F26424F /* PBXTargetDependency */ = {
+		2312891789C51F84EB643127 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = "Pods-MapTileAnimationDemo-TCCMapTileAnimation";
-			target = AA94C666A268C7EFE1AC203D /* Pods-MapTileAnimationDemo-TCCMapTileAnimation */;
-			targetProxy = A28781FFCFBB842A1ABA0AD8 /* PBXContainerItemProxy */;
+			target = 8D89D316EBE3155F79C8ED31 /* Pods-MapTileAnimationDemo-TCCMapTileAnimation */;
+			targetProxy = 814DDB005535C385383635C8 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		1FA6BCD92517AAF790F13FDD /* Release */ = {
+		12DF4910E7FD390C9B8CAC29 /* Release */ = {
 			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				COPY_PHASE_STRIP = YES;
-				ENABLE_NS_ASSERTIONS = NO;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_PREPROCESSOR_DEFINITIONS = "RELEASE=1";
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
-				STRIP_INSTALLED_PRODUCT = NO;
-				SYMROOT = "${SRCROOT}/../build";
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		5C3B89D0804E5AC6FFB115DA /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = C3E5FA477A02B91900252F0B /* Pods-MapTileAnimationDemo-TCCMapTileAnimation-Private.xcconfig */;
-			buildSettings = {
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_PREFIX_HEADER = "Target Support Files/Pods-MapTileAnimationDemo-TCCMapTileAnimation/Pods-MapTileAnimationDemo-TCCMapTileAnimation-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
-				MTL_ENABLE_DEBUG_INFO = NO;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-			};
-			name = Release;
-		};
-		A1EE3BB6F6BF77C656F77A04 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = C3E5FA477A02B91900252F0B /* Pods-MapTileAnimationDemo-TCCMapTileAnimation-Private.xcconfig */;
-			buildSettings = {
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_PREFIX_HEADER = "Target Support Files/Pods-MapTileAnimationDemo-TCCMapTileAnimation/Pods-MapTileAnimationDemo-TCCMapTileAnimation-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
-				MTL_ENABLE_DEBUG_INFO = YES;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-			};
-			name = Debug;
-		};
-		AC7B73AB3D9C0559F8FF9211 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3CA05E8CE5FB0F37C1009475 /* Pods-MapTileAnimationDemo.release.xcconfig */;
+			baseConfigurationReference = C7CFD19E9DBC0631EC1562C4 /* Pods-MapTileAnimationDemo.release.xcconfig */;
 			buildSettings = {
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
@@ -409,9 +343,9 @@
 			};
 			name = Release;
 		};
-		C415FCEDE5991F817C15BDF4 /* Debug */ = {
+		141D0C246EDFD7630E3C5526 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = B6D4B0F5068601A9593EF771 /* Pods-MapTileAnimationDemo.debug.xcconfig */;
+			baseConfigurationReference = 1E8E683C58772717879E744B /* Pods-MapTileAnimationDemo.debug.xcconfig */;
 			buildSettings = {
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
@@ -425,7 +359,7 @@
 			};
 			name = Debug;
 		};
-		C9BF1DDC79E6780F45EE66EF /* Debug */ = {
+		158F8CFF5F5EB0CA11C356CA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -464,37 +398,103 @@
 			};
 			name = Debug;
 		};
+		3815C308F5E7A5F7914CC518 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 74FE8A664760B1D6A3EE61D6 /* Pods-MapTileAnimationDemo-TCCMapTileAnimation-Private.xcconfig */;
+			buildSettings = {
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_PREFIX_HEADER = "Target Support Files/Pods-MapTileAnimationDemo-TCCMapTileAnimation/Pods-MapTileAnimationDemo-TCCMapTileAnimation-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		72EC07F9F6A09EAFCC17717D /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 74FE8A664760B1D6A3EE61D6 /* Pods-MapTileAnimationDemo-TCCMapTileAnimation-Private.xcconfig */;
+			buildSettings = {
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_PREFIX_HEADER = "Target Support Files/Pods-MapTileAnimationDemo-TCCMapTileAnimation/Pods-MapTileAnimationDemo-TCCMapTileAnimation-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		F596D049FAEAC13E446D8D2F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_PREPROCESSOR_DEFINITIONS = "RELEASE=1";
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				STRIP_INSTALLED_PRODUCT = NO;
+				SYMROOT = "${SRCROOT}/../build";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		449BC7CA0C03DE02626ABDBE /* Build configuration list for PBXProject "Pods" */ = {
+		6ABEC79C8E2E11C3CBF3E216 /* Build configuration list for PBXProject "Pods" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				C9BF1DDC79E6780F45EE66EF /* Debug */,
-				1FA6BCD92517AAF790F13FDD /* Release */,
+				158F8CFF5F5EB0CA11C356CA /* Debug */,
+				F596D049FAEAC13E446D8D2F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C137B3A5FD598DB2270592DB /* Build configuration list for PBXNativeTarget "Pods-MapTileAnimationDemo-TCCMapTileAnimation" */ = {
+		93FF54C7AC680A799537FCC7 /* Build configuration list for PBXNativeTarget "Pods-MapTileAnimationDemo-TCCMapTileAnimation" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				A1EE3BB6F6BF77C656F77A04 /* Debug */,
-				5C3B89D0804E5AC6FFB115DA /* Release */,
+				3815C308F5E7A5F7914CC518 /* Debug */,
+				72EC07F9F6A09EAFCC17717D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		FF17A7FBC7E6770EFD3608FB /* Build configuration list for PBXNativeTarget "Pods-MapTileAnimationDemo" */ = {
+		A1753530435E1A06873905CB /* Build configuration list for PBXNativeTarget "Pods-MapTileAnimationDemo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				C415FCEDE5991F817C15BDF4 /* Debug */,
-				AC7B73AB3D9C0559F8FF9211 /* Release */,
+				141D0C246EDFD7630E3C5526 /* Debug */,
+				12DF4910E7FD390C9B8CAC29 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 45171C664DDF1C283E28732C /* Project object */;
+	rootObject = EFB85C218670975861A59189 /* Project object */;
 }

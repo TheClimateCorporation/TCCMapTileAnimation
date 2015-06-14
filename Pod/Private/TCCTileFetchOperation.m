@@ -51,17 +51,9 @@
 {
     @try {
         // Always check for cancellation before launching the task.
-        if ([self isCancelled]) {
-            // Must move the operation to the finished state if it is canceled.
-            [self willChangeValueForKey:@"isFinished"];
-            self.finished = YES;
-            [self didChangeValueForKey:@"isFinished"];
-            return;
-        }
+        if ([self isCancelled]) return;
         
-        [self willChangeValueForKey:@"isExecuting"];
         self.executing = YES;
-        [self didChangeValueForKey:@"isExecuting"];
         
         // If the operation is not canceled, begin executing the task.
         NSURLRequest *request = [[NSURLRequest alloc] initWithURL:self.tileURL
@@ -81,18 +73,22 @@
             self.tileImage = [UIImage imageWithData:data];
         }
         
-        [self willChangeValueForKey:@"isFinished"];
-        [self willChangeValueForKey:@"isExecuting"];
-        
         self.executing = NO;
-        self.finished = YES;
-        
-        [self didChangeValueForKey:@"isFinished"];
-        [self didChangeValueForKey:@"isExecuting"];
+        self.finished = YES;        
     }
     @catch(NSException *exception) {
         // Suppress exception - do not rethrow
     }
+}
+
+// Override cancel to ensure that the finished/executing status flags are set
+// when this operation is cancelled
+- (void)cancel
+{
+    [super cancel];
+    
+    self.finished = YES;
+    self.executing = NO;
 }
 
 @end
