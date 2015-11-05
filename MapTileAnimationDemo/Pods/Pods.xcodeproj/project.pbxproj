@@ -14,6 +14,8 @@
 		7F476F922A4D24459989455126120710 /* Pods-MapTileAnimationDemo-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = B06BE246A4322F7F284A186CD4667F64 /* Pods-MapTileAnimationDemo-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8FF524A8F6FBE7134AA40654357D9F9D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 936AF610DECA8C0DD3EA30897785E36F /* Foundation.framework */; };
 		9814D0E0467F6D78522B1626D2553627 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FD8DD2E1945E8B43854C693150FE2416 /* MapKit.framework */; };
+		A47AD7201BEC0B24007F997C /* TCCAnimationTile.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47AD71F1BEC0B24007F997C /* TCCAnimationTile.swift */; };
+		A47AD7221BEC0D65007F997C /* TCCAnimationTileOverlayRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47AD7211BEC0D65007F997C /* TCCAnimationTileOverlayRenderer.swift */; };
 		CB0C1470CB0309A867D51E6DDFF2837E /* TCCMapTileAnimation-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A12C767FC37A7607B0E69685D463D99 /* TCCMapTileAnimation-dummy.m */; };
 		FB87C19639763C0363BC290146BEF87C /* Pods-MapTileAnimationDemo-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C7CF78BF1CB252454315A0B5CDAB8C3 /* Pods-MapTileAnimationDemo-dummy.m */; };
 /* End PBXBuildFile section */
@@ -45,6 +47,8 @@
 		936AF610DECA8C0DD3EA30897785E36F /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS9.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		A47AD71B1BEBE2FE007F997C /* Private */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Private; sourceTree = "<group>"; };
 		A47AD71C1BEBE2FE007F997C /* Public */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Public; sourceTree = "<group>"; };
+		A47AD71F1BEC0B24007F997C /* TCCAnimationTile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCCAnimationTile.swift; sourceTree = "<group>"; };
+		A47AD7211BEC0D65007F997C /* TCCAnimationTileOverlayRenderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCCAnimationTileOverlayRenderer.swift; sourceTree = "<group>"; };
 		B06BE246A4322F7F284A186CD4667F64 /* Pods-MapTileAnimationDemo-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-MapTileAnimationDemo-umbrella.h"; sourceTree = "<group>"; };
 		B59EDDA8225DD9239B13552B7A6FC275 /* TCCMapTileAnimation-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "TCCMapTileAnimation-umbrella.h"; sourceTree = "<group>"; };
 		BA6428E9F66FD5A23C0A2E06ED26CD2F /* Podfile */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
@@ -178,6 +182,8 @@
 			children = (
 				29A8A4AAB8C40F064812168E9002FFA3 /* TCCAnimationTileOverlay.swift */,
 				8C70662FA0A52B6DD68D833EFD2420C4 /* TCCConstants.swift */,
+				A47AD71F1BEC0B24007F997C /* TCCAnimationTile.swift */,
+				A47AD7211BEC0D65007F997C /* TCCAnimationTileOverlayRenderer.swift */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -254,7 +260,7 @@
 		D41D8CD98F00B204E9800998ECF8427E /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 0700;
+				LastSwiftUpdateCheck = 0710;
 				LastUpgradeCheck = 0700;
 			};
 			buildConfigurationList = 2D8E8EC45A3A1A1D94AE762CB5028504 /* Build configuration list for PBXProject "Pods" */;
@@ -280,7 +286,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A47AD7221BEC0D65007F997C /* TCCAnimationTileOverlayRenderer.swift in Sources */,
 				FB87C19639763C0363BC290146BEF87C /* Pods-MapTileAnimationDemo-dummy.m in Sources */,
+				A47AD7201BEC0B24007F997C /* TCCAnimationTile.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -338,6 +346,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 11D77A60A864F71293541DC4160A8CEA /* Pods-MapTileAnimationDemo.release.xcconfig */;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
@@ -468,6 +477,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 3AD79E0E95D3CE3A69B98F2F48D7C321 /* Pods-MapTileAnimationDemo.debug.xcconfig */;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
