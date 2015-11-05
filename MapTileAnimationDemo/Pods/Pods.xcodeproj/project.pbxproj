@@ -43,8 +43,8 @@
 		5B0AB7435BD3FD9BAE9347BB883965C8 /* Pods-MapTileAnimationDemo-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-MapTileAnimationDemo-resources.sh"; sourceTree = "<group>"; };
 		8C70662FA0A52B6DD68D833EFD2420C4 /* TCCConstants.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TCCConstants.swift; sourceTree = "<group>"; };
 		936AF610DECA8C0DD3EA30897785E36F /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS9.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
-		A48B31681BEBCC66009DF31A /* Public */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Public; sourceTree = "<group>"; };
-		A48B31691BEBCC6B009DF31A /* Private */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Private; sourceTree = "<group>"; };
+		A47AD71B1BEBE2FE007F997C /* Private */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Private; sourceTree = "<group>"; };
+		A47AD71C1BEBE2FE007F997C /* Public */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Public; sourceTree = "<group>"; };
 		B06BE246A4322F7F284A186CD4667F64 /* Pods-MapTileAnimationDemo-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-MapTileAnimationDemo-umbrella.h"; sourceTree = "<group>"; };
 		B59EDDA8225DD9239B13552B7A6FC275 /* TCCMapTileAnimation-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "TCCMapTileAnimation-umbrella.h"; sourceTree = "<group>"; };
 		BA6428E9F66FD5A23C0A2E06ED26CD2F /* Podfile */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
@@ -150,8 +150,8 @@
 		92C8427882DC3B025268B1DAEB9B7170 /* Pod */ = {
 			isa = PBXGroup;
 			children = (
-				A48B31691BEBCC6B009DF31A /* Private */,
-				A48B31681BEBCC66009DF31A /* Public */,
+				A47AD71B1BEBE2FE007F997C /* Private */,
+				A47AD71C1BEBE2FE007F997C /* Public */,
 				C1DDB1768E6CBAFDECEB66688AA79655 /* Classes */,
 			);
 			path = Pod;

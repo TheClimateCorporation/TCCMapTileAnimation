@@ -15,14 +15,16 @@
 		9B49BBCF19490A5700094005 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 9B49BBCD19490A5700094005 /* InfoPlist.strings */; };
 		9B49BBD119490A5700094005 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B49BBD019490A5700094005 /* main.m */; };
 		9B49BBD519490A5700094005 /* TCCAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B49BBD419490A5700094005 /* TCCAppDelegate.m */; };
-		9B49BBD819490A5700094005 /* Main_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9B49BBD619490A5700094005 /* Main_iPhone.storyboard */; };
-		9B49BBDB19490A5700094005 /* Main_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9B49BBD919490A5700094005 /* Main_iPad.storyboard */; };
+		9B49BBD819490A5700094005 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9B49BBD619490A5700094005 /* Main.storyboard */; };
 		9B49BBE019490A5700094005 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9B49BBDF19490A5700094005 /* Images.xcassets */; };
 		9B49BC0019490AAE00094005 /* TCCMapViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B49BBFD19490AAE00094005 /* TCCMapViewController.m */; };
 		9B49BC0119490AAE00094005 /* TCCTimeFrameParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B49BBFF19490AAE00094005 /* TCCTimeFrameParser.m */; };
+		A47AD71E1BEBE3A8007F997C /* TCCMapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47AD71D1BEBE3A8007F997C /* TCCMapViewController.swift */; };
+		B0547224E449894B36A51854 /* Pods_MapTileAnimationDemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04B88D669965FDB30431C7AE /* Pods_MapTileAnimationDemo.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		04B88D669965FDB30431C7AE /* Pods_MapTileAnimationDemo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MapTileAnimationDemo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3269A4F1194911C2003F1AE3 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		6753B9731BEBC04B00A27C02 /* Launch Screen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
 		9B49BBC119490A5700094005 /* MapTileAnimationDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MapTileAnimationDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -35,14 +37,14 @@
 		9B49BBD219490A5700094005 /* MapTileAnimationDemo-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "MapTileAnimationDemo-Prefix.pch"; sourceTree = "<group>"; };
 		9B49BBD319490A5700094005 /* TCCAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TCCAppDelegate.h; sourceTree = "<group>"; };
 		9B49BBD419490A5700094005 /* TCCAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TCCAppDelegate.m; sourceTree = "<group>"; };
-		9B49BBD719490A5700094005 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPhone.storyboard; sourceTree = "<group>"; };
-		9B49BBDA19490A5700094005 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPad.storyboard; sourceTree = "<group>"; };
+		9B49BBD719490A5700094005 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		9B49BBDF19490A5700094005 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		9B49BBE619490A5700094005 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		9B49BBFC19490AAE00094005 /* TCCMapViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCCMapViewController.h; sourceTree = "<group>"; };
 		9B49BBFD19490AAE00094005 /* TCCMapViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCCMapViewController.m; sourceTree = "<group>"; };
 		9B49BBFE19490AAE00094005 /* TCCTimeFrameParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCCTimeFrameParser.h; sourceTree = "<group>"; };
 		9B49BBFF19490AAE00094005 /* TCCTimeFrameParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCCTimeFrameParser.m; sourceTree = "<group>"; };
+		A47AD71D1BEBE3A8007F997C /* TCCMapViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCCMapViewController.swift; sourceTree = "<group>"; };
 		AB4B16A4DA69B2A6187FF2E1 /* Pods-MapTileAnimationDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MapTileAnimationDemo.release.xcconfig"; path = "Pods/Target Support Files/Pods-MapTileAnimationDemo/Pods-MapTileAnimationDemo.release.xcconfig"; sourceTree = "<group>"; };
 		BEB23AB0ED13086226CA3462 /* Pods-MapTileAnimationDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MapTileAnimationDemo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-MapTileAnimationDemo/Pods-MapTileAnimationDemo.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -56,6 +58,7 @@
 				9B49BBC719490A5700094005 /* CoreGraphics.framework in Frameworks */,
 				9B49BBC919490A5700094005 /* UIKit.framework in Frameworks */,
 				9B49BBC519490A5700094005 /* Foundation.framework in Frameworks */,
+				B0547224E449894B36A51854 /* Pods_MapTileAnimationDemo.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -88,6 +91,7 @@
 				9B49BBC619490A5700094005 /* CoreGraphics.framework */,
 				9B49BBC819490A5700094005 /* UIKit.framework */,
 				9B49BBE619490A5700094005 /* XCTest.framework */,
+				04B88D669965FDB30431C7AE /* Pods_MapTileAnimationDemo.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -99,9 +103,9 @@
 				9B49BBFD19490AAE00094005 /* TCCMapViewController.m */,
 				9B49BBFE19490AAE00094005 /* TCCTimeFrameParser.h */,
 				9B49BBFF19490AAE00094005 /* TCCTimeFrameParser.m */,
-				9B49BBD619490A5700094005 /* Main_iPhone.storyboard */,
-				9B49BBD919490A5700094005 /* Main_iPad.storyboard */,
+				9B49BBD619490A5700094005 /* Main.storyboard */,
 				9B49BBCB19490A5700094005 /* Supporting Files */,
+				A47AD71D1BEBE3A8007F997C /* TCCMapViewController.swift */,
 			);
 			path = MapTileAnimationDemo;
 			sourceTree = "<group>";
@@ -186,9 +190,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9B49BBDB19490A5700094005 /* Main_iPad.storyboard in Resources */,
 				9B49BBE019490A5700094005 /* Images.xcassets in Resources */,
-				9B49BBD819490A5700094005 /* Main_iPhone.storyboard in Resources */,
+				9B49BBD819490A5700094005 /* Main.storyboard in Resources */,
 				6753B9741BEBC04B00A27C02 /* Launch Screen.storyboard in Resources */,
 				9B49BBCF19490A5700094005 /* InfoPlist.strings in Resources */,
 			);
@@ -250,6 +253,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9B49BC0119490AAE00094005 /* TCCTimeFrameParser.m in Sources */,
+				A47AD71E1BEBE3A8007F997C /* TCCMapViewController.swift in Sources */,
 				9B49BBD119490A5700094005 /* main.m in Sources */,
 				9B49BC0019490AAE00094005 /* TCCMapViewController.m in Sources */,
 				9B49BBD519490A5700094005 /* TCCAppDelegate.m in Sources */,
@@ -267,20 +271,12 @@
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
-		9B49BBD619490A5700094005 /* Main_iPhone.storyboard */ = {
+		9B49BBD619490A5700094005 /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
 				9B49BBD719490A5700094005 /* Base */,
 			);
-			name = Main_iPhone.storyboard;
-			sourceTree = "<group>";
-		};
-		9B49BBD919490A5700094005 /* Main_iPad.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				9B49BBDA19490A5700094005 /* Base */,
-			);
-			name = Main_iPad.storyboard;
+			name = Main.storyboard;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -365,12 +361,15 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CLANG_ENABLE_MODULES = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "MapTileAnimationDemo/MapTileAnimationDemo-Prefix.pch";
 				INFOPLIST_FILE = "MapTileAnimationDemo/MapTileAnimationDemo-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.TCC.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -381,10 +380,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CLANG_ENABLE_MODULES = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "MapTileAnimationDemo/MapTileAnimationDemo-Prefix.pch";
 				INFOPLIST_FILE = "MapTileAnimationDemo/MapTileAnimationDemo-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.TCC.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
