@@ -118,6 +118,7 @@
 				9B49BBCD19490A5700094005 /* InfoPlist.strings */,
 				9B49BBD019490A5700094005 /* main.m */,
 				9B49BBD219490A5700094005 /* MapTileAnimationDemo-Prefix.pch */,
+				6753B9731BEBC04B00A27C02 /* Launch Screen.storyboard */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -190,6 +191,7 @@
 				9B49BBDB19490A5700094005 /* Main_iPad.storyboard in Resources */,
 				9B49BBE019490A5700094005 /* Images.xcassets in Resources */,
 				9B49BBD819490A5700094005 /* Main_iPhone.storyboard in Resources */,
+				6753B9741BEBC04B00A27C02 /* Launch Screen.storyboard in Resources */,
 				9B49BBCF19490A5700094005 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
