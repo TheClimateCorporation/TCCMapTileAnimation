@@ -7,21 +7,22 @@
 //
 
 import UIKit
+import MapKit
 
 @objc protocol TCCAnimationTileOverlayDelegate {
     func animationTileOverlay(animationTileOverlay: TCCAnimationTileOverlay, didChangeFromAnimationState previousAnimationState: TCCAnimationState, toAnimationState currentAnimationState: TCCAnimationState)
     
-    func animationTileOverlay(animationTileOverlay: TCCAnimationTileOverlay, didAnimationWithAnimationFrameIndex animationFrameIndex: NSInteger)
+    func animationTileOverlay(animationTileOverlay: TCCAnimationTileOverlay, didAnimationWithAnimationFrameIndex animationFrameIndex: Int)
 }
 
-enum TCCAnimationState: NSUInteger {
+@objc enum TCCAnimationState: Int {
     case TCCAnimationStateStopped = 0
     case TCCAnimationStateLoading
     case TCCAnimationStateAnimating
     case TCCAnimationStateScrubbing
 }
 
-enum TCCAnimationTileOverlayError: NSUInteger {
+@objc enum TCCAnimationTileOverlayError: Int {
     case TCCAnimationTileOverlayErrorInvalidZoomLevel = 1001
     case TCCAnimationTileOverlayErrorBadURLResponseCode
     case TCCAnimationTileOverlayErrorNoImageData
@@ -61,23 +62,23 @@ class TCCAnimationTileOverlay: MKTileOverlay {
         
     }
     
-    func fetchTilesForMapRect(mapRect: MKMapRect, zoomLevel: NSUInteger, progressHandler: ((loadedFrameIndex: NSUInteger) -> Void), completionHandler: ((success: Bool, error: NSError) -> Void)) {
+    func fetchTilesForMapRect(mapRect: MKMapRect, zoomLevel: UInt, progressHandler: ((loadedFrameIndex: UInt) -> Void), completionHandler: ((success: Bool, error: NSError) -> Void)) {
         
     }
     
-    func animationTileForMapRect(mapRect: MKMapRect, zoomLevel: NSUInteger) -> TCCAnimationTile {
+    func animationTileForMapRect(mapRect: MKMapRect, zoomLevel: UInt) -> TCCAnimationTile {
         
     }
     
-    func staticTileForMapRect(mapRect: MKMapRect, zoomLevel: NSUInteger) -> TCCAnimationTile {
+    func staticTileForMapRect(mapRect: MKMapRect, zoomLevel: UInt) -> TCCAnimationTile {
         
     }
     
-    func cachedTilesForMapRect(rect: MKMapRect, zoomLevel: NSUInteger) -> NSArray {
+    func cachedTilesForMapRect(rect: MKMapRect, zoomLevel: UInt) -> NSArray {
         
     }
     
-    func cachedStaticTilesForMapRect(rect: MKMapRect, zoomLevel: NSUInteger) -> NSArray {
+    func cachedStaticTilesForMapRect(rect: MKMapRect, zoomLevel: UInt) -> NSArray {
         
     }
 }

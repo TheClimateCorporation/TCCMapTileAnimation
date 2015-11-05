@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		3269A4F2194911C2003F1AE3 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3269A4F1194911C2003F1AE3 /* MapKit.framework */; };
+		6753B9741BEBC04B00A27C02 /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6753B9731BEBC04B00A27C02 /* Launch Screen.storyboard */; };
 		9B49BBC519490A5700094005 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9B49BBC419490A5700094005 /* Foundation.framework */; };
 		9B49BBC719490A5700094005 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9B49BBC619490A5700094005 /* CoreGraphics.framework */; };
 		9B49BBC919490A5700094005 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9B49BBC819490A5700094005 /* UIKit.framework */; };
@@ -19,12 +20,11 @@
 		9B49BBE019490A5700094005 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9B49BBDF19490A5700094005 /* Images.xcassets */; };
 		9B49BC0019490AAE00094005 /* TCCMapViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B49BBFD19490AAE00094005 /* TCCMapViewController.m */; };
 		9B49BC0119490AAE00094005 /* TCCTimeFrameParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B49BBFF19490AAE00094005 /* TCCTimeFrameParser.m */; };
-		FE6C7BAEAB8F097C8BF68818 /* Pods_MapTileAnimationDemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3AE74C15F884AD95D3511307 /* Pods_MapTileAnimationDemo.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		3269A4F1194911C2003F1AE3 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
-		3AE74C15F884AD95D3511307 /* Pods_MapTileAnimationDemo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MapTileAnimationDemo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		6753B9731BEBC04B00A27C02 /* Launch Screen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
 		9B49BBC119490A5700094005 /* MapTileAnimationDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MapTileAnimationDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9B49BBC419490A5700094005 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		9B49BBC619490A5700094005 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -56,7 +56,6 @@
 				9B49BBC719490A5700094005 /* CoreGraphics.framework in Frameworks */,
 				9B49BBC919490A5700094005 /* UIKit.framework in Frameworks */,
 				9B49BBC519490A5700094005 /* Foundation.framework in Frameworks */,
-				FE6C7BAEAB8F097C8BF68818 /* Pods_MapTileAnimationDemo.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -89,7 +88,6 @@
 				9B49BBC619490A5700094005 /* CoreGraphics.framework */,
 				9B49BBC819490A5700094005 /* UIKit.framework */,
 				9B49BBE619490A5700094005 /* XCTest.framework */,
-				3AE74C15F884AD95D3511307 /* Pods_MapTileAnimationDemo.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
