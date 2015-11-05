@@ -1,24 +1,23 @@
 {
   "name": "TCCMapTileAnimation",
-  "version": "0.4.10",
+  "version": "1.0.0",
   "summary": "A library for creating animated map overlays from tiles",
   "homepage": "https://github.com/TheClimateCorporation/TCCMapTileAnimation",
   "license": "MIT",
   "authors": [
-    "Richard Shin",
+    "Kiavash Faisali, John Starin, Richard Shin",
     "Bruce Johnson",
     "Matthew Sniff"
   ],
   "source": {
     "git": "https://github.com/TheClimateCorporation/TCCMapTileAnimation.git",
-    "tag": "0.4.10"
+    "tag": "1.0.0"
   },
   "social_media_url": "https://twitter.com/climatecorp",
   "platforms": {
-    "ios": "7.0"
+    "ios": "8.0"
   },
   "requires_arc": true,
-  "public_header_files": "Pod/Public/*.h",
-  "source_files": "Pod/**/*.{h,m}",
+  "source_files": "Pod/Classes/**/*",
   "frameworks": "MapKit"
 }

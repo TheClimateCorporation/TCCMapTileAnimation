@@ -9,18 +9,18 @@
 
 Pod::Spec.new do |s|
   s.name             = "TCCMapTileAnimation"
-  s.version          = "0.4.10"
+  s.version          = "1.0.0"
   s.summary          = "A library for creating animated map overlays from tiles"
   s.homepage         = "https://github.com/TheClimateCorporation/TCCMapTileAnimation"
   s.license          = 'MIT'
-  s.author           = "Richard Shin", "Bruce Johnson", "Matthew Sniff"
-  s.source           = { :git => "https://github.com/TheClimateCorporation/TCCMapTileAnimation.git", :tag => s.version.to_s }
+  s.author           = "Kiavash Faisali, John Starin, Richard Shin", "Bruce Johnson", "Matthew Sniff"
+  s.source           = { :git => "https://github.com/TheClimateCorporation/TCCMapTileAnimation.git",
+  						 :tag => s.version.to_s }
   s.social_media_url = 'https://twitter.com/climatecorp'
 
-  s.platform     = :ios, '7.0'
+  s.platform     = :ios, '8.0'
   s.requires_arc = true
 
-  s.public_header_files = 'Pod/Public/*.h'
-  s.source_files = 'Pod/**/*.{h,m}'
+  s.source_files = 'Pod/Classes/**/*'
   s.framework = 'MapKit'
 end

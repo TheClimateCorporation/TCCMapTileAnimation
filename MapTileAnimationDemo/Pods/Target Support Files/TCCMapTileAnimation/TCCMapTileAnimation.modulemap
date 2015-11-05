@@ -1,0 +1,6 @@
+framework module TCCMapTileAnimation {
+  umbrella header "TCCMapTileAnimation-umbrella.h"
+
+  export *
+  module * { export * }
+}
