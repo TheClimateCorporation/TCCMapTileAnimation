@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		3269A4F2194911C2003F1AE3 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3269A4F1194911C2003F1AE3 /* MapKit.framework */; };
 		45AF429585B80FCAB67C884A /* libPods-MapTileAnimationDemo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CDF8E1BCF52A9C58F3539AEA /* libPods-MapTileAnimationDemo.a */; };
+		6753B9741BEBC04B00A27C02 /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6753B9731BEBC04B00A27C02 /* Launch Screen.storyboard */; };
 		9B49BBC519490A5700094005 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9B49BBC419490A5700094005 /* Foundation.framework */; };
 		9B49BBC719490A5700094005 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9B49BBC619490A5700094005 /* CoreGraphics.framework */; };
 		9B49BBC919490A5700094005 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9B49BBC819490A5700094005 /* UIKit.framework */; };
@@ -24,6 +25,7 @@
 
 /* Begin PBXFileReference section */
 		3269A4F1194911C2003F1AE3 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
+		6753B9731BEBC04B00A27C02 /* Launch Screen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
 		9B49BBC119490A5700094005 /* MapTileAnimationDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MapTileAnimationDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9B49BBC419490A5700094005 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		9B49BBC619490A5700094005 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -118,6 +120,7 @@
 				9B49BBCD19490A5700094005 /* InfoPlist.strings */,
 				9B49BBD019490A5700094005 /* main.m */,
 				9B49BBD219490A5700094005 /* MapTileAnimationDemo-Prefix.pch */,
+				6753B9731BEBC04B00A27C02 /* Launch Screen.storyboard */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -189,6 +192,7 @@
 				9B49BBDB19490A5700094005 /* Main_iPad.storyboard in Resources */,
 				9B49BBE019490A5700094005 /* Images.xcassets in Resources */,
 				9B49BBD819490A5700094005 /* Main_iPhone.storyboard in Resources */,
+				6753B9741BEBC04B00A27C02 /* Launch Screen.storyboard in Resources */,
 				9B49BBCF19490A5700094005 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -351,7 +355,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "MapTileAnimationDemo/MapTileAnimationDemo-Prefix.pch";
 				INFOPLIST_FILE = "MapTileAnimationDemo/MapTileAnimationDemo-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -366,7 +370,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "MapTileAnimationDemo/MapTileAnimationDemo-Prefix.pch";
 				INFOPLIST_FILE = "MapTileAnimationDemo/MapTileAnimationDemo-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
