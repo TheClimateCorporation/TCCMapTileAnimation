@@ -11,7 +11,7 @@
 #import "TCCAnimationTileOverlayRenderer.h"
 #import "TCCAnimationTileOverlay.h"
 
-#define FUTURE_RADAR_FRAMES_URI @"http://climate.com/assets/future-radar/LKG.txt?grower_apps=true"
+#define FUTURE_RADAR_FRAMES_URI @"https://climate.com/assets/future-radar/LKG.txt?grower_apps=true"
 
 @interface TCCMapViewController () <MKMapViewDelegate, TCCAnimationTileOverlayDelegate, TCCTimeFrameParserDelegateProtocol, UIAlertViewDelegate>
 
