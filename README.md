@@ -15,7 +15,7 @@ Getting Started
 ---------------
 
 ### Installation ###
-If you use Cocoapods, add `pod 'TCCMapTileAnimation'` to your Podfile, then run `pod install`.
+If you use CocoaPods, add `pod 'TCCMapTileAnimation'` to your Podfile, then run `pod install`.
 
 You can also manually add the `.m` and `.h` files in the `TCCMapTileAnimation` directory to your project, or create a static library from those files and add the library to your project.
 
