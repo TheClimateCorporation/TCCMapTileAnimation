@@ -12,7 +12,7 @@
 #import "TCCMapKitHelpers.h"
 
 @interface TCCAnimationTileOverlayRenderer ()
-@property (readwrite, nonatomic) NSUInteger renderedTileZoomLevel;
+@property (readwrite, atomic) NSUInteger renderedTileZoomLevel;
 @end
 
 @implementation TCCAnimationTileOverlayRenderer
