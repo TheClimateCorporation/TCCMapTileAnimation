@@ -317,16 +317,22 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 
 - (void)loadTileAtPath:(MKTileOverlayPath)path result:(void (^)(NSData *, NSError *))result
 {
-    __block TCCAnimationTile *tile = [self.staticTilesCache objectForKey:[self keyForTilePath:path]];
+    // Since the tile is in a cache from which it could be released, we need to capture the tile for use in
+    // the block below.  Setting the variable to __block will not work since "Object variables
+    // of __block storage type are assumed to hold normal pointers with no provision for retain
+    // and release messages." (see http://releases.llvm.org/5.0.0/tools/clang/docs/BlockLanguageSpec.html)
+    // Therefore, we create a weak reference here and make it strong in the block.
+    __weak __typeof__(TCCAnimationTile *) weakTile = [self.staticTilesCache objectForKey:[self keyForTilePath:path]];
     
-    NSURL *url = [NSURL URLWithString:tile.templateURLs[self.currentFrameIndex]];
-    tile.tileImageIndex = self.currentFrameIndex;
+    NSURL *url = [NSURL URLWithString:weakTile.templateURLs[self.currentFrameIndex]];
+    weakTile.tileImageIndex = self.currentFrameIndex;
     NSURLRequest *request = [[NSURLRequest alloc] initWithURL:url
                                                   cachePolicy:NSURLRequestReturnCacheDataElseLoad
                                               timeoutInterval:0];
     NSURLSessionTask *task = [self.session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-        if (data && !error) {
-            tile.tileImage = [UIImage imageWithData:data];
+        __typeof__(TCCAnimationTile *) strongTile = weakTile;
+        if ((strongTile != nil) && data && !error) {
+            strongTile.tileImage = [UIImage imageWithData:data];
         }
         if (result) result(data, error);
     }];
