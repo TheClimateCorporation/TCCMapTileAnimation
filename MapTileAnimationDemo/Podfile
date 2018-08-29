@@ -1,5 +1,7 @@
 source 'https://github.com/CocoaPods/Specs.git'
 
-target 'MapTileAnimationDemo', :exclusive => true do
+platform :ios, '7.0'
+
+target 'MapTileAnimationDemo' do
   pod "TCCMapTileAnimation", :path => "../"
 end
