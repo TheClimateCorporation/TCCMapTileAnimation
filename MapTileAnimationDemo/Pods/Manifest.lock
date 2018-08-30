@@ -1,5 +1,5 @@
 PODS:
-  - TCCMapTileAnimation (0.4.10)
+  - TCCMapTileAnimation (0.4.11)
 
 DEPENDENCIES:
   - TCCMapTileAnimation (from `../`)
@@ -9,6 +9,8 @@ EXTERNAL SOURCES:
     :path: ../
 
 SPEC CHECKSUMS:
-  TCCMapTileAnimation: ec7ed557b4dbb78c92fef325081c30260803d24c
+  TCCMapTileAnimation: 193406375f8020741d836e6ff06ae7259a4bbe44
 
-COCOAPODS: 0.37.2
+PODFILE CHECKSUM: 5898f473e96695d5a1f86bc3aa54c06d3ac708fe
+
+COCOAPODS: 1.4.0
