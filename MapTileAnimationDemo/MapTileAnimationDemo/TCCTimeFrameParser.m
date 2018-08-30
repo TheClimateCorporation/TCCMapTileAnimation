@@ -77,7 +77,7 @@
 			[array addObject: urlString];
 		}
 		
-		_timeFrameURLs = [[NSArray alloc] initWithArray: array];
+		self->_timeFrameURLs = [[NSArray alloc] initWithArray: array];
 	});
 	
 	return _timeFrameURLs;
@@ -98,7 +98,7 @@
 			[array addObject: urlString];
 		}
 		
-		_templateFrameTimeURLs = [[NSArray alloc] initWithArray: array];
+		self->_templateFrameTimeURLs = [[NSArray alloc] initWithArray: array];
 	});
 	
 	return _templateFrameTimeURLs;

@@ -1,9 +1,9 @@
 {
   "name": "TCCMapTileAnimation",
-  "version": "0.4.10",
+  "version": "0.4.11",
   "summary": "A library for creating animated map overlays from tiles",
   "homepage": "https://github.com/TheClimateCorporation/TCCMapTileAnimation",
-  "license": "MIT",
+  "license": "Apache v2",
   "authors": [
     "Richard Shin",
     "Bruce Johnson",
@@ -11,7 +11,7 @@
   ],
   "source": {
     "git": "https://github.com/TheClimateCorporation/TCCMapTileAnimation.git",
-    "tag": "0.4.10"
+    "tag": "0.4.11"
   },
   "social_media_url": "https://twitter.com/climatecorp",
   "platforms": {
