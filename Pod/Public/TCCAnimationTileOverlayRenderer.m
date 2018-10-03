@@ -12,7 +12,7 @@
 #import "TCCMapKitHelpers.h"
 
 @interface TCCAnimationTileOverlayRenderer ()
-@property (readwrite, nonatomic) NSUInteger renderedTileZoomLevel;
+@property (readwrite, atomic) NSUInteger renderedTileZoomLevel;
 @end
 
 @implementation TCCAnimationTileOverlayRenderer
@@ -69,8 +69,12 @@
             return YES;
         }
         MKTileOverlayPath tilePath = [TCCMapKitHelpers tilePathForMapRect:mapRect zoomLevel:cappedZoomLevel];
+        __weak __typeof__(self) weakSelf = self;
         [animationOverlay loadTileAtPath:tilePath result:^(NSData *tileData, NSError *error) {
-            if (!error) [self setNeedsDisplayInMapRect:mapRect zoomScale:zoomScale];
+            __typeof__(self) strongSelf = weakSelf;
+            if (strongSelf != nil) {
+                if (!error) [strongSelf setNeedsDisplayInMapRect:mapRect zoomScale:zoomScale];
+            }
         }];
         return NO;
     }

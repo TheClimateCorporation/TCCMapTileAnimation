@@ -14,7 +14,7 @@
  Zoom level of the currently rendered overlay tiles. Value ranges from 1-20. Useful to
  fetch the tiles with the correct zoom level for the animation overlay.
  */
-@property (readonly, nonatomic) NSUInteger renderedTileZoomLevel;
+@property (readonly, atomic) NSUInteger renderedTileZoomLevel;
 
 @property (nonatomic) BOOL drawDebugInfo;
 
