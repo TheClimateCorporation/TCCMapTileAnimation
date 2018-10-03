@@ -23,7 +23,7 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 @property (nonatomic) NSTimeInterval frameDuration;
 @property (strong, nonatomic) NSTimer *timer;
 @property (readwrite, nonatomic) TCCAnimationState currentAnimationState;
-@property (strong, nonatomic) NSSet *animationTiles;
+@property (strong, nonatomic) NSSet<TCCAnimationTile*> *animationTiles;
 @property (strong, nonatomic) NSCache *staticTilesCache;
 @property (strong, nonatomic) NSURLSession *session;
 
@@ -333,6 +333,9 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
         __typeof__(TCCAnimationTile *) strongTile = weakTile;
         if ((strongTile != nil) && data && !error) {
             strongTile.tileImage = [UIImage imageWithData:data];
+        }
+        if (strongTile.tileImage == nil) {
+            strongTile.failedToFetch = YES;
         }
         if (result) result(data, error);
     }];
