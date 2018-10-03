@@ -9,7 +9,7 @@
 
 Pod::Spec.new do |s|
   s.name             = "TCCMapTileAnimation"
-  s.version          = "0.4.11"
+  s.version          = "0.4.12"
   s.summary          = "A library for creating animated map overlays from tiles"
   s.homepage         = "https://github.com/TheClimateCorporation/TCCMapTileAnimation"
   s.license          = 'Apache v2'
@@ -17,7 +17,7 @@ Pod::Spec.new do |s|
   s.source           = { :git => "https://github.com/TheClimateCorporation/TCCMapTileAnimation.git", :tag => s.version.to_s }
   s.social_media_url = 'https://twitter.com/climatecorp'
 
-  s.platform     = :ios, '7.0'
+  s.platform     = :ios, '8.0'
   s.requires_arc = true
 
   s.public_header_files = 'Pod/Public/*.h'

@@ -65,7 +65,9 @@
         // Draw the image if we have it, otherwise load the tile data. Returning NO will make sure that
         // drawRect doesn't get called immediately until setNeedsDisplayInMapRect:zoomScale: gets called
         // when the tile has finished loading
-        if (tile.tileImage) {
+        // If the tile image failed to fetch, then return `YES` to avoid overwhelming `loadTileAtPath:result:` as this
+        // delegate method is called continously while any rect returns `NO`.
+        if (tile.tileImage || tile.failedToFetch) {
             return YES;
         }
         MKTileOverlayPath tilePath = [TCCMapKitHelpers tilePathForMapRect:mapRect zoomLevel:cappedZoomLevel];
