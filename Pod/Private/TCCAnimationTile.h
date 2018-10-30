@@ -29,7 +29,7 @@
 /**
  The frame index of the @c UIImage stored in the @c tileImage property.
  */
-@property (nonatomic) NSInteger tileImageIndex;
+@property NSInteger tileImageIndex;
 
 /**
  An array of @c NSString objects that represent the URL at which the tile image asset can be
@@ -40,7 +40,7 @@
 /**
  Flag to indicate that a fetch for this tile has previously failed
  */
-@property (nonatomic) BOOL failedToFetch;
+@property BOOL failedToFetch;
 
 - (id)initWithFrame:(MKMapRect)frame x:(NSInteger)x y:(NSInteger)y z:(NSInteger)z;
 

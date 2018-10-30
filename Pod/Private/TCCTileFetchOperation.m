@@ -10,8 +10,8 @@
 #import "TCCAnimationTile.h"
 
 @interface TCCTileFetchOperation ()
-@property (nonatomic) BOOL finished;
-@property (nonatomic) BOOL executing;
+@property BOOL finished;
+@property BOOL executing;
 @property (strong, nonatomic) TCCAnimationTile *tile;
 @property (nonatomic) NSUInteger frameIndex;
 @property (strong, nonatomic) NSURL *tileURL;
