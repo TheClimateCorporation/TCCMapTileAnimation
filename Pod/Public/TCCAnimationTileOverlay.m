@@ -22,7 +22,7 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 @property (strong, nonatomic) NSOperationQueue *downloadQueue;
 @property (nonatomic) NSTimeInterval frameDuration;
 @property (strong, nonatomic) NSTimer *timer;
-@property (readwrite, nonatomic) TCCAnimationState currentAnimationState;
+@property (readwrite) TCCAnimationState currentAnimationState;
 @property (strong, nonatomic) NSSet<TCCAnimationTile*> *animationTiles;
 @property (strong, nonatomic) NSCache *staticTilesCache;
 @property (strong, nonatomic) NSURLSession *session;
@@ -30,6 +30,8 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 @end
 
 @implementation TCCAnimationTileOverlay
+
+TCCAnimationState _currentAnimationState;
 
 #pragma mark - Lifecycle
 
@@ -73,12 +75,25 @@ NSString *const TCCAnimationTileOverlayErrorDomain = @"TCCAnimationTileOverlayEr
 
 - (void)setCurrentAnimationState:(TCCAnimationState)currentAnimationState
 {
-    // Set new animating state if state different than old value
-    if (currentAnimationState != _currentAnimationState){
-        TCCAnimationState previousAnimationState = _currentAnimationState;
-        _currentAnimationState = currentAnimationState;
-        [self.delegate animationTileOverlay:self didChangeFromAnimationState:previousAnimationState toAnimationState:currentAnimationState];
+    @synchronized(self) {
+        // Set new animating state if state different than old value
+        if (currentAnimationState != _currentAnimationState){
+            TCCAnimationState previousAnimationState = _currentAnimationState;
+            _currentAnimationState = currentAnimationState;
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self.delegate animationTileOverlay:self didChangeFromAnimationState:previousAnimationState toAnimationState:currentAnimationState];
+            });
+        }
     }
+}
+
+- (TCCAnimationState)currentAnimationState
+{
+    TCCAnimationState result;
+    @synchronized(self) {
+        result = _currentAnimationState;
+    }
+    return result;
 }
 
 // Allows users to mutate the template URLs of the animation overlay.
