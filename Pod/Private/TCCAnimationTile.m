@@ -13,10 +13,21 @@
 - (id)initWithFrame:(MKMapRect)frame x:(NSInteger)x y:(NSInteger)y z:(NSInteger)z
 {
     self = [super init];
-	if (self) {
-		_x = x;
-		_y = y;
-		_z = z;
+    if (self) {
+        _x = x;
+        _y = y;
+        _z = z;
+        _mapRectFrame = frame;
+    }
+    return self;
+}
+- (id)initWithFrame:(MKMapRect)frame configuringURLSession: (NSURLSessionConfiguration*)configuration x:(NSInteger)x y:(NSInteger)y z:(NSInteger)z {
+    self = [super init];
+    if (self) {
+        _configuration = configuration;
+        _x = x;
+        _y = y;
+        _z = z;
         _mapRectFrame = frame;
     }
     return self;
@@ -38,9 +49,9 @@
     
     TCCAnimationTile *other = (TCCAnimationTile *)object;
     return [self hash] == [other hash] &&
-            self.x == other.x &&
-            self.y == other.y &&
-            self.z == other.z;
+    self.x == other.x &&
+    self.y == other.y &&
+    self.z == other.z;
 }
 
 //custom hash to identify tiles by their x/y/z (their hashCoords)

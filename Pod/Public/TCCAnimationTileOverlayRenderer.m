@@ -21,15 +21,15 @@
 
 - (id)initWithOverlay:(id<MKOverlay>)overlay
 {
-	if (self = [super initWithOverlay:overlay])
-	{
+    if (self = [super initWithOverlay:overlay])
+    {
         if (![overlay isKindOfClass:[TCCAnimationTileOverlay class]]) {
             [NSException raise:@"Unsupported overlay type" format:@"Must be MATAnimatedTileOverlay"];
         }
         TCCAnimationTileOverlay *animationOverlay = overlay;
         [animationOverlay addObserver:self forKeyPath:@"currentAnimationState" options:0 context:NULL];
-	}
-	return self;
+    }
+    return self;
 }
 
 - (void)dealloc {
@@ -109,14 +109,14 @@
     }
     
     // If we have a tile that matches the current zoom level of the map, we can render it immediately.
-	if (tile && zoomLevel == cappedZoomLevel) {
-		CGRect rect = [self rectForMapRect: mapRect];
-		UIImage *image = tile.tileImage;
-		UIGraphicsPushContext(context);
-		[image drawInRect:rect blendMode:kCGBlendModeNormal alpha:self.alpha];
-		UIGraphicsPopContext();
+    if (tile && zoomLevel == cappedZoomLevel) {
+        CGRect rect = [self rectForMapRect: mapRect];
+        UIImage *image = tile.tileImage;
+        UIGraphicsPushContext(context);
+        [image drawInRect:rect blendMode:kCGBlendModeNormal alpha:self.alpha];
+        UIGraphicsPopContext();
         return;
-	}
+    }
     
     // If we reach this point, the TCCAnimationTileOverlay doesn't have a tile to draw for this map rect.
     // This can happen when the tile hasn't been fetched yet (user must call fetchTiles first), failed to
