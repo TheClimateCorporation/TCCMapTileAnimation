@@ -14,6 +14,7 @@
 @property (nonatomic) NSInteger x;
 @property (nonatomic) NSInteger y;
 @property (nonatomic) NSInteger z;
+@property (nonatomic, nonnull) NSURLSessionConfiguration * configuration;
 
 /**
  The @c MKMapRect that corresponds to the x, y, and z coordinates of this animation tile object.
@@ -21,7 +22,7 @@
 @property (nonatomic) MKMapRect mapRectFrame;
 
 /**
- A place to store image data for a tile. This is mostly a convenience so that the 
+ A place to store image data for a tile. This is mostly a convenience so that the
  @c MATAnimatedTileOverlay doesn't have to directly manage the storing and retrieval of images.
  */
 @property (strong, nonatomic) UIImage *tileImage;
@@ -43,5 +44,6 @@
 @property BOOL failedToFetch;
 
 - (id)initWithFrame:(MKMapRect)frame x:(NSInteger)x y:(NSInteger)y z:(NSInteger)z;
+- (id)initWithFrame:(MKMapRect)frame configuringURLSession: (NSURLSessionConfiguration*)configuration x:(NSInteger)x y:(NSInteger)y z:(NSInteger)z;
 
 @end

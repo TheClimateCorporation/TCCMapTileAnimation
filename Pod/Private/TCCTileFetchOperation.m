@@ -56,13 +56,21 @@
         self.executing = YES;
         
         // If the operation is not canceled, begin executing the task.
-        NSURLRequest *request = [[NSURLRequest alloc] initWithURL:self.tileURL
-                                                      cachePolicy:NSURLRequestReturnCacheDataElseLoad
-                                                  timeoutInterval:5];
+        NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:self.tileURL
+                                                                    cachePolicy:NSURLRequestReturnCacheDataElseLoad
+                                                                timeoutInterval:5];
+        
+        
+        [request setHTTPMethod: @"GET"];
+        [request setAllHTTPHeaderFields: [_tile.configuration HTTPAdditionalHeaders]];
         
         NSError *error;
         NSURLResponse *response;
-        NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+        NSData *data = [TCCTileFetchOperation sendSynchronousRequest:request
+                                                       configuration:_tile.configuration
+                                                   returningResponse:&response
+                                                               error:&error];
+
         
         if ([self isCancelled]) return;
         
@@ -74,7 +82,7 @@
         }
         
         self.executing = NO;
-        self.finished = YES;        
+        self.finished = YES;
     }
     @catch(NSException *exception) {
         // Suppress exception - do not rethrow
@@ -89,6 +97,36 @@
     
     self.finished = YES;
     self.executing = NO;
+}
+
++ (NSData *)sendSynchronousRequest:(NSURLRequest *)request
+                     configuration: (NSURLSessionConfiguration *)configuration
+                 returningResponse:(__autoreleasing NSURLResponse **)responsePtr
+                             error:(__autoreleasing NSError **)errorPtr {
+    dispatch_semaphore_t    sem;
+    __block NSData *        result;
+    
+    result = nil;
+    
+    sem = dispatch_semaphore_create(0);
+    
+    [[[NSURLSession sessionWithConfiguration:configuration] dataTaskWithRequest:request
+                                                              completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+                                                                  if (errorPtr != NULL) {
+                                                                      *errorPtr = error;
+                                                                  }
+                                                                  if (responsePtr != NULL) {
+                                                                      *responsePtr = response;
+                                                                  }
+                                                                  if (error == nil) {
+                                                                      result = data;
+                                                                  }
+                                                                  dispatch_semaphore_signal(sem);
+                                                              }] resume];
+    
+    dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
+    
+    return result;
 }
 
 @end

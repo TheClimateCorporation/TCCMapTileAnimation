@@ -42,11 +42,31 @@ TCCAnimationState _currentAnimationState;
                             tileSize:(CGSize)tileSize
 {
     if (self = [super init]) {
+        NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+        
+        return [self initWithTemplateURLs:templateURLs
+                            configuration:configuration
+                            frameDuration:frameDuration
+                                 minimumZ:minimumZ
+                                 maximumZ:maximumZ
+                                 tileSize:tileSize];
+    }
+    return self;
+}
+
+- (instancetype)initWithTemplateURLs:(NSArray *)templateURLs
+                       configuration:(NSURLSessionConfiguration*)configuration
+                       frameDuration:(NSTimeInterval)frameDuration
+                            minimumZ:(NSInteger)minimumZ
+                            maximumZ:(NSInteger)maximumZ
+                            tileSize:(CGSize)tileSize
+{
+    if (self = [super init]) {
         //Initialize network settings
         NSURLCache *URLCache = [[NSURLCache alloc] initWithMemoryCapacity:4 * 1024 * 1024
                                                              diskCapacity:32 * 1024 * 1024
                                                                  diskPath:nil];
-        NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+        
         configuration.URLCache = URLCache;
         _session = [NSURLSession sessionWithConfiguration:configuration];
         
@@ -128,9 +148,9 @@ TCCAnimationState _currentAnimationState;
 {
     // Have to set the current animation state first before firing the timer because the timer depends on
     // the animation state to be animating, otherwise the playback skips one frame of animation.
-	self.currentAnimationState = TCCAnimationStateAnimating;
-	self.timer = [NSTimer scheduledTimerWithTimeInterval:self.frameDuration target:self selector:@selector(updateAnimationTiles:) userInfo:nil repeats:YES];
-	[self.timer fire];
+    self.currentAnimationState = TCCAnimationStateAnimating;
+    self.timer = [NSTimer scheduledTimerWithTimeInterval:self.frameDuration target:self selector:@selector(updateAnimationTiles:) userInfo:nil repeats:YES];
+    [self.timer fire];
 }
 
 - (void)pauseAnimating
@@ -156,7 +176,7 @@ TCCAnimationState _currentAnimationState;
             NSError *error = [NSError errorWithDomain:TCCAnimationTileOverlayErrorDomain
                                                  code:TCCAnimationTileOverlayErrorNoFrames
                                              userInfo:nil];
-                completionHandler(NO, error);
+            completionHandler(NO, error);
         }
         return;
     }
@@ -186,7 +206,7 @@ TCCAnimationState _currentAnimationState;
             completionHandler(YES, nil);
         });
     }];
-
+    
     // Initiate fetch operations for tiles for each frame
     NSMutableArray *operations = [NSMutableArray array];
     NSOperation *previousDoneOp;
@@ -266,7 +286,7 @@ TCCAnimationState _currentAnimationState;
     MKMapRect cappedMapRect = [TCCMapKitHelpers mapRectForTilePath:path];
     
     TCCAnimationTile *tile = [self.staticTilesCache objectForKey:[self keyForTilePath:path]];
-
+    
     if (tile && tile.tileImageIndex == self.currentFrameIndex) {
         return tile;
     }
@@ -341,9 +361,11 @@ TCCAnimationState _currentAnimationState;
     
     NSURL *url = [NSURL URLWithString:weakTile.templateURLs[self.currentFrameIndex]];
     weakTile.tileImageIndex = self.currentFrameIndex;
-    NSURLRequest *request = [[NSURLRequest alloc] initWithURL:url
-                                                  cachePolicy:NSURLRequestReturnCacheDataElseLoad
-                                              timeoutInterval:0];
+    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:url
+                                                                cachePolicy:NSURLRequestReturnCacheDataElseLoad
+                                                            timeoutInterval:0];
+    [request setHTTPMethod: @"GET"];
+    [request setAllHTTPHeaderFields:_session.configuration.HTTPAdditionalHeaders];
     NSURLSessionTask *task = [self.session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         __typeof__(TCCAnimationTile *) strongTile = weakTile;
         if ((strongTile != nil) && data && !error) {
@@ -380,7 +402,7 @@ TCCAnimationState _currentAnimationState;
         [operations addObject:fetchOp];
     }
     [self.downloadQueue addOperations:operations waitUntilFinished:YES];
-
+    
     self.currentFrameIndex = frameIndex;
     if (self.currentAnimationState == TCCAnimationStateAnimating) {
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -394,18 +416,18 @@ TCCAnimationState _currentAnimationState;
  */
 - (NSString *)URLStringForX:(NSInteger)xValue Y:(NSInteger)yValue Z:(NSInteger)zValue timeIndex:(NSInteger)aTimeIndex
 {
-	NSString *currentTemplateURL = [self.templateURLs objectAtIndex: aTimeIndex];
-	NSString *returnString = nil;
-	NSString *xString = [NSString stringWithFormat: @"%ld", (long)xValue];
-	NSString *yString = [NSString stringWithFormat: @"%ld", (long)yValue];
-	NSString *zString = [NSString stringWithFormat: @"%ld", (long)zValue];
-	
-	NSString *replaceX = [currentTemplateURL stringByReplacingOccurrencesOfString: @X_INDEX withString: xString];
-	NSString *replaceY = [replaceX stringByReplacingOccurrencesOfString: @Y_INDEX withString: yString];
-	NSString *replaceZ = [replaceY stringByReplacingOccurrencesOfString: @Z_INDEX withString: zString];
-	
-	returnString = replaceZ;
-	return returnString;
+    NSString *currentTemplateURL = [self.templateURLs objectAtIndex: aTimeIndex];
+    NSString *returnString = nil;
+    NSString *xString = [NSString stringWithFormat: @"%ld", (long)xValue];
+    NSString *yString = [NSString stringWithFormat: @"%ld", (long)yValue];
+    NSString *zString = [NSString stringWithFormat: @"%ld", (long)zValue];
+    
+    NSString *replaceX = [currentTemplateURL stringByReplacingOccurrencesOfString: @X_INDEX withString: xString];
+    NSString *replaceY = [replaceX stringByReplacingOccurrencesOfString: @Y_INDEX withString: yString];
+    NSString *replaceZ = [replaceY stringByReplacingOccurrencesOfString: @Z_INDEX withString: zString];
+    
+    returnString = replaceZ;
+    return returnString;
 }
 
 // Creates a set of @c MATAnimationTile objects for a given map rect and zoom scale
@@ -423,7 +445,7 @@ TCCAnimationState _currentAnimationState;
     // but render them larger.
     // **Adjusted from overZoom * self.tileSize to just self.tileSize in order to render at overzoom properly
     NSInteger adjustedTileSize = self.tileSize.width;
-
+    
     // Need to use the zoom level zoom scale, not the actual zoom scale from the map view!
     NSInteger zoomExponent = 20 - zoomLevel;
     MKZoomScale zoomScale = 1/pow(2, zoomExponent);
@@ -434,11 +456,12 @@ TCCAnimationState _currentAnimationState;
     NSInteger maxY = ceil((MKMapRectGetMaxY(rect) * zoomScale) / adjustedTileSize);
     
     NSMutableSet *tiles = [NSMutableSet set];
-	for (NSInteger x = minX; x <= maxX; x++) {
+    for (NSInteger x = minX; x <= maxX; x++) {
         for (NSInteger y = minY; y <=maxY; y++) {
-			MKMapRect frame = MKMapRectMake((x * adjustedTileSize) / zoomScale, (y * adjustedTileSize) / zoomScale, adjustedTileSize / zoomScale, adjustedTileSize / zoomScale);
+            MKMapRect frame = MKMapRectMake((x * adjustedTileSize) / zoomScale, (y * adjustedTileSize) / zoomScale, adjustedTileSize / zoomScale, adjustedTileSize / zoomScale);
             if (MKMapRectIntersectsRect(frame, rect)) {
                 TCCAnimationTile *tile = [[TCCAnimationTile alloc] initWithFrame:frame x:x y:y z:zoomLevel];
+                [tile setConfiguration:_session.configuration];
                 [tiles addObject:tile];
             }
         }

@@ -11,16 +11,16 @@
 @class TCCAnimationTile;
 
 typedef NS_ENUM(NSUInteger, TCCAnimationState) {
-	TCCAnimationStateStopped = 0,
-	TCCAnimationStateLoading,
-	TCCAnimationStateAnimating,
+    TCCAnimationStateStopped = 0,
+    TCCAnimationStateLoading,
+    TCCAnimationStateAnimating,
     TCCAnimationStateScrubbing
 };
 
 typedef NS_ENUM(NSUInteger, TCCAnimationTileOverlayError) {
-	TCCAnimationTileOverlayErrorInvalidZoomLevel = 1001,
-	TCCAnimationTileOverlayErrorBadURLResponseCode,
-	TCCAnimationTileOverlayErrorNoImageData,
+    TCCAnimationTileOverlayErrorInvalidZoomLevel = 1001,
+    TCCAnimationTileOverlayErrorBadURLResponseCode,
+    TCCAnimationTileOverlayErrorNoImageData,
     TCCAnimationTileOverlayErrorNoFrames
 };
 
@@ -71,6 +71,24 @@ extern NSString *const TCCAnimationTileOverlayErrorDomain;
                             tileSize:(CGSize)tileSize;
 
 /**
+ Designated initializer.
+ @param templateURLs An array of @c NSString objects, one for each frame of animation. The strings
+ are template URLs to the tile and should have @c {x}, @c {y}, and @c {z} to indicate the x, y, and
+ z coordinates for the tile.
+ @param configuration The session configuration to use for tile calls, each tile image will be called with the headers supplied by the configuration.
+ @param frameDuration The number of seconds to display each frame of animation
+ @param minimumZ The minimum zoom level of tiles supported by the tile server.
+ @param maximumZ The maximum zoom level of tiles supported by the tile server.
+ @param tileSize The @c CGSize that represents the size of the tile images from the tile server.
+ */
+- (instancetype)initWithTemplateURLs:(NSArray *)templateURLs
+                       configuration:(NSURLSessionConfiguration *)configuration
+                       frameDuration:(NSTimeInterval)frameDuration
+                            minimumZ:(NSInteger)minimumZ
+                            maximumZ:(NSInteger)maximumZ
+                            tileSize:(CGSize)tileSize;
+
+/**
  Begins animating the tile overlay, starting from the current frame index.
  */
 - (void)startAnimating;
@@ -81,7 +99,7 @@ extern NSString *const TCCAnimationTileOverlayErrorDomain;
 - (void)pauseAnimating;
 
 /**
- Cancels any pending tile loading operations caused by @c 
+ Cancels any pending tile loading operations caused by @c
  fetchTileForMapRect:zoomLevel:progressHandler:completionBlock:.
  */
 - (void)cancelLoading;
@@ -154,7 +172,7 @@ extern NSString *const TCCAnimationTileOverlayErrorDomain;
 /**
  Returns an array of @c TCCAnimationTile objects that have already
  been fetched and cached for a given map rect. Should only be used
- to retrieve a collection of map tiles for use by the renderer to 
+ to retrieve a collection of map tiles for use by the renderer to
  render overzoomed tiles.
  */
 - (NSArray *)cachedStaticTilesForMapRect:(MKMapRect)rect zoomLevel:(NSUInteger)zoomLevel;
