@@ -82,7 +82,7 @@ extern NSString *const TCCAnimationTileOverlayErrorDomain;
  @param tileSize The @c CGSize that represents the size of the tile images from the tile server.
  */
 - (instancetype)initWithTemplateURLs:(NSArray *)templateURLs
-                         configuring: (NSURLSessionConfiguration *)configuration
+                       configuration:(NSURLSessionConfiguration *)configuration
                        frameDuration:(NSTimeInterval)frameDuration
                             minimumZ:(NSInteger)minimumZ
                             maximumZ:(NSInteger)maximumZ

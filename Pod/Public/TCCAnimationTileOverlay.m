@@ -45,7 +45,7 @@ TCCAnimationState _currentAnimationState;
         NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
         
         return [self initWithTemplateURLs:templateURLs
-                              configuring:configuration
+                            configuration:configuration
                             frameDuration:frameDuration
                                  minimumZ:minimumZ
                                  maximumZ:maximumZ
@@ -55,7 +55,7 @@ TCCAnimationState _currentAnimationState;
 }
 
 - (instancetype)initWithTemplateURLs:(NSArray *)templateURLs
-                         configuring:(NSURLSessionConfiguration*)configuration
+                       configuration:(NSURLSessionConfiguration*)configuration
                        frameDuration:(NSTimeInterval)frameDuration
                             minimumZ:(NSInteger)minimumZ
                             maximumZ:(NSInteger)maximumZ

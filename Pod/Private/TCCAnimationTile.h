@@ -14,7 +14,7 @@
 @property (nonatomic) NSInteger x;
 @property (nonatomic) NSInteger y;
 @property (nonatomic) NSInteger z;
-@property (nonatomic) NSURLSessionConfiguration * configuration;
+@property (nonatomic, nonnull) NSURLSessionConfiguration * configuration;
 
 /**
  The @c MKMapRect that corresponds to the x, y, and z coordinates of this animation tile object.
