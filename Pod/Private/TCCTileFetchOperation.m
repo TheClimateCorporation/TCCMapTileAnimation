@@ -66,7 +66,11 @@
         
         NSError *error;
         NSURLResponse *response;
-        NSData *data = [TCCTileFetchOperation sendSynchronousRequest:request returningResponse:&response error:&error];
+        NSData *data = [TCCTileFetchOperation sendSynchronousRequest:request
+                                                       configuration:_tile.configuration
+                                                   returningResponse:&response
+                                                               error:&error];
+
         
         if ([self isCancelled]) return;
         
@@ -96,6 +100,7 @@
 }
 
 + (NSData *)sendSynchronousRequest:(NSURLRequest *)request
+                     configuration: (NSURLSessionConfiguration *)configuration
                  returningResponse:(__autoreleasing NSURLResponse **)responsePtr
                              error:(__autoreleasing NSError **)errorPtr {
     dispatch_semaphore_t    sem;
@@ -105,19 +110,19 @@
     
     sem = dispatch_semaphore_create(0);
     
-    [[[NSURLSession sharedSession] dataTaskWithRequest:request
-                                     completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-                                         if (errorPtr != NULL) {
-                                             *errorPtr = error;
-                                         }
-                                         if (responsePtr != NULL) {
-                                             *responsePtr = response;
-                                         }
-                                         if (error == nil) {
-                                             result = data;
-                                         }
-                                         dispatch_semaphore_signal(sem);
-                                     }] resume];
+    [[[NSURLSession sessionWithConfiguration:configuration] dataTaskWithRequest:request
+                                                              completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+                                                                  if (errorPtr != NULL) {
+                                                                      *errorPtr = error;
+                                                                  }
+                                                                  if (responsePtr != NULL) {
+                                                                      *responsePtr = response;
+                                                                  }
+                                                                  if (error == nil) {
+                                                                      result = data;
+                                                                  }
+                                                                  dispatch_semaphore_signal(sem);
+                                                              }] resume];
     
     dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
     
