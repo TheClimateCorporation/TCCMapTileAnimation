@@ -75,7 +75,7 @@ extern NSString *const TCCAnimationTileOverlayErrorDomain;
  @param templateURLs An array of @c NSString objects, one for each frame of animation. The strings
  are template URLs to the tile and should have @c {x}, @c {y}, and @c {z} to indicate the x, y, and
  z coordinates for the tile.
- @param configuration The session configuration to use for tile calls.
+ @param configuration The session configuration to use for tile calls, each tile image will be called with the headers supplied by the configuration.
  @param frameDuration The number of seconds to display each frame of animation
  @param minimumZ The minimum zoom level of tiles supported by the tile server.
  @param maximumZ The maximum zoom level of tiles supported by the tile server.
