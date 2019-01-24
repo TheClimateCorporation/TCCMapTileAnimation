@@ -38,6 +38,15 @@ TCCMapTileAnimation uses NSURLCache to quickly look up and render overlay tiles 
 	self.overlay = [[TCCAnimationTileOverlay alloc] initWithMapView:self.mapView templateURLs:templateURLs frameDuration:0.50 minimumZ:3 maximumZ:9 tileSize:CGSizeMake(256, 256)];
 	self.overlay.delegate = self;
 	[self.mapView addOverlay:self.overlay];
+	
+	
+### Setting URL Session Configuration when creating the overlay ###
+
+	NSURLSessionConfiguration * configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+	NSArray *templateURLs = @[@"http://url.to/first_frame/{z}/{x}/{y}", @"http://url.to/second_frame/{z}/{x}/{y}"];
+	self.overlay = [[TCCAnimationTileOverlay alloc] initWithTemplateURLs: templateURLs, configuration: configuration, frameDuration:0.50 minimumZ:3 maximumZ:9 tileSize:CGSizeMake(256, 256)];
+	self.overlay.delegate = self;
+	[self.mapView addOverlay:self.overlay];
 
 ### Creating the overlay renderer ###
 
