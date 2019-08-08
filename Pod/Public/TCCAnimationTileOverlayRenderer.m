@@ -15,7 +15,7 @@ NSInteger const TCCMaxZoomLevel = 20;
 int const TCCTileSize = 256; // on iOS 12 and earlier, all tiles are 256. in 13, we've had to divide up given tiles and render our images within, because iOS gives us tiles 512 pts sq. this may change in the future, so we just lay out as many tiles as will fit.
 
 @interface TCCAnimationTileOverlayRenderer ()
-- (int)tccTileSizeForZoomLevel:(int)zoomLevel;
+- (int)tileCoordinateSizeForZoomLevel:(int)zoomLevel;
 @property (readwrite, atomic) NSUInteger renderedTileZoomLevel;
 @end
 
@@ -54,7 +54,7 @@ int const TCCTileSize = 256; // on iOS 12 and earlier, all tiles are 256. in 13,
     }
 }
 
-- (int)tccTileSizeForZoomLevel:(int)zoomLevel {
+- (int)tileCoordinateSizeForZoomLevel:(int)zoomLevel {
     return (int)(TCCTileSize * pow(2, (TCCMaxZoomLevel - zoomLevel)));
 }
 
@@ -70,13 +70,11 @@ int const TCCTileSize = 256; // on iOS 12 and earlier, all tiles are 256. in 13,
         NSUInteger cappedZoomLevel = MIN([TCCMapKitHelpers zoomLevelForZoomScale:zoomScale], animationOverlay.maximumZ);
         
         CGRect rect = [self rectForMapRect: mapRect];
-        int tileSizeForZoomLevel = [self tccTileSizeForZoomLevel:((int)cappedZoomLevel)];
+        int tileSizeForZoomLevel = [self tileCoordinateSizeForZoomLevel:((int)cappedZoomLevel)];
         int heightCount = mapRect.size.height / tileSizeForZoomLevel;
         int widthCount = mapRect.size.width / tileSizeForZoomLevel;
         CGFloat xDelta = rect.size.width / widthCount;
         CGFloat yDelta = rect.size.height / heightCount;
-        CGFloat mapXDelta = mapRect.size.width / widthCount;
-        CGFloat mapYDelta = mapRect.size.height / heightCount;
         
         BOOL resultState = NO;
         
@@ -85,7 +83,7 @@ int const TCCTileSize = 256; // on iOS 12 and earlier, all tiles are 256. in 13,
             int tileCol = 0;
             while (tileCol < widthCount) {
                                 
-                MKMapRect localMapRect = MKMapRectMake(mapRect.origin.x + (tileCol * mapXDelta), mapRect.origin.y + (tileRow * mapYDelta), mapXDelta, mapYDelta);
+                MKMapRect localMapRect = MKMapRectMake(mapRect.origin.x + (tileCol * tileSizeForZoomLevel), mapRect.origin.y + (tileRow * tileSizeForZoomLevel), tileSizeForZoomLevel, tileSizeForZoomLevel);
                 
                 TCCAnimationTile *tile = [animationOverlay staticTileForMapRect:localMapRect zoomLevel:cappedZoomLevel];
                 
@@ -126,16 +124,12 @@ int const TCCTileSize = 256; // on iOS 12 and earlier, all tiles are 256. in 13,
     TCCAnimationTileOverlay *mapOverlay = (TCCAnimationTileOverlay *)self.overlay;
     NSInteger zoomLevel = [TCCMapKitHelpers zoomLevelForZoomScale:zoomScale];
     
-    
-    
     CGRect rect = [self rectForMapRect: mapRect];
-    int tileSizeForZoomLevel = [self tccTileSizeForZoomLevel:((int)zoomLevel)];
+    int tileSizeForZoomLevel = [self tileCoordinateSizeForZoomLevel:((int)zoomLevel)];
     int heightCount = mapRect.size.height / tileSizeForZoomLevel;
     int widthCount = mapRect.size.width / tileSizeForZoomLevel;
     CGFloat xDelta = rect.size.width / widthCount;
     CGFloat yDelta = rect.size.height / heightCount;
-    CGFloat mapXDelta = mapRect.size.width / widthCount;
-    CGFloat mapYDelta = mapRect.size.height / heightCount;
     
     NSUInteger cappedZoomLevel = MIN(zoomLevel, mapOverlay.maximumZ);
     
@@ -147,7 +141,7 @@ int const TCCTileSize = 256; // on iOS 12 and earlier, all tiles are 256. in 13,
         while (tileCol < widthCount) {
             TCCAnimationTile *tile;
             
-            MKMapRect localMapRect = MKMapRectMake(mapRect.origin.x + (tileCol * mapXDelta), mapRect.origin.y + (tileRow * mapYDelta), mapXDelta, mapYDelta);
+            MKMapRect localMapRect = MKMapRectMake(mapRect.origin.x + (tileCol * tileSizeForZoomLevel), mapRect.origin.y + (tileRow * tileSizeForZoomLevel), tileSizeForZoomLevel, tileSizeForZoomLevel);
             
             if (self.drawDebugInfo) {
                 MKTileOverlayPath path = [TCCMapKitHelpers tilePathForMapRect:mapRect zoomLevel:zoomLevel];
