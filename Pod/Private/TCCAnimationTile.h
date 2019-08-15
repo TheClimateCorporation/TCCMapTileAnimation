@@ -25,7 +25,7 @@
  A place to store image data for a tile. This is mostly a convenience so that the
  @c MATAnimatedTileOverlay doesn't have to directly manage the storing and retrieval of images.
  */
-@property (strong, nonatomic) UIImage *tileImage;
+@property (strong, nonatomic, nullable) UIImage *tileImage;
 
 /**
  The frame index of the @c UIImage stored in the @c tileImage property.
@@ -36,14 +36,14 @@
  An array of @c NSString objects that represent the URL at which the tile image asset can be
  fetched. The URLs maintain the order in which the tile images should be animated.
  */
-@property (copy, nonatomic) NSArray *templateURLs;
+@property (copy, nonatomic, nullable) NSArray *templateURLs;
 
 /**
  Flag to indicate that a fetch for this tile has previously failed
  */
 @property BOOL failedToFetch;
 
-- (id)initWithFrame:(MKMapRect)frame x:(NSInteger)x y:(NSInteger)y z:(NSInteger)z;
-- (id)initWithFrame:(MKMapRect)frame configuringURLSession: (NSURLSessionConfiguration*)configuration x:(NSInteger)x y:(NSInteger)y z:(NSInteger)z;
+- (nullable id)initWithFrame:(MKMapRect)frame x:(NSInteger)x y:(NSInteger)y z:(NSInteger)z;
+- (nullable id)initWithFrame:(MKMapRect)frame configuringURLSession: (NSURLSessionConfiguration* _Nonnull)configuration x:(NSInteger)x y:(NSInteger)y z:(NSInteger)z;
 
 @end

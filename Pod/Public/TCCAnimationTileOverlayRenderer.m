@@ -69,12 +69,9 @@ int const TCCTileSize = 256; // on iOS 12 and earlier, all tiles are 256. in 13,
     if (animationOverlay.currentAnimationState == TCCAnimationStateStopped) {
         NSUInteger cappedZoomLevel = MIN([TCCMapKitHelpers zoomLevelForZoomScale:zoomScale], animationOverlay.maximumZ);
         
-        CGRect rect = [self rectForMapRect: mapRect];
         int tileSizeForZoomLevel = [self tileCoordinateSizeForZoomLevel:((int)cappedZoomLevel)];
         int heightCount = mapRect.size.height / tileSizeForZoomLevel;
         int widthCount = mapRect.size.width / tileSizeForZoomLevel;
-        CGFloat xDelta = rect.size.width / widthCount;
-        CGFloat yDelta = rect.size.height / heightCount;
         
         BOOL resultState = NO;
         
@@ -124,12 +121,9 @@ int const TCCTileSize = 256; // on iOS 12 and earlier, all tiles are 256. in 13,
     TCCAnimationTileOverlay *mapOverlay = (TCCAnimationTileOverlay *)self.overlay;
     NSInteger zoomLevel = [TCCMapKitHelpers zoomLevelForZoomScale:zoomScale];
     
-    CGRect rect = [self rectForMapRect: mapRect];
     int tileSizeForZoomLevel = [self tileCoordinateSizeForZoomLevel:((int)zoomLevel)];
     int heightCount = mapRect.size.height / tileSizeForZoomLevel;
     int widthCount = mapRect.size.width / tileSizeForZoomLevel;
-    CGFloat xDelta = rect.size.width / widthCount;
-    CGFloat yDelta = rect.size.height / heightCount;
     
     NSUInteger cappedZoomLevel = MIN(zoomLevel, mapOverlay.maximumZ);
     

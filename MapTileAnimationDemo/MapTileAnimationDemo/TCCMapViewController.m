@@ -23,7 +23,7 @@
 @property (strong, nonatomic) TCCTimeFrameParser *timeFrameParser;
 @property (strong, nonatomic) TCCAnimationTileOverlay *animatedTileOverlay;
 @property (strong, nonatomic) TCCAnimationTileOverlayRenderer *animatedTileRenderer;
-@property (weak, nonatomic) UIAlertView *alertView;
+@property (weak, nonatomic) UIAlertController * alertViewController;
 
 @end
 
@@ -93,9 +93,10 @@
 
 - (void)displayError:(NSError *)error
 {
-    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Error" message:error.localizedDescription delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
-    self.alertView = alertView;
-    [alertView show];
+    UIAlertController * alertView = [UIAlertController alertControllerWithTitle:@"Error" message:error.localizedDescription preferredStyle:UIAlertControllerStyleAlert];
+    [alertView addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleCancel handler:nil]];
+    self.alertViewController = alertView;
+    [self presentViewController:alertView animated:YES completion:nil];
 }
 
 #pragma mark - Protocol conformance
@@ -157,7 +158,7 @@
 {
     NSLog(@"%s ERROR %ld %@", __PRETTY_FUNCTION__, (long)error.code, error.localizedDescription);
     // Only want to display one error alert view at a time
-    if (!self.alertView) {
+    if (!self.alertViewController) {
         [self displayError:error];
     }
 }
