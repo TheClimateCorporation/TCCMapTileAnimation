@@ -91,6 +91,10 @@ TCCAnimationState _currentAnimationState;
     return self;
 }
 
+- (void)dealloc {
+    [self pauseAnimating];
+}
+
 #pragma mark - Custom accessors
 
 - (void)setCurrentAnimationState:(TCCAnimationState)currentAnimationState

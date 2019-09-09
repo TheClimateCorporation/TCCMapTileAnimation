@@ -93,15 +93,17 @@ int const TCCTileSize = 256; // on iOS 12 and earlier, all tiles are 256. in 13,
                     resultState = YES;
                 }
                 
-                MKTileOverlayPath tilePath = [TCCMapKitHelpers tilePathForMapRect:localMapRect zoomLevel:cappedZoomLevel];
-                __weak __typeof__(self) weakSelf = self;
-                [animationOverlay loadTileAtPath:tilePath result:^(NSData *tileData, NSError *error) {
-                    __typeof__(self) strongSelf = weakSelf;
-                    if (strongSelf != nil) {
-                        if (!error) [strongSelf setNeedsDisplayInMapRect:localMapRect zoomScale:zoomScale];
-                    }
-                }];
-                
+                if (!resultState) {
+                    MKTileOverlayPath tilePath = [TCCMapKitHelpers tilePathForMapRect:localMapRect zoomLevel:cappedZoomLevel];
+                    __weak __typeof__(self) weakSelf = self;
+                    [animationOverlay loadTileAtPath:tilePath result:^(NSData *tileData, NSError *error) {
+                        __typeof__(self) strongSelf = weakSelf;
+                        if (strongSelf != nil) {
+                            if (!error) [strongSelf setNeedsDisplayInMapRect:localMapRect zoomScale:zoomScale];
+                        }
+                    }];
+                }
+                                
                 tileCol++;
             }
             tileRow++;
