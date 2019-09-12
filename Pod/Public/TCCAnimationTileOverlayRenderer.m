@@ -30,29 +30,11 @@ int const TCCTileSize = 256; // on iOS 12 and earlier, all tiles are 256. in 13,
         if (![overlay isKindOfClass:[TCCAnimationTileOverlay class]]) {
             [NSException raise:@"Unsupported overlay type" format:@"Must be MATAnimatedTileOverlay"];
         }
-        TCCAnimationTileOverlay *animationOverlay = overlay;
-        [animationOverlay addObserver:self forKeyPath:@"currentAnimationState" options:0 context:NULL];
     }
     return self;
 }
 
-- (void)dealloc {
-    [(TCCAnimationTileOverlay *)self.overlay removeObserver:self forKeyPath:@"currentAnimationState"];
-}
-
 #pragma mark - Public methods
-
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
-{
-    if ([keyPath isEqualToString:@"currentAnimationState"]) {
-        TCCAnimationTileOverlay *animationOverlay = self.overlay;
-        if (animationOverlay.currentAnimationState == TCCAnimationStateStopped) {
-            [self setNeedsDisplay];
-        }
-    } else {
-        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
-    }
-}
 
 - (int)tileCoordinateSizeForZoomLevel:(int)zoomLevel {
     return (int)(TCCTileSize * pow(2, (TCCMaxZoomLevel - zoomLevel)));
@@ -63,6 +45,8 @@ int const TCCTileSize = 256; // on iOS 12 and earlier, all tiles are 256. in 13,
     self.renderedTileZoomLevel = [TCCMapKitHelpers zoomLevelForZoomScale:zoomScale];
     
     TCCAnimationTileOverlay *animationOverlay = (TCCAnimationTileOverlay *)self.overlay;
+    
+    __weak TCCAnimationTileOverlayRenderer * weakSelf = self;
     
     // Render static tiles if we're stopped. Uses the MKTileOverlay method loadTileAtPath:result:
     // to load and render tile images asynchronously and on demand.
@@ -93,14 +77,11 @@ int const TCCTileSize = 256; // on iOS 12 and earlier, all tiles are 256. in 13,
                     resultState = YES;
                 }
                 
-                if (!resultState) {
+                if (!tile.tileImage) {
                     MKTileOverlayPath tilePath = [TCCMapKitHelpers tilePathForMapRect:localMapRect zoomLevel:cappedZoomLevel];
-                    __weak __typeof__(self) weakSelf = self;
+
                     [animationOverlay loadTileAtPath:tilePath result:^(NSData *tileData, NSError *error) {
-                        __typeof__(self) strongSelf = weakSelf;
-                        if (strongSelf != nil) {
-                            if (!error) [strongSelf setNeedsDisplayInMapRect:localMapRect zoomScale:zoomScale];
-                        }
+                        [weakSelf setNeedsDisplayInMapRect:localMapRect zoomScale:zoomScale];
                     }];
                 }
                                 

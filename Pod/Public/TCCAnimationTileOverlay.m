@@ -159,10 +159,16 @@ TCCAnimationState _currentAnimationState;
 
 - (void)pauseAnimating
 {
+    [self.session getAllTasksWithCompletionHandler:^(NSArray * tasks) {
+        for (NSURLSessionTask * task in tasks) {
+            [task cancel];
+        }
+    }];
     self.currentAnimationState = TCCAnimationStateStopped;
     [self.timer invalidate];
     [self.downloadQueue cancelAllOperations];
     self.timer = nil;
+    [self.staticTilesCache removeAllObjects];
 }
 
 - (void)cancelLoading
@@ -363,24 +369,9 @@ TCCAnimationState _currentAnimationState;
     // Therefore, we create a weak reference here and make it strong in the block.
     __weak __typeof__(TCCAnimationTile *) weakTile = [self.staticTilesCache objectForKey:[self keyForTilePath:path]];
     
-    NSURL *url = [NSURL URLWithString:weakTile.templateURLs[self.currentFrameIndex]];
-    weakTile.tileImageIndex = self.currentFrameIndex;
-    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:url
-                                                                cachePolicy:NSURLRequestReturnCacheDataElseLoad
-                                                            timeoutInterval:0];
-    [request setHTTPMethod: @"GET"];
-    [request setAllHTTPHeaderFields:_session.configuration.HTTPAdditionalHeaders];
-    NSURLSessionTask *task = [self.session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-        __typeof__(TCCAnimationTile *) strongTile = weakTile;
-        if ((strongTile != nil) && data && !error) {
-            strongTile.tileImage = [UIImage imageWithData:data];
-        }
-        if (strongTile.tileImage == nil) {
-            strongTile.failedToFetch = YES;
-        }
+    [weakTile fetchTileForFrameIndex:self.currentFrameIndex session:_session completionHandler:^(NSData * data, NSURLResponse * response, NSError * error) {
         if (result) result(data, error);
     }];
-    [task resume];
 }
 
 #pragma  mark - Private
