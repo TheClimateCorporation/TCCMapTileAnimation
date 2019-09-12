@@ -362,11 +362,6 @@ TCCAnimationState _currentAnimationState;
 
 - (void)loadTileAtPath:(MKTileOverlayPath)path result:(void (^)(NSData *, NSError *))result
 {
-    // Since the tile is in a cache from which it could be released, we need to capture the tile for use in
-    // the block below.  Setting the variable to __block will not work since "Object variables
-    // of __block storage type are assumed to hold normal pointers with no provision for retain
-    // and release messages." (see http://releases.llvm.org/5.0.0/tools/clang/docs/BlockLanguageSpec.html)
-    // Therefore, we create a weak reference here and make it strong in the block.
     __weak __typeof__(TCCAnimationTile *) weakTile = [self.staticTilesCache objectForKey:[self keyForTilePath:path]];
     
     [weakTile fetchTileForFrameIndex:self.currentFrameIndex session:_session completionHandler:^(NSData * data, NSURLResponse * response, NSError * error) {
