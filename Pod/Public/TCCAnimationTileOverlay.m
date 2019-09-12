@@ -159,10 +159,16 @@ TCCAnimationState _currentAnimationState;
 
 - (void)pauseAnimating
 {
+    [self.session getAllTasksWithCompletionHandler:^(NSArray * tasks) {
+        for (NSURLSessionTask * task in tasks) {
+            [task cancel];
+        }
+    }];
     self.currentAnimationState = TCCAnimationStateStopped;
     [self.timer invalidate];
     [self.downloadQueue cancelAllOperations];
     self.timer = nil;
+    [self.staticTilesCache removeAllObjects];
 }
 
 - (void)cancelLoading
@@ -356,31 +362,11 @@ TCCAnimationState _currentAnimationState;
 
 - (void)loadTileAtPath:(MKTileOverlayPath)path result:(void (^)(NSData *, NSError *))result
 {
-    // Since the tile is in a cache from which it could be released, we need to capture the tile for use in
-    // the block below.  Setting the variable to __block will not work since "Object variables
-    // of __block storage type are assumed to hold normal pointers with no provision for retain
-    // and release messages." (see http://releases.llvm.org/5.0.0/tools/clang/docs/BlockLanguageSpec.html)
-    // Therefore, we create a weak reference here and make it strong in the block.
     __weak __typeof__(TCCAnimationTile *) weakTile = [self.staticTilesCache objectForKey:[self keyForTilePath:path]];
     
-    NSURL *url = [NSURL URLWithString:weakTile.templateURLs[self.currentFrameIndex]];
-    weakTile.tileImageIndex = self.currentFrameIndex;
-    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:url
-                                                                cachePolicy:NSURLRequestReturnCacheDataElseLoad
-                                                            timeoutInterval:0];
-    [request setHTTPMethod: @"GET"];
-    [request setAllHTTPHeaderFields:_session.configuration.HTTPAdditionalHeaders];
-    NSURLSessionTask *task = [self.session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-        __typeof__(TCCAnimationTile *) strongTile = weakTile;
-        if ((strongTile != nil) && data && !error) {
-            strongTile.tileImage = [UIImage imageWithData:data];
-        }
-        if (strongTile.tileImage == nil) {
-            strongTile.failedToFetch = YES;
-        }
+    [weakTile fetchTileForFrameIndex:self.currentFrameIndex session:_session completionHandler:^(NSData * data, NSURLResponse * response, NSError * error) {
         if (result) result(data, error);
     }];
-    [task resume];
 }
 
 #pragma  mark - Private

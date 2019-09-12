@@ -60,4 +60,27 @@
     return [[NSString stringWithFormat:@"%ld/%ld/%ld", (long)self.x, (long)self.y, (long)self.z] hash];
 }
 
+- (void)fetchTileForFrameIndex:(NSInteger)frameIndex session:(NSURLSession *)session completionHandler:(void (^)(NSData * date, NSURLResponse * response, NSError * error))completionBlock {
+    
+    NSURL *url = [NSURL URLWithString:self.templateURLs[frameIndex]];
+    self.tileImageIndex = frameIndex;
+    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:url
+                                                                cachePolicy:NSURLRequestReturnCacheDataElseLoad
+                                                            timeoutInterval:0];
+    [request setHTTPMethod: @"GET"];
+    [request setAllHTTPHeaderFields:session.configuration.HTTPAdditionalHeaders];
+    NSURLSessionTask * task = [session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        if (data && !error) {
+            self.tileImage = [UIImage imageWithData:data];
+        }
+        if (self.tileImage == nil) {
+            self.failedToFetch = YES;
+        }
+        if (completionBlock) {
+            completionBlock(data, response, error);
+        }
+    }];
+    [task resume];
+}
+
 @end
