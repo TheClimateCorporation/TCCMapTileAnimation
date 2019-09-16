@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0A12C55C230593DB0010AB6D /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0A12C55B230593DB0010AB6D /* Launch Screen.storyboard */; };
 		3269A4F2194911C2003F1AE3 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3269A4F1194911C2003F1AE3 /* MapKit.framework */; };
 		9B49BBC519490A5700094005 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9B49BBC419490A5700094005 /* Foundation.framework */; };
 		9B49BBC719490A5700094005 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9B49BBC619490A5700094005 /* CoreGraphics.framework */; };
@@ -23,6 +24,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0A12C55B230593DB0010AB6D /* Launch Screen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
 		231E57AA91CD9F10FA345C0F /* Pods-MapTileAnimationDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MapTileAnimationDemo.release.xcconfig"; path = "Pods/Target Support Files/Pods-MapTileAnimationDemo/Pods-MapTileAnimationDemo.release.xcconfig"; sourceTree = "<group>"; };
 		3269A4F1194911C2003F1AE3 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		9B49BBC119490A5700094005 /* MapTileAnimationDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MapTileAnimationDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -113,6 +115,7 @@
 				9B49BBD619490A5700094005 /* Main_iPhone.storyboard */,
 				9B49BBD919490A5700094005 /* Main_iPad.storyboard */,
 				9B49BBCB19490A5700094005 /* Supporting Files */,
+				0A12C55B230593DB0010AB6D /* Launch Screen.storyboard */,
 			);
 			path = MapTileAnimationDemo;
 			sourceTree = "<group>";
@@ -164,7 +167,7 @@
 			};
 			buildConfigurationList = 9B49BBBC19490A5700094005 /* Build configuration list for PBXProject "MapTileAnimationDemo" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
@@ -188,6 +191,7 @@
 				9B49BBDB19490A5700094005 /* Main_iPad.storyboard in Resources */,
 				9B49BBE019490A5700094005 /* Images.xcassets in Resources */,
 				9B49BBD819490A5700094005 /* Main_iPhone.storyboard in Resources */,
+				0A12C55C230593DB0010AB6D /* Launch Screen.storyboard in Resources */,
 				9B49BBCF19490A5700094005 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -361,11 +365,10 @@
 			baseConfigurationReference = D3CFA8F43769FA0530846A82 /* Pods-MapTileAnimationDemo.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "MapTileAnimationDemo/MapTileAnimationDemo-Prefix.pch";
 				INFOPLIST_FILE = "MapTileAnimationDemo/MapTileAnimationDemo-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.TCC.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
@@ -377,11 +380,10 @@
 			baseConfigurationReference = 231E57AA91CD9F10FA345C0F /* Pods-MapTileAnimationDemo.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "MapTileAnimationDemo/MapTileAnimationDemo-Prefix.pch";
 				INFOPLIST_FILE = "MapTileAnimationDemo/MapTileAnimationDemo-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.TCC.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;

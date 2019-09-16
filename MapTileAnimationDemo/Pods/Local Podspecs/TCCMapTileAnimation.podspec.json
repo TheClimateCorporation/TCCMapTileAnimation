@@ -1,6 +1,6 @@
 {
   "name": "TCCMapTileAnimation",
-  "version": "0.4.13",
+  "version": "0.4.15",
   "summary": "A library for creating animated map overlays from tiles",
   "homepage": "https://github.com/TheClimateCorporation/TCCMapTileAnimation",
   "license": "Apache v2",
@@ -11,7 +11,7 @@
   ],
   "source": {
     "git": "https://github.com/TheClimateCorporation/TCCMapTileAnimation.git",
-    "tag": "0.4.13"
+    "tag": "0.4.15"
   },
   "social_media_url": "https://twitter.com/climatecorp",
   "platforms": {
