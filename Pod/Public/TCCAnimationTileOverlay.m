@@ -143,7 +143,9 @@ TCCAnimationState _currentAnimationState;
 - (IBAction)updateAnimationTiles:(NSTimer *)aTimer
 {
     self.currentFrameIndex = (self.currentFrameIndex + 1) % (self.numberOfAnimationFrames);
-    [self updateAnimationTilesToFrameIndex:self.currentFrameIndex];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+        [self updateAnimationTilesToFrameIndex:self.currentFrameIndex];
+    });
 }
 
 #pragma mark - Public
@@ -272,7 +274,9 @@ TCCAnimationState _currentAnimationState;
         // (uses cached animation tiles synchronously). If we don't set this to scrubbing and let it
         // be stopped, the rendering has a noticeable flicker due to the async nature of loading tiles.
         self.currentAnimationState = TCCAnimationStateScrubbing;
-        [self updateAnimationTilesToFrameIndex:frameIndex];
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+            [self updateAnimationTilesToFrameIndex:frameIndex];
+        });
         // We're actively scrubbing, so there's a good chance that the static tiles in the cache
         // will not be used.
         [self.staticTilesCache removeAllObjects];
