@@ -9,7 +9,7 @@
 
 Pod::Spec.new do |s|
   s.name             = "TCCMapTileAnimation"
-  s.version          = "0.4.17"
+  s.version          = "0.4.18"
   s.summary          = "A library for creating animated map overlays from tiles"
   s.homepage         = "https://github.com/TheClimateCorporation/TCCMapTileAnimation"
   s.license          = 'Apache v2'
